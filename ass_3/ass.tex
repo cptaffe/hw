@@ -1,0 +1,503 @@
+
+\documentclass[letterpaper, 10pt]{article}
+
+% get rid of pesky indentation
+\setlength{\parindent}{0pt}
+
+\title{
+	$A_3$\\
+	{\large the Third Assignment}
+}
+\author{Connor Taffe}
+
+\begin{document}
+	\maketitle
+
+	The following is my report for Assignment 3, a report for Lab 3-1. The following are the enumerated tasks outlined in the assignment.
+
+	\section*{T$_1$}
+
+	First, I started {\tt emacs} and used the M-x prompt to spawn {\tt gdb nachos}. Then, I set a breakpoint at function call {\tt Initialize(argc, argv)}. The following is the output from the shell, {\tt emacs}, and {\tt gdb}.
+
+	\begin{verbatim}
+		emacs -nw
+		(emacs overwrites terminal buffer)
+		M-x gdb
+		Run gdb (like this): gdb nachos
+		Current directory is ~/nachos-3.4/code/threads/
+		... (gdb message omitted)
+		(gdb) list
+		... (several lines omitted)
+		82      main(int argc, char **argv)
+		83      {
+		84          int argCount; // the number of arguments
+		85                        // for a particular command
+		86
+		87          DEBUG('t', "Entering main");
+		88          (void) Initialize(argc, argv);
+		(gdb) break 88
+		Breakpoint 1 at 0x8048b5e: file main.cc, line 88.
+	\end{verbatim}
+
+	\section*{T$_2$}
+
+	Then I stepped into {\tt Initialize(argc, argv)}, finished all the statements up to {\tt currentThread =
+new Thread("main");}.
+
+	\begin{verbatim}
+		(gdb) step
+		Initialize (argc=1, argv=0xbfffbfa4) at system.cc:81
+		(gdb) next
+		(gdb)
+		(gdb)
+		(gdb)
+		(gdb)
+		(gdb)
+		(gdb)
+		(gdb)
+		(gdb)
+		(gdb) print Scheduler
+		Attempt to use a type name as an expression
+		(gdb) print scheduler
+		$1 = (Scheduler *) 0x804f0c8
+		(gdb) print threadToBeDestroyed
+		$2 = (Thread *) 0x0
+		(gdb) print *scheduler
+		$3 = {readyList = 0x804f0d8}
+		(gdb)
+	\end{verbatim}
+
+	\begin{itemize}
+
+	\item[a.]{The value of {\tt Scheduler} is a memory address: 0x804f0c8.}
+	\item[b.]{The value of {\tt threadToBeDestroyed} is null or 0x0.}
+
+	\end{itemize}
+
+	\section*{T$_3$}
+
+	Then I finished the next two statements and then answered questions a and b.
+
+	\begin{verbatim}
+		(gdb) next
+		(gdb)
+		(gdb) print currentThread
+		$4 = (Thread *) 0x804f0e8
+		(gdb) print *currentThread
+		$5 = {stackTop = 0x0, machineState = {0 <repeats 18 times>},
+		  stack = 0x0, status = RUNNING, name = 0x804c54e "main"}
+	\end{verbatim}
+
+	\begin{itemize}
+		\item[a.]{The value of {\tt currentThread} is the memory address 0x804f0e8, the value of {\tt *currentThread} is the following structure:
+		\begin{verbatim}
+		{ stackTop = 0x0,
+		  machineState = {0 $<repeats 18 times>},
+		  stack = 0x0,
+		  status = RUNNING,
+		  name = 0x804c54e "main" }
+		\end{verbatim}}
+
+		\item[b.]{{\tt currentThread} points to an object of type Thread.}
+	\end{itemize}
+
+	\section*{T$_4$}
+
+	I then finished the {\tt Initialize(argc, argv);} and returned to {\tt main} by running the following commands in gdb:
+
+	\begin{verbatim}
+		(gdb) next
+		(gdb)
+		main (argc=1, argv=0xbfffd0a4) at main.cc:91
+		(gdb)
+	\end{verbatim}
+
+	\section*{T$_5$}
+
+	Next, I stepped into the {\tt ThreadTest} function.
+
+	\begin{verbatim}
+		(gdb) step
+		ThreadTest () at threadtest.cc:44
+		(gdb)
+	\end{verbatim}
+
+	\section*{T$_6$}
+
+	Then, I finished the {\tt DEBUG()} and {\tt Thread *t = new Thread("forked thread");} statements.
+
+	\begin{verbatim}
+		(gdb) next
+		(gdb) next
+		(gdb) print t
+		$1 = (Thread *) 0x804f148
+		(gdb) print *t
+		$2 = {stackTop = 0x0, machineState = {0 <repeats 18 times>},
+		  stack = 0x0, status = JUST_CREATED,
+		  name = 0x804c64b "forked thread"}
+	\end{verbatim}
+
+	\begin{itemize}
+		\item[a.]{The value of {\tt t} is a Thread pointer with the value 0x804f148. The value of {\tt *t} is the following structure:
+		\begin{verbatim}
+			{ stackTop = 0x0,
+			  machineState = {0 <repeats 18 times>},
+			  stack = 0x0,
+			  status = JUST_CREATED,
+			  name = 0x804c64b "forked thread" }
+		\end{verbatim}}
+		\item[b.]{The object pointed to by {\tt t} is of type Thread.}
+	\end{itemize}
+
+	\section*{T$_7$}
+
+	Then I stepped into the function {\tt t->Fork(SimpleThread, 1);}.
+
+	\begin{verbatim}
+		(gdb) step
+		Thread::Fork (this=0x804f148, func=0x804a8b8 <SimpleThread(int)>, arg=1)
+			at thread.cc:95
+		(gdb)
+	\end{verbatim}
+
+	\section*{T$_8$}
+
+	Then I finished the {\tt DEBUG()} call and stepped into the function call {\tt StackAllocate(func, arg);}.
+
+	\begin{verbatim}
+		(gdb) next
+		(gdb) step
+		Thread::StackAllocate (this=0x804f148, func=0x804a8b8 <SimpleThread(int)>,
+			arg=1) at thread.cc:260
+		(gdb)
+	\end{verbatim}
+
+	\section*{T$_9$}
+
+	Then I finished up to the first machineState assignment, {\tt machineState[PCState] = (\_int) ThreadRoot;}.
+
+	\begin{verbatim}
+		(gdb) next
+		(gdb)
+		(gdb)
+		(gdb)
+	\end{verbatim}
+
+	\section*{T$_{10}$}
+
+	The questions a-d are answerd as follows:
+
+	\begin{verbatim}
+		(gdb) print stackTop
+		$3 = (int *) 0x8054198
+		(gdb) print stack
+		$4 = (int *) 0x80501a8
+		(gdb) print ThreadRoot
+		$5 = {<text variable, no debug info>} 0x804c22c <ThreadRoot>
+		(gdb) print InterruptEnable()
+		$6 = void
+		(gdb) print InterruptEnable
+		$7 = {void (void)} 0x804a31c <InterruptEnable()>
+		(gdb) print ThreadFinish
+		$8 = {void (void)} 0x804a53c <ThreadFinish()>
+		(gdb) print func
+		$9 = (VoidFunctionPtr) 0x804a8b8 <SimpleThread(int)>
+		(gdb) print arg
+		$10 = 1
+		(gdb) whatis $
+		type = int
+		(gdb)
+	\end{verbatim}
+
+	\begin{itemize}
+		\item[a.]{The value of {\tt stackTop} is 0x8054198. The value of {\tt stack} is 0x80501a8.}
+		\item[b.]{The starting addresses of function {\tt ThreadRoot} is 0x804c22c. The starting address of function {\tt InterruptEnable} is 0x804a31c. The starting address of function {\tt ThreadFinish} is 0x804a53c.}
+		\item[c.]{The value of parameter {\tt func} is 0x804a8b8. {\tt func} is an object of type {\tt VoidFunctionPtr} which points to the function {\tt SimpleThread(int)}.}
+		\item[d.]{The value of parameter {\tt arg} is 1. {\tt arg} is an object of type {\tt int}.}
+	\end{itemize}
+
+	\section*{T$_{11}$}
+
+	Then I finished the function {\tt StackAllocate(func, arg);} and returned back to function {\tt t->Fork(SimpleThread, 1);}.
+
+	\begin{verbatim}
+		(gdb) next
+		(gdb) next
+		(gdb) next
+		(gdb) next
+		(gdb) next
+		(gdb)
+		Thread::Fork (this=0x804f148, func=0x804a8b8 <SimpleThread(int)>, arg=1)
+			at thread.cc:100
+		(gdb)
+	\end{verbatim}
+
+	\section*{T$_{12}$}
+
+	I then finished {\tt IntStatus oldLevel = interrupt->SetLevel(IntOff);} and answered the questions in the following:
+
+	\begin{verbatim}
+		(gdb) print this
+		$1 = (Thread * const) 0x804f148
+		(gdb) print *this
+		$2 = {stackTop = 0x8054198, machineState = {0, 0, 134521628, 1, 0, 134523064,
+			134522172, 134529580, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, stack = 0x80501a8,
+		status = JUST_CREATED, name = 0x804c64b "forked thread"}
+		(gdb) print /x *this
+		$3 = {stackTop = 0x8054198, machineState = {0x0, 0x0, 0x804a31c, 0x1, 0x0,
+			0x804a8b8, 0x804a53c, 0x804c22c, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
+			0x0, 0x0}, stack = 0x80501a8, status = 0x0, name = 0x804c64b}
+	\end{verbatim}
+
+	\begin{itemize}
+		\item[a.]{The value of {\tt this} is 0x804f148. The value of {\tt *this} is the structure as follows:
+		\begin{verbatim}
+			{ stackTop = 0x8054198,
+			  machineState = {0, 0, 134521628, 1, 0, 134523064,
+			    134522172, 134529580, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+			  stack = 0x80501a8,
+			  status = JUST_CREATED,
+			  name = 0x804c64b "forked thread" }
+		\end{verbatim}}
+		\item[b.]{The binary value of {\tt *this} is as follows:
+		\begin{verbatim}
+			{ stackTop = 0x8054198,
+			  machineState = {0x0, 0x0, 0x804a31c, 0x1, 0x0,
+			    0x804a8b8, 0x804a53c, 0x804c22c, 0x0, 0x0,
+			    0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
+			  stack = 0x80501a8,
+			  status = 0x0,
+			  name = 0x804c64b }
+		\end{verbatim}}
+		\item[c.]{Yes, the pointer points to the same memory address.}
+		\item[d.]{Yes, {\tt stackTop} has been assigned a non-zero value, and {\tt machineState} contains some data.}
+		\item[e.]{Yes. The values for sevaral indices of {\tt machineState} have the same value as those functions have. They are stored in {\tt machineState}.}
+	\end{itemize}
+
+	\section*{T$_{13}$}
+
+	Then I stepped into the function call {\tt scheduler->ReadyToRun(this);}.
+
+	\begin{verbatim}
+		(gdb) next
+		(gdb) step
+		Scheduler::ReadyToRun (this=0x804f0c8, thread=0x804f148) at scheduler.cc:56
+	\end{verbatim}
+
+	\section*{T$_{14}$}
+
+	I then finished the {\tt DEBUG()} call and {\tt thread->setStatus(READY);} and answered the questions in the following:
+
+	\begin{verbatim}
+		(gdb) next
+		(gdb) next
+		(gdb) print readyList
+		$4 = (List *) 0x804f0d8
+		(gdb) print *readyList
+		$5 = {first = 0x0, last = 0x0}
+		(gdb)
+	\end{verbatim}
+
+	\begin{itemize}
+		\item[a.]{The value of {\tt readyList} is 0x804f0d8. The value of {\tt *readyList} is the structure as follows:
+		\begin{verbatim}
+			{ first = 0x0,
+			  last = 0x0 }
+		\end{verbatim}}
+		\item[b.]{Yes, it has not been filled yet as we just set the status our status to `READY` and have not appended anything to the list yet.}
+	\end{itemize}
+
+	\section*{T$_{15}$}
+
+	Next, I finished the function call {\tt readyList->Append((void *)thread);} and answered the questions as follows:
+
+	\begin{verbatim}
+		(gdb) next
+		(gdb) print readyList
+		$6 = (List *) 0x804f0d8
+		(gdb) print *readyList
+		$7 = {first = 0x80551b0, last = 0x80551b0}
+		(gdb) print readyList->first
+		$8 = (ListElement *) 0x80551b0
+		(gdb) print *readyList->first
+		$9 = {next = 0x0, key = 0, item = 0x804f148}
+		(gdb)
+	\end{verbatim}
+
+	\begin{itemize}
+		\item[a.]{The value of {\tt readyList} is 0x804f0d8. The value of {\tt *readyList} is the following structure:
+		\begin{verbatim}
+			{ first = 0x80551b0,
+			  last = 0x80551b0 }
+		\end{verbatim}}
+		\item[b.]{No, it has one item as {\tt first} and {\tt last} are pointing to the same item, but it is an item and not null.}
+		\item[c.]{Its first {\tt ListElement} is the following structure:
+		\begin{verbatim}
+			{ next = 0x0,
+			  key = 0,
+			  item = 0x804f148 }
+		\end{verbatim}
+		Yes. The value of the item is a pointer to a Thread object, the same thread object in {\tt t} from {\tt ThreadTest}, and {\tt this} in {\tt t->Fork}.}
+	\end{itemize}
+
+	\section*{T$_{16}$}
+
+	I then finished {\tt scheduler->ReadyToRun(this);} and return back to {\tt t->Fork(SimpleThread, 1);}.
+
+	\begin{verbatim}
+		(gdb) next
+		Thread::Fork (this=0x804f148, func=0x804a8b8 <SimpleThread(int)>, arg=1)
+			at thread.cc:103
+		(gdb)
+	\end{verbatim}
+
+	\section*{T$_{17}$}
+
+	I then finished {\tt t->Fork(SimpleThread, 1);} and return back to {\tt ThreadTest()}.
+
+	\begin{verbatim}
+		(gdb) next
+		(gdb)
+		ThreadTest () at threadtest.cc:49
+		(gdb)
+	\end{verbatim}
+
+	\section*{T$_{18}$}
+
+	I then finished the function call {\tt SimpleThread(0);} and reported the output.
+
+	\begin{verbatim}
+		(gdb) next
+		*** thread 0 looped 0 times
+		*** thread 1 looped 0 times
+		*** thread 0 looped 1 times
+		*** thread 1 looped 1 times
+		*** thread 0 looped 2 times
+		*** thread 1 looped 2 times
+		*** thread 0 looped 3 times
+		*** thread 1 looped 3 times
+		*** thread 0 looped 4 times
+		*** thread 1 looped 4 times
+		(gdb)
+	\end{verbatim}
+
+	\section*{T$_{19}$}
+
+	I then finished the {\tt ThreadTest();} function and return to {\tt main(int argc, char **argv)}.
+
+	\begin{verbatim}
+		(gdb) next
+		main (argc=1, argv=0xbfffd364) at main.cc:97
+		(gdb)
+	\end{verbatim}
+
+	\section*{T$_{20}$}
+
+	Next, I finished the {\tt for (argc--, argv++; argc > 0; argc -= argCount, argv += argCount)} loop.
+
+	\begin{verbatim}
+		(gdb) next
+		(gdb)
+	\end{verbatim}
+
+	\section*{T$_{21}$}
+
+	I then stepped into function call {\tt currentThread->Finish();} and finished all the statements up to {\tt Sleep()} and answer the questions as following:
+
+	\begin{verbatim}
+		(gdb) step
+		Thread::Finish (this=0x804f0e8) at thread.cc:151
+		(gdb) next
+		(gdb)
+		(gdb)
+		(gdb)
+		(gdb) print threadToBeDestroyed
+		$10 = (Thread *) 0x804f0e8
+		(gdb) print *threadToBeDestroyed
+		$11 = {stackTop = 0xbfffd1bc, machineState = {134541544, 134530635, 6565120,
+			724249387, -1073753624, 3415200, 0, 134516763, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0}, stack = 0x0, status = RUNNING, name = 0x804c54e "main"}
+		(gdb)
+	\end{verbatim}
+
+	\begin{itemize}
+		\item[a.]{The value of {\tt threadToBeDestroyed} is 0x804f0e8. The value of {\tt *threadToBeDestroyed} is the following structure:
+		\begin{verbatim}
+			{ stackTop = 0xbfffd1bc,
+			  machineState = {134541544, 134530635, 6565120,
+			    724249387, -1073753624, 3415200, 0, 134516763, 0, 0, 0,
+			    0, 0, 0, 0, 0, 0, 0},
+			  stack = 0x0,
+			  status = RUNNING,
+			  name = 0x804c54e "main" }
+		\end{verbatim}}
+		\item[b.]{The object pointed to by {\tt threadToBeDestroyed} is of type Thread. Yes, it points to the same memory address.}
+		\item[c.]{The stackTop is no longer null and pointed at 0x0, the machineState has data and is not empty.}
+	\end{itemize}
+
+	\section*{T$_{22}$}
+
+	I then stepped into function call {\tt Sleep();} and finished all the statements up to {\tt scheduler->Run(nextThread);} and answer the questions as following:
+
+	\begin{verbatim}
+		(gdb) step
+		Thread::Sleep (this=0x804f0e8) at thread.cc:221
+		(gdb) next
+		(gdb)
+		(gdb)
+		(gdb)
+		(gdb)
+		(gdb) print nextThread
+		$12 = (Thread *) 0x804f148
+		(gdb) print *nextThread
+		$13 = {stackTop = 0x8054100, machineState = {134541640, 134530382, 6565120,
+			724249387, 134562092, 134523064, 134522172, 134516763, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0}, stack = 0x80501a8, status = READY,
+		name = 0x804c64b "forked thread"}
+		(gdb)
+	\end{verbatim}
+
+	\begin{itemize}
+		\item[a.]{The value of {\tt nextThread} is 0x804f148. The value of {\tt *nextThread} is the following structure:
+		\begin{verbatim}
+			{ stackTop = 0x8054100,
+			  machineState = {134541640, 134530382, 6565120,
+			    724249387, 134562092, 134523064, 134522172, 134516763,
+			    0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+			  stack = 0x80501a8,
+			  status = READY,
+			  name = 0x804c64b "forked thread" }
+		\end{verbatim}}
+		\item[b.]{The object pointed to by {\tt nextThread} is of type Thread.}
+	\end{itemize}
+
+	\section*{T$_{23}$}
+
+	I then finished the {\tt scheduler->Run(nextThread);} and answered the questions as follows:
+
+	\begin{verbatim}
+		(gdb) next
+		No threads ready or runnable, and no pending interrupts.
+		Assuming the program completed.
+		Machine halting!
+
+		Ticks: total 130, idle 0, system 130, user 0
+		Disk I/O: reads 0, writes 0
+		Console I/O: reads 0, writes 0
+		Paging: faults 0
+		Network I/O: packets received 0, sent 0
+
+		Cleaning up...
+
+		Program exited normally.
+		(gdb) next
+		The program is not being run.
+		(gdb)
+	\end{verbatim}
+
+	\begin{itemize}
+		\item[a.]{Output of this function is recorded above.}
+		\item[b.]{No, {\tt scheduler->Run(nextThread);} did not return. No, the program has terminated.}
+	\end{itemize}
+
+\end{document}
