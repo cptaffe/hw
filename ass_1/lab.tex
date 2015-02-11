@@ -1,0 +1,200 @@
+
+% Copyright (c) 2015 Connor Taffe <cpaynetaffe@gmail.com>
+
+\input macros.tex % include macro definitions
+
+\set(subtitlefntsize, 10pt)
+
+\title{Assignment I}{Connor Taffe} % title
+
+% nonnumbered section
+\sec{Sec. 2}{
+
+Here follows the report done for Assignment I about Laboratory I. The part A-D sections as follows contain abreviated promts expressed as ``\code{\$}'' to avoid uneccessary length and complexity.
+
+% subsections
+\subsec{Part A.}{
+% had to manually break the filename here.
+I created a new course directory named \code{courses\slash 3380\slash ass1-2015} and copied \code{\slash tmp\slash nachos-3.4-\break UALR.tgz} into it. The following screen dump shows an empty directory was created.
+
+% code paragraphs
+\codeblock{
+\$ ls \par
+\$ mkdir -p courses/3380/ass1-2015 \par
+\$ cd courses/3380/ass1-2015/ \par
+\$ ls \par
+\$ cp /tmp/nachos-3.4-UALR.tgz .
+}
+
+} \subsec{Part B.}{
+I then used the \code{tar} command to untar the nachos file in the working directory, and removed the \code{.tgz} file.
+
+% code paragraphs
+\codeblock{
+\$ tar -xzf nachos-3.4-UALR.tgz \par
+\$ ls \par
+nachos-3.4  nachos-3.4-UALR.tgz \par
+\$ rm nachos-3.4-UALR.tgz \par
+\$ ls \par
+nachos-3.4
+}
+
+} \subsec{Part C.}{
+I then compiled the \code{NachOS threads/} directory as follows using the make command:
+
+\codeblock{
+\$ cd nachos-3.2/code/threads/ \par
+\$ make \par
+... (many lines omitted)
+}
+
+} \subsec{Part D.}{
+Following compilation, I ran the resulting binary using the symlink present in the \code{threads/} directory (my current working directory).
+
+\codeblock{
+\$ ./nachos \par
+... (many lines omitted) \par
+Cleaning up...
+}
+
+}
+
+}\sec{Sec. 4}{
+
+The following is the screens for tasks A-I within Section 4.
+
+\subsec{Part A.}{
+
+After finishing the above Sec. 2, I \code{cd}'d up to the \code{c++example} directory and \code{rm}'d the \code{stack} file.
+
+\codeblock{
+\$ cd cd ../../c++example \par
+\$ ls \par
+c++.log      c++.tex	      inheritstack.h  Makefile	stack.h \par
+copyright.h  hello.cpp	      list.cc	      stack	templatestack.cc \par
+c++.ps	     inheritstack.cc  list.h	      stack.cc	templatestack.h \par
+\$ rm stack \par
+\$ ls \par
+c++.log      c++.tex	      inheritstack.h  Makefile	templatestack.cc \par
+copyright.h  hello.cpp	      list.cc	      stack.cc	templatestack.h \par
+c++.ps	     inheritstack.cc  list.h	      stack.h
+}}
+
+\subsec{Part B.}{
+
+Following removal of the old binary, I compiled a new one using \code{make stack}.
+
+\codeblock{
+\$ make stack \par
+g++ -g -o stack stack.cc \par
+... (several lines omitted) \par
+\$ ls \par
+c++.log      c++.tex	      inheritstack.h  Makefile	stack.h \par
+copyright.h  hello.cpp	      list.cc	      stack	templatestack.cc \par
+c++.ps	     inheritstack.cc  list.h	      stack.cc	templatestack.h
+}}
+
+\subsec{Part C.}{
+
+Then I opened emacs.
+
+\codeblock{
+\$ emacs -nw \par
+(new emacs window opens, controlling terminal) \par
+}}
+
+\subsec{Part D.}{
+
+Then I used the ``meta'' (esc) and `x' keys to obtain an \code{M-x} prompt.
+
+\codeblock{
+M-x gdb \par
+Run gdb (like this): gdb stack
+}}
+
+\subsec{Part E.}{
+
+Then I listed the first few lines of stack.
+
+\codeblock{
+... (several lines omitted) \par
+(gdb) list \par
+... (many lines omitted) \par
+128 main() \char123 \par
+129 Stack *stack = new Stack(10); // Constructor with an argument.
+}}
+
+\subsec{Part F.}{
+
+Then I set a breakpoint at line 131.
+
+\codeblock{
+(gdb) break 131 \par
+Breakpoint 1 at 0x8048a26: file stack.cc, line 131.
+}}
+
+\subsec{Part G.}{
+
+Then I ran the program, and stepped into the function \code{stack->SelfTest()}.
+
+\codeblock{
+(gdb) r \par
+Starting program: /home/cptaffe/courses/3380/ass1-2015/nachos-3.4/c++example/st\
+ack \par
+\par
+Breakpoint 1, main () at stack.cc:131 \par
+(gdb) step \par
+Stack::SelfTest (this=0x804a008) at stack.cc:108
+}}
+
+\subsec{Part H.}{
+
+Then I incremented through the statements in the program, printing values of \code{count}. First the uninitialized value, and then three values in the loop.
+
+\codeblock{
+(gdb) print count \par
+\$1 = 3415200 \par
+(gdb) next \par
+(gdb) print count \par
+\$2 = 17 \par
+(gdb) next \par
+(gdb) \par
+pushing 17 \par
+(gdb) \par
+(gdb) print count \par
+\$3 = 18 \par
+(gdb) next \par
+(gdb) \par
+pushing 18 \par
+(gdb) print count \par
+\$4 = 18 \par
+(gdb) next \par
+(gdb) print count \par
+\$5 = 19 \par
+}}
+
+The following is the loop, the \code{=>} basically just proceeds to follow the loop logic, showing each current statement. For brevity, I have only included this one copy of the code window.
+
+\codeblock {
+// Put a bunch of stuff in the stack... \par
+=>  while (!Full()) \char123 \par
+cout << "pushing " << count << "\char92 n"; \par
+Push(count++); \par
+\char125
+}
+
+\subsec{Part I.}{
+
+Then I used \code{gdb}'s \code{continue} command to finish tracing the program.
+
+\codeblock{
+(gdb) continue \par
+... (many lines omitted) \par
+popping 18 \par
+popping 17 \par
+\par
+Program exited normally. \par
+(gdb) \par
+}}
+
+}\bye % end of document

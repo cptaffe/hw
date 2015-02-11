@@ -1,0 +1,117 @@
+
+% Copyright (c) 2015 Connor Taffe <cpaynetaffe@gmail.com>
+
+% Macro definition style: \def\macro(#1,#2){#1...#2}
+% Internal use macros are to use the '@' symbol
+
+\catcode`@=11
+\def\@{\char`@} % \@ prints '@'
+
+% FONT MACROS
+
+% font globals
+\def\@@cfnt{cmr10} % current font
+\def\@@chfnt{cmr12} % current heading font
+\def\@@cfntsz{10pt} % current font size
+
+% global font modification
+\def\@glblfnt#1{\def\@@cfnt{#1}}
+\def\@glblhfnt#1{\def\@@chfnt{#1}}
+\def\@glblfntsz#1{\def\@@cfntsz{#1}}
+
+% font change function
+\long\def\@fntdef#1{\font\@fnt=#1 \@fnt}
+
+% convenience functions
+\def\@fnt#1#2{\@fntdef{"#2" at #1}}
+\def\@fntns#1{\@fntdef{"#1" at \@@cfntsz}}
+\def\@fntrsz#1{\@fntdef{"\@@cfnt" at #1}}
+
+% OTHER MACROS
+
+% num(number, skip)
+\def\@itm(#1,#2){\textindent{#1}{\kern #2}}
+
+% shift a block by length
+\long\def\@shift(#1)#2{{\leftskip=#1 #2 \par}}
+
+% GLOBALS
+
+% assigned counts
+\newcount\@@secnum \@@secnum=1  % section number
+\newcount\@@cindent \@@cindent=0 % indent length
+
+% construct default font sizes
+\def\@@titlefntsize{20pt}
+\def\@@subtitlefntsize{12pt}
+\def\@@secfntsize{16pt}
+\def\@@subsecfntsize{14pt}
+
+% default fonts
+\def\@@codefnt{cmtt12}
+
+% DEFAULT PRESETS
+\@fnt{\@@cfntsz}{\@@cfnt}
+
+% USER INTERFACE MACROS
+
+% font setting
+\long\def\setfont(#1,#2){\@glblfnt{#2}\@glblfntsz{#2}\@fnt{#1}{#2})}
+\long\def\sethfont(#1,#2){\@glblhfnt{#1}\@fnt{#1}{#2})}
+\long\def\setfontl(#1,#2)#3{{\@fnt{#1}{#2}) #3}}
+
+% prefix number
+\def\num(#1)#2#3{{\@itm(#2,#1)#3}}
+
+\long\def\code#1{{\@fntns{\@@codefnt}#1}}
+\long\def\codeblock#1{
+	{\parskip=0pt\vskip 5pt{\block(10){\code{#1}}}{\par\vskip 5pt}}
+}
+
+% title macro
+\long\def\title#1#2{
+	{{\centerline{\@fntdef{"\@@chfnt" at \@@titlefntsize}{#1}}\par\vskip 10pt}}
+	{{\centerline{\@fntdef{"\@@chfnt" at \@@subtitlefntsize}{#2}}\par\vskip 20pt}}
+}
+
+\long\def\block(#1)#2{
+	\par
+	\advance\@@cindent by #1
+	\@shift(\number\@@cindent pt){#2}
+	\advance\@@cindent by -#1
+	\par
+}
+
+% paragraph
+\long\def\pgrph#1{
+	{\parskip=10pt\parindent=0pt {#1} \par\vskip 5pt}
+}
+
+% section macro
+\long\def\sec#1#2{
+	\vskip 15pt{\@fntdef{"\@@chfnt" at \@@secfntsize}{
+		\num(0.5em){\number\@@secnum}{#1}
+	}\par\vskip 10pt}
+	{\pgrph{#2}}
+	\global\advance\@@secnum by 1
+}
+
+% sketchy negative horizontal offset
+\long\def\secnn#1#2{
+	\vskip 15pt{\@fntdef{"\@@chfnt" at \@@secfntsize}{
+		\hskip -18pt #1} \par\vskip 10pt
+	}
+	{\pgrph{#2}}
+}
+
+\long\def\subsec#1#2{
+	\vskip 5pt
+	{\@fntdef{"\@@chfnt" at \@@subsecfntsize}#1\par}
+	{\pgrph{\block(15){#2}}}
+}
+
+\def\set(#1,#2) {
+	\expandafter\global\expandafter\def\csname @@#1\endcsname{#2}
+}
+
+\catcode`@=12
