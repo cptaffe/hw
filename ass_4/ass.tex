@@ -1,0 +1,774 @@
+
+\documentclass[letterpaper, 10pt]{article}
+
+% get rid of pesky indentation
+%\setlength{\parindent}{0pt}
+
+\title{
+	$A_4$\\
+	{\large the Fourth Assignment}
+}
+\author{Connor Taffe}
+
+\begin{document}
+	\maketitle
+
+	The following is my report for Assignment 4 and the enumerated tasks outlined in it.
+
+	\section*{T$_1$}
+
+	First, I started emacs and, using the M-x prompt, started gdb to debug nachos binary. Then I added a breakpoint at the function call {\tt Initialize(argc, argv)}.
+
+	% code block
+	\begin{verbatim}
+$ emacs -nw
+(screen is overwritten by emacs)
+M-x gdb
+Run gdb (like this): gdb nachos
+	\end{verbatim}
+
+	At this point gdb starts and prints out some licensing information and details.
+
+	\begin{verbatim}
+(gdb) list
+78      //              ex: "nachos -d +" -> argv = {"nachos", "-d", "+"}
+79      //---------------------------------------------------------------------\
+-
+80
+81      int
+82      main(int argc, char **argv)
+83      {
+84          int argCount;                       // the number of arguments
+85                                              // for a particular command
+86
+87          DEBUG('t', "Entering main");
+(gdb) list
+88          (void) Initialize(argc, argv);
+89
+90      #ifdef THREADS
+91          ThreadTest();
+92      #if 0
+93          SynchTest();
+94      #endif
+95      #endif
+96
+97          for (argc--, argv++; argc > 0; argc -= argCount, argv += argCount) \
+{
+(gdb) break 88
+Breakpoint 1 at 0x8048b5e: file main.cc, line 88.
+(gdb)
+	\end{verbatim}
+
+	\section*{T$_2$}
+
+	Then I finished {\tt Initialize(argc, argv)} without stepping into it.
+
+	\begin{verbatim}
+(gdb) r
+Starting program: /home/cptaffe/nachos-3.4/code/threads/nachos
+
+Breakpoint 1, main (argc=1, argv=0xbfffc1d4) at main.cc:88
+(gdb) next
+(gdb)
+	\end{verbatim}
+
+	The lower panel of emacs shows the following after running the above, it is reproduced in the following.
+
+	\begin{verbatim}
+{
+	int argCount;                       // the number of arguments
+										// for a particular command
+
+	DEBUG('t', "Entering main");
+	(void) Initialize(argc, argv);
+
+#ifdef THREADS
+=>  ThreadTest();
+#if 0
+	\end{verbatim}
+
+	Which means that I have finished {\tt Initialize(argc, argv)}.
+
+	\section*{T$_3$}
+
+	Then I printed the value of {\tt currentThread} and the binary value of {\tt *currentThread} as follows.
+
+	\begin{verbatim}
+(gdb) print currentThread
+$1 = (Thread *) 0x804f0e8
+(gdb) print /x *currentThread
+$2 = {stackTop = 0x0, machineState = {0x0 <repeats 18 times>}, stack = 0x0,
+status = 0x1, name = 0x804c54e}
+(gdb) print *currentThread
+$3 = {stackTop = 0x0, machineState = {0 <repeats 18 times>}, stack = 0x0,
+status = RUNNING, name = 0x804c54e "main"}
+(gdb)
+	\end{verbatim}
+
+	This means that {\tt currentThread} is an object of type {\tt Thread *} (a Thread pointer) which has an address of {\tt 0x804c54e}, and that the address {\tt 0x804c54e} is where the following {\tt Thread} structure is stored (found with {\tt *currentThread}):
+
+	\begin{verbatim}
+{stackTop = 0x0, machineState = {0x0 <repeats 18 times>}, stack = 0x0,
+status = 0x1, name = 0x804c54e}
+	\end{verbatim}
+
+	Since we just called {\tt Initialize(argc, argv)}, this structure is not yet storing the state of a thread. We can see that {\tt stackTop} is null, as is {\tt machineState} and {\tt stack}.
+
+	The following is the same structure printed without the {\tt /x} option, which shows the name of the constant {\tt RUNNING} stored in status, and the string stored in name, {\tt "main"}.
+
+	\begin{verbatim}
+{stackTop = 0x0, machineState = {0 <repeats 18 times>}, stack = 0x0,
+status = RUNNING, name = 0x804c54e "main"}
+	\end{verbatim}
+
+	This structure represents the current thread of execution, as it has not saved state yet, is {\tt RUNNING}, and is named ``main.''
+
+	\section*{T$_4$}
+
+	I then stepped into {\tt ThreadTest}.
+
+	\begin{verbatim}
+(gdb) step
+ThreadTest () at threadtest.cc:44
+(gdb)
+	\end{verbatim}
+
+	The lower panel of emacs displays the following source code.
+
+	\begin{verbatim}
+//----------------------------------------------------------------------
+
+void
+ThreadTest()
+{
+=>  DEBUG('t', "Entering SimpleTest");
+
+    Thread *t = new Thread("forked thread");
+
+    t->Fork(SimpleThread, 1);
+    SimpleThread(0);
+	\end{verbatim}
+
+	\section*{T$_5$}
+
+	I then finished all the statements up to {\tt SimpleThread(0);} and printed the value of {\tt t} and the binary value of {\tt *t}.
+
+	\begin{verbatim}
+(gdb) next
+(gdb)
+(gdb)
+(gdb) print t
+$4 = (Thread *) 0x804f148
+(gdb) print /x *t
+$5 = {stackTop = 0x8054198, machineState = {0x0, 0x0, 0x804a31c, 0x1, 0x0,
+	0x804a8b8, 0x804a53c, 0x804c22c, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
+	0x0, 0x0}, stack = 0x80501a8, status = 0x2, name = 0x804c64b}
+(gdb) print *t
+$6 = {stackTop = 0x8054198, machineState = {0, 0, 134521628, 1, 0, 134523064,
+		134522172, 134529580, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, stack = 0x80501a8,
+	status = READY, name = 0x804c64b "forked thread"}
+(gdb) print SimpleThread
+$7 = {void (int)} 0x804a8b8 <SimpleThread(int)>
+(gdb) print *scheduler->readyList
+$8 = {first = 0x80551b0, last = 0x80551b0}
+(gdb) print *(scheduler->readyList->first)
+$9 = {next = 0x0, key = 0, item = 0x804f148}
+	\end{verbatim}
+
+	{\tt t} is a new thread named ``forked thread.'' There now exist two threads, the ``main'' thread, which is currently executing, and the ``forked thread'' which is {\tt READY} (ready to be scheduled), but not {\tt RUNNING} (currently executing).
+
+	\begin{itemize}
+		\item[a.]{
+		Two threads have been created so far. They are the ``main'' thread and the ``forked thread'' thread, which are both objects of type {\tt Thread}. ``main'' was created in the {\tt main} function and represents the currently running thread while ``forked thread'' was just created in {\tt ThreadTest}.
+		}
+		\item[b.]{
+		The ``main'' thread is the currently running thread as it is in the {\tt RUNNING} state and not the {\tt READY} state. It was also created earlier and our execution state has not been saved yet or our context changed.
+		}
+		\item[c.]{
+		The ready queue, {\tt *scheduler->readyList}, for Nachos contains the following:
+
+		\begin{verbatim}
+			{first = 0x80551b0, last = 0x80551b0}
+		\end{verbatim}
+
+		There is one element in the ready queue because {\tt first} and {\tt last} are the same address, 0x80551b0. The ready queueu contains the ``forked thread'' thread, which makes sense as ``forked thread'''s state is {\tt READY}. The address of {\tt first} and {\tt last}, 0x80551b0, is the address to a stucture, {\tt *(scheduler->readyList->first)}, which contains a member {\tt item} as follows:
+
+		\begin{verbatim}
+			{next = 0x0, key = 0, item = 0x804f148}
+		\end{verbatim}
+
+		{\tt item} is a pointer to address {\tt 0x804f148}. This address is the address of ``forked thread'', the newly created thread stored in variable {\tt t}.
+		}
+	\end{itemize}
+
+	\section*{T$_6$}
+
+	I then stepped into function {\tt SimpleThread(0)}.
+
+	\begin{verbatim}
+(gdb) step
+SimpleThread (which=0) at threadtest.cc:29
+(gdb)
+	\end{verbatim}
+
+	The lower panel in emacs shows the following code snippet.
+
+	\begin{verbatim}
+void
+SimpleThread(_int which)
+{
+    int num;
+
+=>  for (num = 0; num < 5; num++) {
+        printf("*** thread %d looped %d times\n", (int) which, num);
+        currentThread->Yield();
+    }
+}
+	\end{verbatim}
+
+	\section*{T$_7$}
+
+	I then finished the {\tt printf()} statement of the first iteration of the loop.
+
+	\begin{verbatim}
+(gdb) next
+(gdb)
+*** thread 0 looped 0 times
+(gdb) print which
+$12 = 0
+(gdb)
+	\end{verbatim}
+
+	\begin{itemize}
+		\item[a.]{
+		The output of this {\tt printf} statement is ``*** thread 0 looped 0 times''.
+		}
+		\item[b.]{
+		{\tt which} has a value of 0.
+		}
+	\end{itemize}
+
+	\section*{T$_8$}
+
+	I then stepped into {\tt currentThread->Yield();}.
+
+	\begin{verbatim}
+(gdb) step
+Thread::Yield (this=0x804f0e8) at thread.cc:183
+(gdb)
+	\end{verbatim}
+
+	The lower panel in emacs contains the following code snippet.
+
+	\begin{verbatim}
+void
+Thread::Yield ()
+{
+    Thread *nextThread;
+=>  IntStatus oldLevel = interrupt->SetLevel(IntOff);
+
+    ASSERT(this == currentThread);
+
+    DEBUG('t', "Yielding thread \"%s\"\n", getName());
+	\end{verbatim}
+
+	\section*{T$_9$}
+
+	Then I finished all the statements up to the {\tt if (nextThread != NULL)} statement.
+
+	\begin{verbatim}
+(gdb)next
+(gdb)
+(gdb)
+(gdb)
+(gdb) print nextThread
+$14 = (Thread *) 0x804f148
+(gdb) print *nextThread
+$15 = {stackTop = 0x8054100, machineState = {134541640, 134530382, 6565120,
+	724249387, 134562092, 134523064, 134522172, 134516763, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0}, stack = 0x80501a8, status = READY,
+name = 0x804c64b "forked thread"}
+(gdb) print *scheduler->readyList
+$16 = {first = 0x0, last = 0x0}
+	\end{verbatim}
+
+	\begin{itemize}
+		\item[a.]{
+		{\tt nextThread} points to the ``forked thread'' thread because the pointer address, 0x804f148, is the same address from {\tt t} in {\tt ThreadTest} and {\tt *nextThread} yeilds an attribute {\tt name} that is {\tt "forked thread"}.
+		}
+		\item[b.]{
+		The ready queue is empty, because both the {\tt first} and {\tt last} attributes are 0x0. This is because we are still running the ``main'' thread, and the {\tt scheduler->FindNextToRun()} function removed ``forked thread'' from the queue, so both threads are currently not on the queue.
+		}
+	\end{itemize}
+
+	\section*{T$_{10}$}
+
+	I then finished {\tt scheduler->ReadyToRun(this);}.
+
+	\begin{verbatim}
+(gdb) next
+(gdb)
+(gdb) print *scheduler->readyList
+$17 = {first = 0x80551b0, last = 0x80551b0}
+(gdb) print *(scheduler->readyList->first)
+$18 = {next = 0x0, key = 0, item = 0x804f0e8}
+	\end{verbatim}
+
+	\begin{itemize}
+		\item[a.]{
+		The ready queue contains one element because the {\tt first} and {\tt last} elements of the {\tt scheduler->readyList} structure are the same pointer value (0x80551b0). That address points to the following structure.
+
+		\begin{verbatim}
+			{next = 0x0, key = 0, item = 0x804f0e8}
+		\end{verbatim}
+
+		The {\tt item} element is an address, the same address that was the value of {\tt currentThread} in {\tt main} after {\tt Initialize(argc, argv)} which makes it the ``main'' thread.
+		}
+	\end{itemize}
+
+	\section*{T$_{11}$}
+
+	I then stepped into {\tt scheduler->Run(nextThread);} and finished all the statements up to function call {\tt SWITCH(oldThread, nextThread);}.
+
+	\begin{verbatim}
+(gdb) step
+Scheduler::Run (this=0x804f0c8, nextThread=0x804f148) at scheduler.cc:93
+(gdb) next
+(gdb)
+(gdb)
+(gdb)
+(gdb)
+(gdb) print oldThread
+$20 = (Thread *) 0x804f0e8
+(gdb) print *oldThread
+$21 = {stackTop = 0xbfffc02c, machineState = {134541544, 134530635, 6565120,
+	724249387, -1073758120, 3415200, 0, 134516763, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0}, stack = 0x0, status = READY, name = 0x804c54e "main"}
+(gdb) print nextThread
+$22 = (Thread *) 0x804f148
+(gdb) print *nextThread
+$23 = {stackTop = 0x8054100, machineState = {134541640, 134530382, 6565120,
+	724249387, 134562092, 134523064, 134522172, 134516763, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0}, stack = 0x80501a8, status = RUNNING,
+name = 0x804c64b "forked thread"}
+(gdb) print currentThread
+$24 = (Thread *) 0x804f148
+	\end{verbatim}
+
+	After stepping into {\tt scheduler->Run(nextThread);}, the lower panel in emacs displays the following code snippet.
+
+	\begin{verbatim}
+		void
+Scheduler::Run (Thread *nextThread)
+{
+=>  Thread *oldThread = currentThread;
+
+#ifdef USER_PROGRAM                     // ignore until running user programs
+    if (currentThread->space != NULL) { // if this thread is a user program,
+        currentThread->SaveUserState(); // save the user's CPU registers
+        currentThread->space->SaveState();
+	\end{verbatim}
+
+	\begin{itemize}
+		\item[a.]{
+		{\tt oldThread} points to the ``main'' thread, while {\tt newThread} points to the ``forked thread'' thread.
+		}
+		\item[b.]{
+		The ``main'' thread is currently running as we have not yet executed the {\tt SWITCH} function to switch threads. Although {\tt currentThread} was assigned to ``forked thread'' ({\tt nextThread}) and its status set to {\tt RUNNING}, we have not actually switched threads yet.
+		}
+	\end{itemize}
+
+	\section*{T$_{12}$}
+
+	I then disassembled the current function and found the value of the program counter (i.e. {\tt eip}).
+
+	\begin{verbatim}
+		(gdb) disas
+Dump of assembler code for function Scheduler::Run(Thread*):
+0x08048f9e <Scheduler::Run(Thread*)+0>: push   %ebp
+0x08048f9f <Scheduler::Run(Thread*)+1>: mov    %esp,%ebp
+0x08048fa1 <Scheduler::Run(Thread*)+3>: push   %ebx
+0x08048fa2 <Scheduler::Run(Thread*)+4>: sub    $0x24,%esp
+0x08048fa5 <Scheduler::Run(Thread*)+7>: mov    0x804e1d4,%eax
+0x08048faa <Scheduler::Run(Thread*)+12>:        mov    %eax,-0x8(%ebp)
+0x08048fad <Scheduler::Run(Thread*)+15>:        mov    -0x8(%ebp),%eax
+0x08048fb0 <Scheduler::Run(Thread*)+18>:        mov    %eax,(%esp)
+0x08048fb3 <Scheduler::Run(Thread*)+21>:        call   0x804a34c <Thread::Check\
+Overflow()>
+0x08048fb8 <Scheduler::Run(Thread*)+26>:        mov    0xc(%ebp),%eax
+0x08048fbb <Scheduler::Run(Thread*)+29>:        mov    %eax,0x804e1d4
+0x08048fc0 <Scheduler::Run(Thread*)+34>:        mov    0x804e1d4,%eax
+0x08048fc5 <Scheduler::Run(Thread*)+39>:        movl   $0x1,0x4(%esp)
+0x08048fcd <Scheduler::Run(Thread*)+47>:        mov    %eax,(%esp)
+0x08048fd0 <Scheduler::Run(Thread*)+50>:        call   0x80491de <Thread::setSt\
+atus(ThreadStatus)>
+0x08048fd5 <Scheduler::Run(Thread*)+55>:        mov    0xc(%ebp),%eax
+0x08048fd8 <Scheduler::Run(Thread*)+58>:        mov    %eax,(%esp)
+0x08048fdb <Scheduler::Run(Thread*)+61>:        call   0x80491ec <Thread::getNa\
+me()>
+0x08048fe0 <Scheduler::Run(Thread*)+66>:        mov    %eax,%ebx
+0x08048fe2 <Scheduler::Run(Thread*)+68>:        mov    -0x8(%ebp),%eax
+0x08048fe5 <Scheduler::Run(Thread*)+71>:        mov    %eax,(%esp)
+0x08048fe8 <Scheduler::Run(Thread*)+74>:        call   0x80491ec <Thread::getNa\
+me()>
+0x08048fed <Scheduler::Run(Thread*)+79>:        mov    %ebx,0xc(%esp)
+0x08048ff1 <Scheduler::Run(Thread*)+83>:        mov    %eax,0x8(%esp)
+0x08048ff5 <Scheduler::Run(Thread*)+87>:        movl   $0x804c41c,0x4(%esp)
+0x08048ffd <Scheduler::Run(Thread*)+95>:        movl   $0x74,(%esp)
+0x08049004 <Scheduler::Run(Thread*)+102>:       call   0x804a86a <DEBUG(char, c\
+har*, ...)>
+0x08049009 <Scheduler::Run(Thread*)+107>:       mov    0xc(%ebp),%eax
+0x0804900c <Scheduler::Run(Thread*)+110>:       mov    %eax,0x4(%esp)
+0x08049010 <Scheduler::Run(Thread*)+114>:       mov    -0x8(%ebp),%eax
+0x08049013 <Scheduler::Run(Thread*)+117>:       mov    %eax,(%esp)
+0x08049016 <Scheduler::Run(Thread*)+120>:       call   0x804c23a <SWITCH>
+0x0804901b <Scheduler::Run(Thread*)+125>:       mov    0x804e1d4,%eax
+0x08049020 <Scheduler::Run(Thread*)+130>:       mov    %eax,(%esp)
+0x08049023 <Scheduler::Run(Thread*)+133>:       call   0x80491ec <Thread::getNa\
+me()>
+0x08049028 <Scheduler::Run(Thread*)+138>:       mov    %eax,0x8(%esp)
+0x0804902c <Scheduler::Run(Thread*)+142>:       movl   $0x804c447,0x4(%esp)
+0x08049034 <Scheduler::Run(Thread*)+150>:       movl   $0x74,(%esp)
+0x0804903b <Scheduler::Run(Thread*)+157>:       call   0x804a86a <DEBUG(char, c\
+har*, ...)>
+0x08049040 <Scheduler::Run(Thread*)+162>:       mov    0x804e1d8,%eax
+0x08049045 <Scheduler::Run(Thread*)+167>:       test   %eax,%eax
+0x08049047 <Scheduler::Run(Thread*)+169>:       je     0x8049077 <Scheduler::Ru\
+n(Thread*)+217>
+0x08049049 <Scheduler::Run(Thread*)+171>:       mov    0x804e1d8,%eax
+0x0804904e <Scheduler::Run(Thread*)+176>:       mov    %eax,-0x18(%ebp)
+0x08049051 <Scheduler::Run(Thread*)+179>:       cmpl   $0x0,-0x18(%ebp)
+0x08049055 <Scheduler::Run(Thread*)+183>:       je     0x804906d <Scheduler::Ru\
+n(Thread*)+207>
+0x08049057 <Scheduler::Run(Thread*)+185>:       mov    -0x18(%ebp),%eax
+0x0804905a <Scheduler::Run(Thread*)+188>:       mov    %eax,(%esp)
+0x0804905d <Scheduler::Run(Thread*)+191>:       call   0x804a6bc <Thread::~Thre\
+ad()>
+0x08049062 <Scheduler::Run(Thread*)+196>:       mov    -0x18(%ebp),%eax
+0x08049065 <Scheduler::Run(Thread*)+199>:       mov    %eax,(%esp)
+0x08049068 <Scheduler::Run(Thread*)+202>:       call   0x8048878 <_ZdlPv@plt>
+0x0804906d <Scheduler::Run(Thread*)+207>:       movl   $0x0,0x804e1d8
+0x08049077 <Scheduler::Run(Thread*)+217>:       add    $0x24,%esp
+0x0804907a <Scheduler::Run(Thread*)+220>:       pop    %ebx
+0x0804907b <Scheduler::Run(Thread*)+221>:       pop    %ebp
+0x0804907c <Scheduler::Run(Thread*)+222>:       ret
+End of assembler dump.
+(gdb) print $eip
+$26 = (void (*)(void)) 0x8049009 <Scheduler::Run(Thread*)+107>
+(gdb)
+	\end{verbatim}
+
+	\section*{T$_{13}$}
+
+	I then traced the program in the machine level and finish the instructions up to instruction {\tt 0x08049016 <Scheduler::Run(Thread*)+120>: call 0x804c23a <SWITCH>}
+
+	\begin{verbatim}
+(gdb) nexti
+(gdb)
+(gdb)
+(gdb)
+(gdb) print $eip
+$27 = (void (*)(void)) 0x8049016 <Scheduler::Run(Thread*)+120>
+(gdb)
+	\end{verbatim}
+
+	\section*{T$_{14}$}
+
+	I then stepped into assembly function {\tt SWITCH} using stepi and disassembled it.
+
+	\begin{verbatim}
+(gdb) stepi
+0x0804c23a in SWITCH ()
+(gdb) disas
+Dump of assembler code for function SWITCH:
+0x0804c23a <SWITCH+0>:  mov    %eax,0x804e1f4
+0x0804c23f <SWITCH+5>:  mov    0x4(%esp),%eax
+0x0804c243 <SWITCH+9>:  mov    %ebx,0x8(%eax)
+0x0804c246 <SWITCH+12>: mov    %ecx,0xc(%eax)
+0x0804c249 <SWITCH+15>: mov    %edx,0x10(%eax)
+0x0804c24c <SWITCH+18>: mov    %esi,0x18(%eax)
+0x0804c24f <SWITCH+21>: mov    %edi,0x1c(%eax)
+0x0804c252 <SWITCH+24>: mov    %ebp,0x14(%eax)
+0x0804c255 <SWITCH+27>: mov    %esp,(%eax)
+0x0804c257 <SWITCH+29>: mov    0x804e1f4,%ebx
+0x0804c25d <SWITCH+35>: mov    %ebx,0x4(%eax)
+0x0804c260 <SWITCH+38>: mov    (%esp),%ebx
+0x0804c263 <SWITCH+41>: mov    %ebx,0x20(%eax)
+0x0804c266 <SWITCH+44>: mov    0x8(%esp),%eax
+0x0804c26a <SWITCH+48>: mov    0x4(%eax),%ebx
+0x0804c26d <SWITCH+51>: mov    %ebx,0x804e1f4
+0x0804c273 <SWITCH+57>: mov    0x8(%eax),%ebx
+0x0804c276 <SWITCH+60>: mov    0xc(%eax),%ecx
+0x0804c279 <SWITCH+63>: mov    0x10(%eax),%edx
+0x0804c27c <SWITCH+66>: mov    0x18(%eax),%esi
+0x0804c27f <SWITCH+69>: mov    0x1c(%eax),%edi
+0x0804c282 <SWITCH+72>: mov    0x14(%eax),%ebp
+0x0804c285 <SWITCH+75>: mov    (%eax),%esp
+0x0804c287 <SWITCH+77>: mov    0x20(%eax),%eax
+0x0804c28a <SWITCH+80>: mov    %eax,(%esp)
+0x0804c28d <SWITCH+83>: mov    0x804e1f4,%eax
+0x0804c292 <SWITCH+88>: ret
+0x0804c293 <SWITCH+89>: nop
+... (several nop instructions omitted)
+0x0804c29f <SWITCH+101>:        nop
+End of assembler dump.
+(gdb) x /3w $esp
+0xbfffc02c:     0x0804901b      0x0804f0e8      0x0804f148
+	\end{verbatim}
+
+	\begin{itemize}
+		\item[a.]{
+		The following are three memory addresses pointed to be {\tt \%esp}.
+		\begin{verbatim}
+			0xbfffc02c:     0x0804901b      0x0804f0e8      0x0804f148
+		\end{verbatim}
+		}
+		\item[b.]{
+		The first address, 0x0804901b, is the address of the next instruction in {\tt scheduler->Run(nextThread);} after the {\tt call} for this function. The next address, 0x0804f0e8, is the address of the ``main'' thread. The next address, 0x0804f148, is the address of the ``forked thread'' thread.
+
+		These addresses are here becuase two of them, the ``main'' thread from {\tt oldThread}, and ``forked thread'' from {\tt nextThread} were passed here as arguments; and the final one is the return address pushed by the {\tt call} instruction.
+		}
+	\end{itemize}
+
+	\section*{T$_{15}$}
+
+	I then finished all the instructions up to {\tt ret} instruction.
+
+	\begin{verbatim}
+(gdb) print $eip
+$29 = (void (*)(void)) 0x804c23a <SWITCH>
+(gdb) nexti
+0x0804c23f in SWITCH ()
+(gdb)
+... (several returns omitted)
+0x0804c292 in SWITCH ()
+	\end{verbatim}
+
+	\section*{T$_{16}$}
+
+	I then finished the {\tt ret} instruction with {\tt nexti}.
+
+	\begin{verbatim}
+		(gdb) nexti
+		Scheduler::Run (this=0x804f0c8, nextThread=0x804f0e8) at scheduler.cc:118
+	\end{verbatim}
+
+	\begin{itemize}
+		\item[a.]{
+			I am in {\tt Scheduler::Run}, disassembly is as follows.
+
+			\begin{verbatim}
+(gdb) disas
+Dump of assembler code for function ThreadRoot:
+0x0804c22c <ThreadRoot+0>:      push   %ebp
+0x0804c22d <ThreadRoot+1>:      mov    %esp,%ebp
+0x0804c22f <ThreadRoot+3>:      push   %edx
+0x0804c230 <ThreadRoot+4>:      call   *%ecx
+0x0804c232 <ThreadRoot+6>:      call   *%esi
+0x0804c234 <ThreadRoot+8>:      call   *%edi
+0x0804c236 <ThreadRoot+10>:     mov    %ebp,%esp
+0x0804c238 <ThreadRoot+12>:     pop    %ebp
+0x0804c239 <ThreadRoot+13>:     ret
+End of assembler dump.
+(gdb)
+			\end{verbatim}
+		}
+		\item[a.]{
+		{\tt SWITCH} returns here because it uses the return address as a way to switch into the last state of another thread. After storing registers, it starts off the other thread like nothing happened by returning from the function that the new thread would have called when it was put into a {\tt READY} state from a {\tt RUNNING}.
+		\item[b.]{
+		{\tt SWITCH} stores the return value for that the ``main'' thread and will use it to resume the ``main'' thread (which is no longer active) when a switch to that thread occurs. {\tt SWITCH}'s job was to switch to ``forked thread'', so it returned control to it instead of ``main'' after saving ``main'''s state and restoring ``forked thread'''s.
+		}
+		\item[c.]{
+
+			Although we can be sure that this thread is ``forked thread'' because it is not ``main'' and {\tt SWITCH} performed a context switch and returned control to the second parameter, {\tt newThread} or ``forked thread''; it is a simple task to check {\tt currentThread}, as it is changed during switches like this.
+
+			\begin{verbatim}
+(gdb) print currentThread
+$30 = (Thread *) 0x804f148
+			\end{verbatim}
+
+			0x804f148 is the address for the ``forked thread'' thread, so that is the thread that we are running.
+
+		}
+		}
+	\end{itemize}
+
+	\section*{T$_{17}$}
+
+	I then finished all the instructions up to {\tt call *\%esi}.
+
+	\begin{verbatim}
+(gdb) print $eip
+$3 = (void (*)(void)) 0x804c22f <ThreadRoot+3>
+(gdb) nexti
+0x0804c230 in ThreadRoot ()
+(gdb)
+0x0804c232 in ThreadRoot ()
+(gdb)
+	\end{verbatim}
+
+	\section*{T$_{18}$}
+
+	I then stepped into the function pointed by {\tt \%esi} by using {\tt stepi}.
+
+	\begin{verbatim}
+(gdb) stepi
+SimpleThread (which=1) at threadtest.cc:25
+(gdb)
+	\end{verbatim}
+
+	Here the lower pane updates with the following snippet.
+
+	\begin{verbatim}
+void
+=>mpleThread(_int which)
+{
+    int num;
+
+    for (num = 0; num < 5; num++) {
+        printf("*** thread %d looped %d times\n", (int) which, num);
+        currentThread->Yield();
+    }
+}
+	\end{verbatim}
+
+	\begin{itemize}
+		\item[a.]{
+			I am now in {\tt SimpleThread}.
+		}
+		\item[b.]{
+			We are still in the same thread, nothing has changed the thread state, we are just in the thread assembly that sets up the thread, runs a job, and returns the thread. But just to be sure, we could check {\tt currentThread}.
+
+			\begin{verbatim}
+(gdb) print currentThread
+$4 = (Thread *) 0x804f148
+			\end{verbatim}
+
+			Yes, we are still in the ``forked thread'' thread.
+		}
+	\end{itemize}
+
+	\section*{T$_{19}$}
+
+	Then I switched to trace the program at the source level. I finished all statements up to the {\tt printf()} statement and found the value of {\tt which}.
+
+	\begin{verbatim}
+(gdb) next
+(gdb)
+(gdb) print which
+$5 = 1
+(gdb)
+	\end{verbatim}
+
+	The value of {\tt which} is 1.
+
+	\section*{T$_{20}$}
+
+	Then I finished the {\tt printf()} and stepped into {\tt currentThread->Yield();}.
+
+	\begin{verbatim}
+(gdb) next
+*** thread 1 looped 0 times
+(gdb) step
+Thread::Yield (this=0x804f148) at thread.cc:183
+(gdb)
+	\end{verbatim}
+
+	\section*{T$_{21}$}
+
+	I then finished all the statements up to {\tt SWITCH(oldThread, nextThread);}.
+
+	\begin{verbatim}
+(gdb) n
+(gdb)
+(gdb)
+(gdb)
+(gdb)
+(gdb)
+(gdb) s
+Scheduler::Run (this=0x804f0c8, nextThread=0x804f0e8) at scheduler.cc:93
+(gdb) n
+(gdb) n
+(gdb) n
+(gdb) n
+(gdb) n
+(gdb) print oldThread
+$1 = (Thread *) 0x804f148
+(gdb) print nextThread
+$2 = (Thread *) 0x804f0e8
+(gdb)
+	\end{verbatim}
+
+	\begin{itemize}
+		\item[a.]{
+		{\tt oldThread} is a pointer to the address 0x804f148, {\tt nextThread} is a pointer to the address 0x804f0e8.
+		}
+		\item[b.]{
+		{\tt oldThread} is the ``forked thread'' thread, {\tt nextThread} is the ``main'' thread.
+		}
+	\end{itemize}
+
+	\section*{T$_{22}$}
+
+	I then stepped into assembly function {\tt SWITCH} using {\tt stepi} and dissembled it.
+
+	\begin{verbatim}
+(gdb) stepi
+(gdb) disas
+Dump of assembler code for function Scheduler::Run(Thread*):
+... (duplicate of dissasembly on page 10-11)
+End of assembler dump.
+	\end{verbatim}
+
+	\section*{T$_{23}$}
+
+	I then finished all the instructions up to instruction {\tt ret}.
+
+	\begin{verbatim}
+(gdb) nexti
+(gdb) print $eip
+$3 = (void (*)(void)) 0x8049010 <Scheduler::Run(Thread*)+114>
+(gdb) nexti
+	\end{verbatim}
+
+	\section*{T$_{24}$}
+
+	I then finish the {\tt ret} instruction by {\tt nexti}.
+
+	\begin{itemize}
+		\item[a.]{
+		The current function is {\tt Scheduler::Run}.
+		}
+		\item[b.]{
+
+		The current {\tt \%eip} value is as follows,
+
+		\begin{verbatim}
+(gdb) print $eip
+$1 = (void (*)(void)) 0x804901b <Scheduler::Run(Thread*)+125>
+		\end{verbatim}
+
+		so the current instruction is the first in the following list, and the next instruction to execute follows it.
+		\begin{verbatim}
+0x0804901b <Scheduler::Run(Thread*)+125>:       mov    0x804e1d4,%eax
+0x08049020 <Scheduler::Run(Thread*)+130>:       mov    %eax,(%esp)
+		\end{verbatim}
+		}
+		\item[c.]{
+
+		The current thread is ``main'' because it has gone through a second context switch with only two possible threads, so ``main'' is our only option.
+
+		\begin{verbatim}
+(gdb) print currentThread
+$2 = (Thread *) 0x804f0e8
+		\end{verbatim}
+
+		As we expected, 0x804f0e8 coresponds to the ``main'' thread.
+		}
+		\item[d.]{
+		The {\tt ret} instruction reads the value at {\tt esp} and changes {\tt eip} to that address (in short). Any value can be placed at {\tt esp}. A {\tt jmp} instruction could have been used to achieve the same effect. In short, it is no hurdle for the CPU to do this, the context of the thread is only conceptual, all the CPU knows is that it is pushing/poping, jumping, etc.
+		}
+	\end{itemize}
+
+
+\end{document}
