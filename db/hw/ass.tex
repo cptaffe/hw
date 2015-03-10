@@ -1,0 +1,247 @@
+\documentclass[11pt]{article}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{fancyhdr}
+\usepackage{hw}
+
+% margins
+\usepackage[vmargin=1in,hmargin=1.5in]{geometry}
+
+% Config
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\hw}{2}
+\newcommand{\name}{Connor Taffe}
+\newcommand{\tno}{3742} % last 4 digits of T number.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title{
+    $H_{\hw}$ \\
+    {\large Homework Assignment \rom{\hw}}
+}
+\author{
+    \name. T no. \tno
+}
+\date{March $10^{\text{th}}$, 2015}
+
+\pagestyle{fancy}
+\rhead{Homework {\rom{\hw}}}
+\lhead{{\name}. T no. \tno}
+
+\begin{document}
+\maketitle
+
+\begin{question}
+
+    Given the following relation schema R(A, B, C, D, E) and the
+database, answer the following questions (diagram not reproduced).
+
+\begin{subquestion}
+    % restate the question
+    List all super keys of $R$.
+
+    % answer the question
+    Attributes $C$ and $D$ are candidate keys of relation $R$ becuase they are unique to each tuple in $R$.
+
+    \begin{align}
+        \text{where } K\in\left\{C, D\right\}, \text{ and } t \text{ is a tuple }\in{R}\\
+        t_{1}[K] \ne t_{2}[K] \ne t_{3}[K] \ne t_{4}[K]\\
+        \therefore \forall t\in{R}, t_{n}[K] \ne t_{m}[K]
+    \end{align}
+
+    Since we now have $C$ and $D$ as candidate keys, we can narrow the list of super keys to the tuples as follows:
+
+    Our minimal superkeys, or keys are
+
+    \begin{equation}
+        (C), (D)
+    \end{equation}
+
+    Other superkeys are any set of $C$ or $D$ with any other key (including $C$ or $D$) as long as the key.
+
+    \begin{equation}
+        \left\{ K\subset R \mid (C \lor D)\cup K \right\}
+    \end{equation}
+
+    Meaning the set of $C$ or $D$ or both, unioned with any set of other elements, including the null set, $\phi$.
+
+    The complete list is as follows:
+    \begin{align*}
+        (C), (D), (C, D),
+        % C combos
+        (A, B, C, E),
+        (A, C), (B, C), (C, E),
+        (A, B, C),\\ (A, C, E),
+        (B, C, E),
+        % D combos
+        (A, B, D, E),
+        (A, D), (B, D), (E, D),
+        (A, B, D),\\ (A, D, E),
+        (B, D, E),
+        % C D combos
+        (A, B, C, D, E),
+        (A, C, D), (B, C, D),\\ (C, D, E),
+        (A, B, C, D), (A, C, D, E),
+        (B, C, D, E)\\
+    \end{align*}
+\end{subquestion}
+
+\begin{subquestion}
+    % restate the question
+    List all keys of $R$.
+
+    % answer the question
+    As indicated in the prelude of Q. 1.1, $C$ and $D$ are the keys of $R$ because keys are defined as superkeys that cannot have an element removed and remain a superkey.
+\end{subquestion}
+
+\begin{subquestion}
+    % restate the question
+    List all candidate keys of $R$.
+
+    % answer the question
+    As indicated in the prelude of Q. 1.1, $C$ and $D$ are the candidate keys of $R$. As candidate keys are defined as a key in the case where a relational schema has more than one key, both keys are candidate keys.
+\end{subquestion}
+
+\begin{subquestion}
+    % restate the question
+    Suggest a primary key for $R$.
+
+    % answer the question
+    Both candidate keys $C$ and $D$ will work as primary keys for $R$.
+\end{subquestion}
+
+\end{question}
+
+\begin{question}
+    Short Answers
+
+\begin{subquestion}
+    Explain the differences among an entity, an entity type, and an entity set.
+
+    An entity is one record or instance with certain attributes. An entity type is a set of entities that share the same attributes. An entity set is all the elements of the same entity type in the database at any point.
+
+    \begin{align}
+        \label{eqEntity}
+        e_0 &\in E_t, \text{ where $E_t$ is the entity type.} \\
+        \label{eqEntitySet}
+        E_s &= E_t \cap D, \text{ where $D$ is the database.}
+    \end{align}
+
+    Here \ref{eqEntity} shows an entity $e_0$ as an element of an entity type $E_t$ while \ref{eqEntitySet} shows the set of all elements of a type, $E_s$, the entity set, in the database $D$.
+
+\end{subquestion}
+
+\begin{subquestion}
+    Explain the difference between an attribute and a value set.
+
+    An attribute is a quality that describes an entity, while a value set is the set of possible values for an attribute. An attribute is a member of its value set.
+
+    \begin{equation}
+        a \in V_s
+    \end{equation}
+\end{subquestion}
+
+\end{question}
+
+\begin{question}
+    Consider the following relational database schema (schema not reproduced).
+
+    \begin{subquestion}
+        Answer true if the statement is necessarily true; false otherwise.
+
+        \begin{subsubquestion}
+            A tuple with the {\tt NULL} value on {\tt C\_ID} can be inserted to the {\tt COURSE} relation.
+
+            False, {\tt C\_ID} serves as the primary key (probably) for {\tt COURSE} and is used as a foriegn key elsewhere, and NULL is not a proper for a foreign key that points to a value.
+
+        \end{subsubquestion}
+
+        \begin{subsubquestion}
+            {\tt C\_ID} in the {\tt SECTION} schema is a superkey.
+
+            False, there would theoretically be many sections of the same course.
+        \end{subsubquestion}
+    \end{subquestion}
+
+    \begin{subquestion}
+        Short Answers
+
+        \begin{subsubquestion}
+            Name the foreign key(s) of the {\tt STUDENT} schema in the diagram.
+
+            \begin{itemize}
+                \item[{\tt D\_ID}]{
+                    Foriegn key to the {\tt DEPARTMENT} schema.
+                }
+                \item[{\tt P\_ID}]{
+                    Foriegn key to the {\tt PROFESSOR} schema.
+                }
+            \end{itemize}
+        \end{subsubquestion}
+        \begin{subsubquestion}
+            Name the primary key of the {\tt ENROLL} schema.\
+
+            A student can probably retake a course, meaning ({\tt S\_ID}, {\tt C\_ID}, {\tt SEC\_ID}) is the primary key.
+        \end{subsubquestion}
+    \end{subquestion}
+\end{question}
+\begin{question}
+    Answer true if the statement is necessarily true; false otherwise.
+
+    \begin{subquestion}
+        The operations {\tt UNION}, {\tt INTERSECTION}, {\tt SET DIFFERENCE} and {\tt CROSS PRODUCT} require the relations on which they are applied be union compatible.
+
+        True.
+    \end{subquestion}
+
+    \begin{subquestion}
+        The operations {\tt UNION}, {\tt INTERSECTION}, and {\tt SET DIFFERENCE} are commutative.
+
+        True.
+    \end{subquestion}
+
+    \begin{subquestion}
+        Which of the following queries is true? (options not reproduced)
+
+        $b$ is true.
+    \end{subquestion}
+\end{question}
+\begin{question}
+    Short Answers: Consider the relations $r$ and $s$ below, $r(a, b, c, d)$ and $s(e, f, g)$. (relations not reproduced)
+
+    \begin{subquestion}
+        Show the results of the operation {\tt select * from $r$ UNION select * from $s$}? If there is an error, explain why?
+
+        This errors, the relations are not union compatible as they have differing numbers of elements.
+    \end{subquestion}
+
+    \begin{subquestion}
+        Show the results of the operation, {\tt select count(*), avg($g$) from $s$}?
+
+        It will yeild $(4, 10)$.
+    \end{subquestion}
+
+\end{question}
+
+\begin{question}
+    Consider the following tales, answer the questions in {\tt SQL}.
+
+    \begin{subquestion}
+        List the students ({\tt ID}, {\tt NAME}) for either computer science or electrical engineering majors.
+
+        {\tt select ID, NAME from EEE\_MAJORS UNION select ID, NAME from CSE\_MAJORS;}
+    \end{subquestion}
+
+    \begin{subquestion}
+        List the students ({\tt ID}, {\tt NAME}) for either computer science or electrical engineering majors.
+
+        {\tt select NAME from TEACHES where (COURSE\_ID=`CPSC2376' OR\\ COURSE\_ID=`CPSC3375');}
+    \end{subquestion}
+
+    \begin{subquestion}
+        List the students ({\tt NAME}) for computer science majors, who are not double majors in electrical engineering.
+
+        {\tt select NAME from IEE\_MAJORS LEFT JOIN select NAME from CSE\_MAJORS;}
+    \end{subquestion}
+
+\end{question}
+
+\end{document}
