@@ -1,2 +1,4 @@
-# os_hw
-Operating Systems Homework
+# hw
+Computer Science Homework
+
+Written in LaTeX.
