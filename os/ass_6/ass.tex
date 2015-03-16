@@ -1,0 +1,248 @@
+\documentclass[11pt]{article}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{fancyhdr}
+\usepackage{hw}
+
+% margins
+\usepackage[vmargin=1in,hmargin=1.5in]{geometry}
+
+% Config
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\hw}{6}
+\newcommand{\name}{Connor Taffe}
+\newcommand{\tno}{3742} % last 4 digits of T number.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title{
+    $A_{\hw}$ \\
+    {\large Assignment \rom{\hw}}
+}
+\author{
+    \name. T no. \tno
+}
+\date{March $10^{\text{th}}$, 2015}
+
+\pagestyle{fancy}
+\rhead{Homework {\rom{\hw}}}
+\lhead{{\name}. T no. \tno}
+
+\begin{document}
+\maketitle
+
+\begin{question}
+
+    Mentally trace the execution of this nachos and write (1) the contents of the ready-queue of the systesm, (2) the value of the semaphore sem and (3) the contents of the queue of the semaphore {\tt sem}, when each of the messages above is printed, by filling the table as follows:
+
+    \begin{subquestion}
+        Thread 0 tries to enter critical section 0 time.
+
+    \begin{itemize}
+        \item{
+            Ready Queue: $\text{head}\longrightarrow t_{1}\longrightarrow t_{2}\longrightarrow\varnothing$
+        } \item{
+            Value of {\tt sem}: 1
+        } \item{
+            Queue of {\tt sem}: $\text{head}\longrightarrow\varnothing$
+        }
+    \end{itemize}
+    \end{subquestion}
+
+    \begin{subquestion}
+        Thread 1 tries to enter critical section 0 time.
+
+    \begin{itemize}
+        \item{
+            Ready Queue: $\text{head}\longrightarrow t_{2}\longrightarrow t_{0}\longrightarrow\varnothing$
+        } \item{
+            Value of {\tt sem}: 0
+        } \item{
+            Queue of {\tt sem}: $\text{head}\longrightarrow\varnothing$
+        }
+    \end{itemize}
+    \end{subquestion}
+
+    \begin{subquestion}
+        Thread 2 tries to enter critical section 0 time.
+
+    \begin{itemize}
+        \item{
+            Ready Queue: $\text{head}\longrightarrow t_{0}\longrightarrow\varnothing$
+        } \item{
+            Value of {\tt sem}: 0
+        } \item{
+            Queue of {\tt sem}: $\text{head}\longrightarrow t_{1}\longrightarrow\varnothing$
+        }
+    \end{itemize}
+    \end{subquestion}
+
+    \begin{subquestion}
+        Thread 0 is exiting critical section 0 time.
+
+    \begin{itemize}
+        \item{
+            Ready Queue: $\text{head}\longrightarrow\varnothing$
+        } \item{
+            Value of {\tt sem}: 0
+        } \item{
+            Queue of {\tt sem}: $\text{head}\longrightarrow t_{1}\longrightarrow t_{2}\longrightarrow\varnothing$
+        }
+    \end{itemize}
+    \end{subquestion}
+
+    \begin{subquestion}
+        Thread 0 tries to enter critical section 1 time.
+
+    \begin{itemize}
+        \item{
+            Ready Queue: $\text{head}\longrightarrow t_{1}\longrightarrow\varnothing$
+        } \item{
+            Value of {\tt sem}: 1
+        } \item{
+            Queue of {\tt sem}: $\text{head}\longrightarrow t_{2}\longrightarrow\varnothing$
+        }
+    \end{itemize}
+    \end{subquestion}
+
+    \begin{subquestion}
+        Thread 0 is exiting critical section 1 time.
+
+    \begin{itemize}
+        \item{
+            Ready Queue: $\text{head}\longrightarrow\varnothing$
+        } \item{
+            Value of {\tt sem}: 0
+        } \item{
+            Queue of {\tt sem}: $\text{head}\longrightarrow t_{2}\longrightarrow t_{1}\longrightarrow\varnothing$
+        }
+    \end{itemize}
+    \end{subquestion}
+
+    \begin{subquestion}
+        *** Value of Shared is 2, when thread 0 is finishing.
+
+    \begin{itemize}
+        \item{
+            Ready Queue: $\text{head}\longrightarrow t_{2}\longrightarrow\varnothing$
+        } \item{
+            Value of {\tt sem}: 1
+        } \item{
+            Queue of {\tt sem}: $\text{head}\longrightarrow t_{1}\longrightarrow\varnothing$
+        }
+    \end{itemize}
+    \end{subquestion}
+
+    \begin{subquestion}
+        Thread 2 is exiting critical section 0 time.
+
+    \begin{itemize}
+        \item{
+            Ready Queue: $\text{head}\longrightarrow\varnothing$
+        } \item{
+            Value of {\tt sem}: 0
+        } \item{
+            Queue of {\tt sem}: $\text{head}\longrightarrow t_{1}\longrightarrow\varnothing$
+        }
+    \end{itemize}
+    \end{subquestion}
+
+    \begin{subquestion}
+        Thread 2 tries to enter critical section 1 time.
+
+    \begin{itemize}
+        \item{
+            Ready Queue: $\text{head}\longrightarrow t_{1}\longrightarrow\varnothing$
+        } \item{
+            Value of {\tt sem}: 1
+        } \item{
+            Queue of {\tt sem}: $\text{head}\longrightarrow\varnothing$
+        }
+    \end{itemize}
+    \end{subquestion}
+
+    \begin{subquestion}
+        Thread 2 is exiting critical section 1 time.
+
+    \begin{itemize}
+        \item{
+            Ready Queue: $\text{head}\longrightarrow\varnothing$
+        } \item{
+            Value of {\tt sem}: 0
+        } \item{
+            Queue of {\tt sem}: $\text{head}\longrightarrow t_{1}\longrightarrow\varnothing$
+        }
+    \end{itemize}
+    \end{subquestion}
+
+    \begin{subquestion}
+        *** Value of Shared is 4, when thread 2 is finishing.
+
+    \begin{itemize}
+        \item{
+            Ready Queue: $\text{head}\longrightarrow t_{1}\longrightarrow\varnothing$
+        } \item{
+            Value of {\tt sem}: 1
+        } \item{
+            Queue of {\tt sem}: $\text{head}\longrightarrow\varnothing$
+        }
+    \end{itemize}
+    \end{subquestion}
+
+    \begin{subquestion}
+        Thread 1 is exiting critical section 0 time.
+
+    \begin{itemize}
+        \item{
+            Ready Queue: $\text{head}\longrightarrow\varnothing$
+        } \item{
+            Value of {\tt sem}: 0
+        } \item{
+            Queue of {\tt sem}: $\text{head}\longrightarrow\varnothing$
+        }
+    \end{itemize}
+    \end{subquestion}
+
+    \begin{subquestion}
+        Thread 1 tries to enter critical section 1 time.
+
+    \begin{itemize}
+        \item{
+            Ready Queue: $\text{head}\longrightarrow\varnothing$
+        } \item{
+            Value of {\tt sem}: 1
+        } \item{
+            Queue of {\tt sem}: $\text{head}\longrightarrow\varnothing$
+        }
+    \end{itemize}
+    \end{subquestion}
+
+    \begin{subquestion}
+        Thread 1 is exiting critical section 1 time.
+
+    \begin{itemize}
+        \item{
+            Ready Queue: $\text{head}\longrightarrow\varnothing$
+        } \item{
+            Value of {\tt sem}: 0
+        } \item{
+            Queue of {\tt sem}: $\text{head}\longrightarrow\varnothing$
+        }
+    \end{itemize}
+    \end{subquestion}
+
+    \begin{subquestion}
+        *** Value of Shared is 6, when thread 1 is finishing.
+
+    \begin{itemize}
+        \item{
+            Ready Queue: $\text{head}\longrightarrow\varnothing$
+        } \item{
+            Value of {\tt sem}: 1
+        } \item{
+            Queue of {\tt sem}: $\text{head}\longrightarrow\varnothing$
+        }
+    \end{itemize}
+    \end{subquestion}
+
+\end{question}
+
+\end{document}
