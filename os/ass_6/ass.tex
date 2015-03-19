@@ -1,7 +1,6 @@
 \documentclass[11pt]{article}
 \usepackage{amsmath,amssymb,amsthm}
 \usepackage{fancyhdr}
-\usepackage{hw}
 
 % margins
 \usepackage[vmargin=1in,hmargin=1.5in]{geometry}
@@ -26,9 +25,209 @@
 \rhead{Homework {\rom{\hw}}}
 \lhead{{\name}. T no. \tno}
 
+\usepackage{hw}
+
 \begin{document}
 \maketitle
 
+\setcounter{section}{1}
+\section{Report of Lab 4-2}
+
+    \begin{question}
+        Write the report about your lab task 3(e).
+        \begin{itemize}
+        \item[(e)]{Change the function {\tt SimpleThread()} to bump the shared variable repeatedly as follows:
+
+        \ldots
+
+        Recompile and run the Nachos again. Observe the printout and final value of {\tt shared}.
+
+        First, I set up the lab4-2 directory so I could compile a new, altered, nachos.
+
+        \begin{verbatim}
+$ mkdir lab4-2
+$ ls
+ass3  bin      lab4-2  machine          monitor  threads
+ass4  filesys  lab5    Makefile.common  network  userprog
+ass5  lab2     lab7-8  Makefile.dep     test     vm
+$ cd lab4-2/
+$ cp ../threads/threadtest.cc .
+$ ls
+threadtest.cc
+$ cd ../threads/
+$ make clean
+...
+rm -f nachos coff2noff coff2flat
+rm -f *.noff *.flat
+$ cd ../lab4-2/
+$ ls
+threadtest.cc
+$ cp -r ../threads/arch/ .
+$ cp ../threads/Makefile .
+$ cp ../threads/Makefile.local .
+$ ls
+arch  Makefile  Makefile.local  threadtest.cc
+        \end{verbatim}
+
+        Then, I edited the source files as specified by part $a$ through $e$ of Lab 4-2.
+
+        \begin{verbatim}
+$ emacs threadtest.cc
+...
+$ ls
+arch  Makefile  Makefile.local  threadtest.cc  threadtest.cc~
+$ diff threadtest.cc threadtest.cc~
+14d13
+< #include "synch.h"
+$ ls
+arch  Makefile  Makefile.local  threadtest.cc  threadtest.cc~
+$ diff threadtest.cc threadtest.cc~
+16,18d15
+< int shared = 0;
+< Semaphore * sem = new Semaphore("Mutex", 1);
+<
+31,41c28,33
+<   int num;
+<   for (int i = 0; i < 2; i++) {
+<     printf("Thread %d tries to enter critical section %d time.\n", which, i);
+<     num =shared;
+<     num = num + 1;
+<     currentThread->Yield();
+<     shared = num;
+<     printf("Thread %d is exiting critical section %d time.\n", which, i);
+<   }
+<   printf("*** Value of Shared is %d, when thread %d is finishing.\n",
+<        shared, which);
+---
+>     int num;
+>
+>     for (num = 0; num < 5; num++) {
+>       printf("*** thread %d looped %d times\n", (int) which, num);
+>         currentThread->Yield();
+>     }
+53c45
+<   DEBUG('t', "Entering SimpleTest");
+---
+>     DEBUG('t', "Entering SimpleTest");
+54a47
+>     Thread *t = new Thread("forked thread");
+56,60c49,50
+<   Thread *t;
+<   for (int i=0; i<3; i++) {
+<     t = new Thread("forked thread");
+<     t->Fork(SimpleThread, i);
+<   }
+---
+>     t->Fork(SimpleThread, 1);
+>     SimpleThread(0);
+        \end{verbatim}
+
+        Then, I ran {\tt make} to compile a new copy of nachos using the altered source code. And, following that, ran the new {\tt nachos} binary symbolically linked to {\tt nachos} in my current directory.
+
+        \begin{verbatim}
+$ make
+...
+ln -sf arch/unknown-i386-linux/bin/nachos nachos
+$ ./nachos
+Thread 0 tries to enter critical section 0 time.
+Thread 1 tries to enter critical section 0 time.
+Thread 2 tries to enter critical section 0 time.
+Thread 0 is exiting critical section 0 time.
+Thread 0 tries to enter critical section 1 time.
+Thread 1 is exiting critical section 0 time.
+Thread 1 tries to enter critical section 1 time.
+Thread 2 is exiting critical section 0 time.
+Thread 2 tries to enter critical section 1 time.
+Thread 0 is exiting critical section 1 time.
+*** Value of Shared is 2, when thread 0 is finishing.
+Thread 1 is exiting critical section 1 time.
+*** Value of Shared is 2, when thread 1 is finishing.
+Thread 2 is exiting critical section 1 time.
+*** Value of Shared is 2, when thread 2 is finishing.
+No threads ready or runnable, and no pending interrupts.
+Assuming the program completed.
+Machine halting!
+
+Ticks: total 130, idle 0, system 130, user 0
+Disk I/O: reads 0, writes 0
+Console I/O: reads 0, writes 0
+Paging: faults 0
+Network I/O: packets received 0, sent 0
+
+Cleaning up...
+        \end{verbatim}
+
+        The final value of {\tt shared} is 2.
+
+        }
+        \end{itemize}
+
+    \end{question}
+    \begin{question}
+        Write the report about your lab task 3(f).
+        \begin{itemize}
+            \item[(f)]{Now add semaphore P() and V() calls for the entry and exit codes of the critical sections as follows:
+
+            \ldots
+
+            Recompile and run the Nachos again. Observe the printout and final value of {\tt shared}.
+
+            I edited the {\tt threadtest.cc} to include the calls to P() and V().
+
+            \begin{verbatim}
+$ emacs threadtest.cc
+...
+$ diff threadtest.cc threadtest.cc~
+34d33
+<     sem->P();
+40d38
+<     sem->V();
+            \end{verbatim}
+
+            Then, I ran {\tt make} to recompile the {\tt nachos} source code with the new P() and V() calls. Afterwards, I ran the new {\tt nachos} with the command {\tt ./nachos}.
+
+            \begin{verbatim}
+$ make
+...
+ln -sf arch/unknown-i386-linux/bin/nachos nachos
+$ ./nachos
+Thread 0 tries to enter critical section 0 time.
+Thread 1 tries to enter critical section 0 time.
+Thread 2 tries to enter critical section 0 time.
+Thread 0 is exiting critical section 0 time.
+Thread 0 tries to enter critical section 1 time.
+Thread 0 is exiting critical section 1 time.
+*** Value of Shared is 2, when thread 0 is finishing.
+Thread 2 is exiting critical section 0 time.
+Thread 2 tries to enter critical section 1 time.
+Thread 2 is exiting critical section 1 time.
+*** Value of Shared is 4, when thread 2 is finishing.
+Thread 1 is exiting critical section 0 time.
+Thread 1 tries to enter critical section 1 time.
+Thread 1 is exiting critical section 1 time.
+*** Value of Shared is 6, when thread 1 is finishing.
+No threads ready or runnable, and no pending interrupts.
+Assuming the program completed.
+Machine halting!
+
+Ticks: total 250, idle 0, system 250, user 0
+Disk I/O: reads 0, writes 0
+Console I/O: reads 0, writes 0
+Paging: faults 0
+Network I/O: packets received 0, sent 0
+
+Cleaning up...
+            \end{verbatim}
+
+            The final value of {\tt shared} is 6.
+
+            }
+        \end{itemize}
+
+    \end{question}
+
+\section{Questions about Lab 4-2}
+\setcounter{qsection}{0}
 \begin{question}
 
     Mentally trace the execution of this nachos and write (1) the contents of the ready-queue of the systesm, (2) the value of the semaphore sem and (3) the contents of the queue of the semaphore {\tt sem}, when each of the messages above is printed, by filling the table as follows:
