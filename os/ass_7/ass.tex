@@ -1,0 +1,1503 @@
+\documentclass[11pt]{article}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{fancyhdr}
+
+% margins
+\usepackage[vmargin=1in,hmargin=1.5in]{geometry}
+
+% Config
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\hw}{7}
+\newcommand{\name}{Connor Taffe}
+\newcommand{\tno}{3742} % last 4 digits of T number.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title{
+    $A_{\hw}$ \\
+    {\large Assignment \rom{\hw}}
+}
+\author{
+    \name. T no. \tno
+}
+\date{March $10^{\text{th}}$, 2015}
+
+\pagestyle{fancy}
+\rhead{Homework {\rom{\hw}}}
+\lhead{{\name}. T no. \tno}
+
+\usepackage{hw}
+
+\begin{document}
+\maketitle
+
+\section{Report of Lab 4-3}
+
+    \subsection{Original Lab 4-3}
+
+    \setcounter{qsection}{3}
+
+    \begin{question}
+        I then completed all programs in file {\tt prodcons++.cc} as follows:
+
+        \begin{subquestion}
+            In function {\tt ProdCons}, I added the code to construct the three semaphores as follows:
+            \begin{verbatim}
+    mutex = new Semaphore("mutex", 1);
+    nempty = new Semaphore("nempty", BUFF_SIZE);
+    nfull = new Semaphore("nfull", 0);
+            \end{verbatim}
+
+            I then added the ring instantiation code in the same function as follows:
+            \begin{verbatim}
+    ring = new Ring(BUFF_SIZE);
+            \end{verbatim}
+
+            I then added the producer instantiation and forking code as follows:
+            \begin{verbatim}
+    Thread *t = new Thread(prod_names[i]);
+    t->Fork(Producer, i);
+            \end{verbatim}
+
+            And similarly, the consumer forking code:
+            \begin{verbatim}
+    Thread *t = new Thread(cons_names[i]);
+    t->Fork(Consumer, i);
+            \end{verbatim}
+
+        \end{subquestion}
+        \begin{subquestion}
+
+            In function {\tt Producer}, I added the following code before {\tt ring->Put(message)}.
+            \begin{verbatim}
+    nempty->P();
+    mutex->P();
+            \end{verbatim}
+
+            Similarly, the following syncronization code after {\tt ring->Put(message)}.
+            \begin{verbatim}
+    mutex->V();
+    nfull->V();
+    currentThread->Yield();
+            \end{verbatim}
+
+        \end{subquestion}
+        \begin{subquestion}
+        In function {\tt Consumer}, I added the following code before {\tt ring->Get(message)}.
+        \begin{verbatim}
+    nfull->P();
+    mutex->P();
+        \end{verbatim}
+
+        Similarly, the code after {\tt ring->Get(message)}.
+        \begin{verbatim}
+    mutex->V();
+    nempty->V();
+    currentThread->Yield();
+        \end{verbatim}
+        \end{subquestion}
+
+    \end{question}
+    \begin{question}
+        I then compiled a new nachos via command {\tt make} and tested if my program was working or not as follows:
+        \begin{verbatim}
+    $ make
+    ... (many lines omitted)
+    ln -sf arch/unknown-i386-linux/bin/nachos nachos
+\end{verbatim}
+        After running {\tt make}, I ran nachos with {\tt -rs 27} and {\tt -rs 28}.
+\begin{verbatim}
+    $ ./nachos -rs 27
+    No threads ready or runnable, and no pending interrupts.
+    Assuming the program completed.
+    Machine halting!
+
+    Ticks: total 890, idle 0, system 890, user 0
+    Disk I/O: reads 0, writes 0
+    Console I/O: reads 0, writes 0
+    Paging: faults 0
+    Network I/O: packets received 0, sent 0
+
+    Cleaning up...
+    $ ls
+    arch     Makefile        Makefile.local~  prodcons++.cc  ring.h  tmp_1
+    main.cc  Makefile.local  nachos           ring.cc        tmp_0
+    $ cat tmp_0
+    producer id --> 0; Message number --> 0;
+    producer id --> 0; Message number --> 1;
+    producer id --> 1; Message number --> 1;
+    producer id --> 1; Message number --> 3;
+    producer id --> 0; Message number --> 3;
+    $ cat tmp_1
+    producer id --> 1; Message number --> 0;
+    producer id --> 0; Message number --> 2;
+    producer id --> 1; Message number --> 2;
+    $ ./nachos -rs 28
+    No threads ready or runnable, and no pending interrupts.
+    Assuming the program completed.
+    Machine halting!
+
+    Ticks: total 978, idle 8, system 970, user 0
+    Disk I/O: reads 0, writes 0
+    Console I/O: reads 0, writes 0
+    Paging: faults 0
+    Network I/O: packets received 0, sent 0
+
+    Cleaning up...
+    $ cat tmp_0
+    producer id --> 0; Message number --> 0;
+    producer id --> 1; Message number --> 1;
+    producer id --> 1; Message number --> 2;
+    producer id --> 0; Message number --> 2;
+    producer id --> 0; Message number --> 3;
+    $ cat tmp_1
+    producer id --> 1; Message number --> 0;
+    producer id --> 0; Message number --> 1;
+    producer id --> 1; Message number --> 3;
+        \end{verbatim}
+
+        As you can see from both runs at rs = 27 and rs = 28, there are 2 consumers ({\tt N\_CONS} is 2), and each has a non-repeating, sequential access for each producer. Moreover {\tt N\_MESSG} is 4, and 0 through 3 were given from producer, so all messages were recieved.
+    \end{question}
+
+    \subsection{Configuration tests on Lab 4-3}
+
+    I then proceeded to test my Lab 4-3 using the three test configurations given in Assignment 7.
+
+    \setcounter{qsection}{0}
+    \begin{question}
+        Configuration one sets {\it buffer size} to 2, {\it number of producers} to 4,  {\it number of messages per producer} to 3, and {\it number of consumers} to 2.
+
+    \begin{subquestion}
+        I implemented this by changing the following constants as stated here:
+        \begin{verbatim}
+    #define BUFF_SIZE   2
+    #define N_PROD      4
+    #define N_MESSG     3
+    #define N_CONS      2
+        \end{verbatim}
+
+        I then ran make to recompile the reconfigured {\tt nachos}.
+        \begin{verbatim}
+    $ make
+    ... (many lines omitted)
+    ln -sf arch/unknown-i386-linux/bin/nachos nachos
+        \end{verbatim}
+
+        I then completed parts {\bf a} and {\bf b} as follows:
+        \begin{itemize}
+            \item[(a)]{
+                Here I ran the Nachos without randomization with command: {\tt ./nachos}.
+                \begin{verbatim}
+    $ ./nachos
+    No threads ready or runnable, and no pending interrupts.
+    Assuming the program completed.
+    Machine halting!
+
+    Ticks: total 1330, idle 0, system 1330, user 0
+    Disk I/O: reads 0, writes 0
+    Console I/O: reads 0, writes 0
+    Paging: faults 0
+    Network I/O: packets received 0, sent 0
+
+    Cleaning up...
+    $ ls tmp_*
+    tmp_0  tmp_1
+    $ cat tmp_0
+    producer id --> 0; Message number --> 0;
+    producer id --> 0; Message number --> 1;
+    producer id --> 3; Message number --> 0;
+    producer id --> 3; Message number --> 1;
+    producer id --> 3; Message number --> 2;
+    $ cat tmp_1
+    producer id --> 1; Message number --> 0;
+    producer id --> 1; Message number --> 1;
+    producer id --> 0; Message number --> 2;
+    producer id --> 1; Message number --> 2;
+    producer id --> 2; Message number --> 0;
+    producer id --> 2; Message number --> 1;
+    producer id --> 2; Message number --> 2;
+    $ rm tmp_*
+                \end{verbatim}
+            }
+            \item[(b)]{
+                Here I ran the Nachos with random seed 99: {\tt ./nachos -rs 99}.
+                \begin{verbatim}
+    $ ./nachos -rs 99
+    No threads ready or runnable, and no pending interrupts.
+    Assuming the program completed.
+    Machine halting!
+
+    Ticks: total 1494, idle 34, system 1460, user 0
+    Disk I/O: reads 0, writes 0
+    Console I/O: reads 0, writes 0
+    Paging: faults 0
+    Network I/O: packets received 0, sent 0
+
+    Cleaning up...
+    $ ls tmp_*
+    tmp_0  tmp_1
+    $ cat tmp_0
+    producer id --> 0; Message number --> 0;
+    producer id --> 1; Message number --> 1;
+    producer id --> 0; Message number --> 2;
+    producer id --> 3; Message number --> 0;
+    producer id --> 3; Message number --> 1;
+    producer id --> 2; Message number --> 1;
+    producer id --> 2; Message number --> 2;
+    $ cat tmp_1
+    producer id --> 1; Message number --> 0;
+    producer id --> 0; Message number --> 1;
+    producer id --> 1; Message number --> 2;
+    producer id --> 2; Message number --> 0;
+    producer id --> 3; Message number --> 2;
+    $ rm tmp_*
+                \end{verbatim}
+            }
+        \end{itemize}
+
+    \end{subquestion}
+    \begin{subquestion}
+        I then examined the output files ({\tt cat}'d above for clarity) of the consumers to see if the bounded buffer problem is solved and implemented correctly.
+
+        We can see that on both runs, no indice was repeated for the same producer, and that the consumers recieved indices in numerical order on a per producer basis.
+    \end{subquestion}
+    \begin{subquestion}
+        The {\tt cat}'d results are provided above.
+    \end{subquestion}
+    \end{question}
+
+    \begin{question}
+        Configuration one sets {\it buffer size} to 2, {\it number of producers} to 4,  {\it number of messages per producer} to 3, and {\it number of consumers} to 2.
+
+    \begin{subquestion}
+        I implemented this by changing the following constants as stated here:
+        \begin{verbatim}
+    #define BUFF_SIZE   2
+    #define N_PROD      4
+    #define N_MESSG     3
+    #define N_CONS      2
+        \end{verbatim}
+
+        I then ran make to recompile the reconfigured {\tt nachos}.
+        \begin{verbatim}
+    $ make
+    ... (many lines omitted)
+    ln -sf arch/unknown-i386-linux/bin/nachos nachos
+        \end{verbatim}
+
+        I then completed parts {\bf a} and {\bf b} as follows:
+        \begin{itemize}
+            \item[(a)]{
+                Here I ran the Nachos without randomization with command: {\tt ./nachos}.
+                \begin{verbatim}
+    $ ./nachos
+    No threads ready or runnable, and no pending interrupts.
+    Assuming the program completed.
+    Machine halting!
+
+    Ticks: total 1330, idle 0, system 1330, user 0
+    Disk I/O: reads 0, writes 0
+    Console I/O: reads 0, writes 0
+    Paging: faults 0
+    Network I/O: packets received 0, sent 0
+
+    Cleaning up...
+    $ ls tmp_*
+    tmp_0  tmp_1
+    $ cat tmp_0
+    producer id --> 0; Message number --> 0;
+    producer id --> 0; Message number --> 1;
+    producer id --> 3; Message number --> 0;
+    producer id --> 3; Message number --> 1;
+    producer id --> 3; Message number --> 2;
+    $ cat tmp_1
+    producer id --> 1; Message number --> 0;
+    producer id --> 1; Message number --> 1;
+    producer id --> 0; Message number --> 2;
+    producer id --> 1; Message number --> 2;
+    producer id --> 2; Message number --> 0;
+    producer id --> 2; Message number --> 1;
+    producer id --> 2; Message number --> 2;
+    $ rm tmp_*
+                \end{verbatim}
+            }
+            \item[(b)]{
+                Here I ran the Nachos with random seed 99: {\tt ./nachos -rs 99}.
+                \begin{verbatim}
+    $ ./nachos -rs 99
+    No threads ready or runnable, and no pending interrupts.
+    Assuming the program completed.
+    Machine halting!
+
+    Ticks: total 1494, idle 34, system 1460, user 0
+    Disk I/O: reads 0, writes 0
+    Console I/O: reads 0, writes 0
+    Paging: faults 0
+    Network I/O: packets received 0, sent 0
+
+    Cleaning up...
+    $ ls tmp_*
+    tmp_0  tmp_1
+    $ cat tmp_0
+    producer id --> 0; Message number --> 0;
+    producer id --> 1; Message number --> 1;
+    producer id --> 0; Message number --> 2;
+    producer id --> 3; Message number --> 0;
+    producer id --> 3; Message number --> 1;
+    producer id --> 2; Message number --> 1;
+    producer id --> 2; Message number --> 2;
+    $ cat tmp_1
+    producer id --> 1; Message number --> 0;
+    producer id --> 0; Message number --> 1;
+    producer id --> 1; Message number --> 2;
+    producer id --> 2; Message number --> 0;
+    producer id --> 3; Message number --> 2;
+    $ rm tmp_*
+                \end{verbatim}
+            }
+        \end{itemize}
+
+    \end{subquestion}
+    \begin{subquestion}
+        I then examined the output files ({\tt cat}'d above for clarity) of the consumers to see if the bounded buffer problem is solved and implemented correctly.
+
+        We can see that on both runs, no indice was repeated for the same producer, and that the consumers recieved indices in numerical order on a per producer basis.
+    \end{subquestion}
+    \begin{subquestion}
+        The {\tt cat}'d results are provided above.
+    \end{subquestion}
+    \end{question}
+
+    % Configuration 2
+    \begin{question}
+        Configuration one sets {\it buffer size} to 5, {\it number of producers} to 3,  {\it number of messages per producer} to 4, and {\it number of consumers} to 3.
+
+    \begin{subquestion}
+        I implemented this by changing the following constants as stated here:
+        \begin{verbatim}
+    #define BUFF_SIZE   5
+    #define N_PROD      3
+    #define N_MESSG     4
+    #define N_CONS      3
+        \end{verbatim}
+
+        I then ran make to recompile the reconfigured {\tt nachos}.
+        \begin{verbatim}
+    $ make
+    ... (many lines omitted)
+    ln -sf arch/unknown-i386-linux/bin/nachos nachos
+        \end{verbatim}
+
+        I then completed parts {\bf a} and {\bf b} as follows:
+        \begin{itemize}
+            \item[(a)]{
+                Here I ran the Nachos without randomization with command: {\tt ./nachos}.
+                \begin{verbatim}
+    $ ./nachos
+    No threads ready or runnable, and no pending interrupts.
+    Assuming the program completed.
+    Machine halting!
+
+    Ticks: total 1330, idle 0, system 1330, user 0
+    Disk I/O: reads 0, writes 0
+    Console I/O: reads 0, writes 0
+    Paging: faults 0
+    Network I/O: packets received 0, sent 0
+
+    Cleaning up...
+    $ ls tmp_*
+    tmp_0  tmp_1  tmp_2
+    $ cat tmp_0
+    producer id --> 0; Message number --> 0;
+    producer id --> 0; Message number --> 1;
+    producer id --> 0; Message number --> 2;
+    producer id --> 0; Message number --> 3;
+    $ cat tmp_1
+    producer id --> 1; Message number --> 0;
+    producer id --> 1; Message number --> 1;
+    producer id --> 1; Message number --> 2;
+    producer id --> 1; Message number --> 3;
+    $ cat tmp_2
+    producer id --> 2; Message number --> 0;
+    producer id --> 2; Message number --> 1;
+    producer id --> 2; Message number --> 2;
+    producer id --> 2; Message number --> 3;
+    $ rm tmp_*
+                \end{verbatim}
+            }
+            \item[(b)]{
+                Here I ran the Nachos with random seed 99: {\tt ./nachos -rs 99}.
+                \begin{verbatim}
+    $ ./nachos -rs 99
+    No threads ready or runnable, and no pending interrupts.
+    Assuming the program completed.
+    Machine halting!
+
+    Ticks: total 1494, idle 34, system 1460, user 0
+    Disk I/O: reads 0, writes 0
+    Console I/O: reads 0, writes 0
+    Paging: faults 0
+    Network I/O: packets received 0, sent 0
+
+    Cleaning up...
+    $ ls tmp_*
+    tmp_0  tmp_1  tmp_2
+    $ cat tmp_0
+    producer id --> 0; Message number --> 0;
+    producer id --> 1; Message number --> 1;
+    producer id --> 2; Message number --> 1;
+    producer id --> 0; Message number --> 3;
+    producer id --> 2; Message number --> 3;
+    $ cat tmp_1
+    producer id --> 1; Message number --> 0;
+    producer id --> 0; Message number --> 1;
+    producer id --> 0; Message number --> 2;
+    producer id --> 2; Message number --> 2;
+    $ cat tmp_2
+    producer id --> 2; Message number --> 0;
+    producer id --> 1; Message number --> 2;
+    producer id --> 1; Message number --> 3;
+    $ rm tmp_*
+                \end{verbatim}
+            }
+        \end{itemize}
+
+    \end{subquestion}
+    \begin{subquestion}
+        I then examined the output files ({\tt cat}'d above for clarity) of the consumers to see if the bounded buffer problem is solved and implemented correctly.
+
+        We can see that on both runs, no indice was repeated for the same producer, and that the consumers recieved indices in numerical order on a per producer basis.
+    \end{subquestion}
+    \begin{subquestion}
+        The {\tt cat}'d results are provided above.
+    \end{subquestion}
+    \end{question}
+
+    % Configuration 3
+    \begin{question}
+        Configuration one sets {\it buffer size} to 4, {\it number of producers} to 5,  {\it number of messages per producer} to 20, and {\it number of consumers} to 4.
+
+    \begin{subquestion}
+        I implemented this by changing the following constants as stated here:
+        \begin{verbatim}
+    #define BUFF_SIZE   4
+    #define N_PROD      5
+    #define N_MESSG     20
+    #define N_CONS      4
+        \end{verbatim}
+
+        I then ran make to recompile the reconfigured {\tt nachos}.
+        \begin{verbatim}
+    $ make
+    ... (many lines omitted)
+    ln -sf arch/unknown-i386-linux/bin/nachos nachos
+        \end{verbatim}
+
+        I then completed parts {\bf a} and {\bf b} as follows:
+        \begin{itemize}
+            \item[(a)]{
+                Here I ran the Nachos without randomization with command: {\tt ./nachos}.
+                \begin{verbatim}
+    $ ./nachos
+    No threads ready or runnable, and no pending interrupts.
+    Assuming the program completed.
+    Machine halting!
+
+    Ticks: total 10190, idle 0, system 10190, user 0
+    Disk I/O: reads 0, writes 0
+    Console I/O: reads 0, writes 0
+    Paging: faults 0
+    Network I/O: packets received 0, sent 0
+
+    Cleaning up...
+    $ ls tmp_*
+    tmp_0  tmp_1  tmp_2  tmp_3
+    $ cat tmp_0
+    producer id --> 0; Message number --> 0;
+    producer id --> 0; Message number --> 1;
+    producer id --> 0; Message number --> 2;
+    producer id --> 0; Message number --> 3;
+    producer id --> 0; Message number --> 4;
+    producer id --> 0; Message number --> 5;
+    producer id --> 0; Message number --> 6;
+    producer id --> 0; Message number --> 7;
+    producer id --> 0; Message number --> 8;
+    producer id --> 0; Message number --> 9;
+    producer id --> 0; Message number --> 10;
+    producer id --> 0; Message number --> 11;
+    producer id --> 0; Message number --> 12;
+    producer id --> 0; Message number --> 13;
+    producer id --> 0; Message number --> 14;
+    producer id --> 0; Message number --> 15;
+    producer id --> 0; Message number --> 16;
+    producer id --> 0; Message number --> 17;
+    producer id --> 0; Message number --> 18;
+    producer id --> 0; Message number --> 19;
+    producer id --> 4; Message number --> 0;
+    producer id --> 4; Message number --> 1;
+    producer id --> 4; Message number --> 2;
+    producer id --> 4; Message number --> 3;
+    producer id --> 4; Message number --> 4;
+    producer id --> 4; Message number --> 5;
+    producer id --> 4; Message number --> 6;
+    producer id --> 4; Message number --> 7;
+    producer id --> 4; Message number --> 8;
+    producer id --> 4; Message number --> 9;
+    producer id --> 4; Message number --> 10;
+    producer id --> 4; Message number --> 11;
+    producer id --> 4; Message number --> 12;
+    producer id --> 4; Message number --> 13;
+    producer id --> 4; Message number --> 14;
+    producer id --> 4; Message number --> 15;
+    producer id --> 4; Message number --> 16;
+    producer id --> 4; Message number --> 17;
+    producer id --> 4; Message number --> 18;
+    producer id --> 4; Message number --> 19;
+    $ cat tmp_1
+    producer id --> 1; Message number --> 0;
+    producer id --> 1; Message number --> 1;
+    producer id --> 1; Message number --> 2;
+    producer id --> 1; Message number --> 3;
+    producer id --> 1; Message number --> 4;
+    producer id --> 1; Message number --> 5;
+    producer id --> 1; Message number --> 6;
+    producer id --> 1; Message number --> 7;
+    producer id --> 1; Message number --> 8;
+    producer id --> 1; Message number --> 9;
+    producer id --> 1; Message number --> 10;
+    producer id --> 1; Message number --> 11;
+    producer id --> 1; Message number --> 12;
+    producer id --> 1; Message number --> 13;
+    producer id --> 1; Message number --> 14;
+    producer id --> 1; Message number --> 15;
+    producer id --> 1; Message number --> 16;
+    producer id --> 1; Message number --> 17;
+    producer id --> 1; Message number --> 18;
+    producer id --> 1; Message number --> 19;
+    $ cat tmp_2
+    producer id --> 2; Message number --> 0;
+    producer id --> 2; Message number --> 1;
+    producer id --> 2; Message number --> 2;
+    producer id --> 2; Message number --> 3;
+    producer id --> 2; Message number --> 4;
+    producer id --> 2; Message number --> 5;
+    producer id --> 2; Message number --> 6;
+    producer id --> 2; Message number --> 7;
+    producer id --> 2; Message number --> 8;
+    producer id --> 2; Message number --> 9;
+    producer id --> 2; Message number --> 10;
+    producer id --> 2; Message number --> 11;
+    producer id --> 2; Message number --> 12;
+    producer id --> 2; Message number --> 13;
+    producer id --> 2; Message number --> 14;
+    producer id --> 2; Message number --> 15;
+    producer id --> 2; Message number --> 16;
+    producer id --> 2; Message number --> 17;
+    producer id --> 2; Message number --> 18;
+    producer id --> 2; Message number --> 19;
+    $ cat tmp_3
+    producer id --> 3; Message number --> 0;
+    producer id --> 3; Message number --> 1;
+    producer id --> 3; Message number --> 2;
+    producer id --> 3; Message number --> 3;
+    producer id --> 3; Message number --> 4;
+    producer id --> 3; Message number --> 5;
+    producer id --> 3; Message number --> 6;
+    producer id --> 3; Message number --> 7;
+    producer id --> 3; Message number --> 8;
+    producer id --> 3; Message number --> 9;
+    producer id --> 3; Message number --> 10;
+    producer id --> 3; Message number --> 11;
+    producer id --> 3; Message number --> 12;
+    producer id --> 3; Message number --> 13;
+    producer id --> 3; Message number --> 14;
+    producer id --> 3; Message number --> 15;
+    producer id --> 3; Message number --> 16;
+    producer id --> 3; Message number --> 17;
+    producer id --> 3; Message number --> 18;
+    producer id --> 3; Message number --> 19;
+    $ rm tmp_*
+                \end{verbatim}
+            }
+            \item[(b)]{
+                Here I ran the Nachos with random seed 99: {\tt ./nachos -rs 99}.
+                \begin{verbatim}
+    $ ./nachos -rs 99
+    No threads ready or runnable, and no pending interrupts.
+    Assuming the program completed.
+    Machine halting!
+
+    Ticks: total 11334, idle 54, system 11280, user 0
+    Disk I/O: reads 0, writes 0
+    Console I/O: reads 0, writes 0
+    Paging: faults 0
+    Network I/O: packets received 0, sent 0
+
+    Cleaning up...
+    $ ls tmp_*
+    tmp_0  tmp_1  tmp_2  tmp_3
+    $ cat tmp_0
+    producer id --> 3; Message number --> 0;
+    producer id --> 4; Message number --> 0;
+    producer id --> 4; Message number --> 1;
+    producer id --> 0; Message number --> 5;
+    producer id --> 1; Message number --> 3;
+    producer id --> 3; Message number --> 5;
+    producer id --> 0; Message number --> 8;
+    producer id --> 2; Message number --> 7;
+    producer id --> 3; Message number --> 6;
+    producer id --> 0; Message number --> 11;
+    producer id --> 4; Message number --> 7;
+    producer id --> 4; Message number --> 8;
+    producer id --> 2; Message number --> 12;
+    producer id --> 3; Message number --> 11;
+    producer id --> 0; Message number --> 15;
+    producer id --> 4; Message number --> 13;
+    producer id --> 1; Message number --> 12;
+    producer id --> 3; Message number --> 16;
+    producer id --> 1; Message number --> 13;
+    producer id --> 1; Message number --> 14;
+    producer id --> 3; Message number --> 17;
+    producer id --> 1; Message number --> 15;
+    producer id --> 1; Message number --> 16;
+    $ cat tmp_1
+    producer id --> 0; Message number --> 0;
+    producer id --> 2; Message number --> 0;
+    producer id --> 0; Message number --> 1;
+    producer id --> 0; Message number --> 2;
+    producer id --> 3; Message number --> 1;
+    producer id --> 2; Message number --> 5;
+    producer id --> 1; Message number --> 2;
+    producer id --> 0; Message number --> 6;
+    producer id --> 4; Message number --> 3;
+    producer id --> 1; Message number --> 5;
+    producer id --> 2; Message number --> 10;
+    producer id --> 2; Message number --> 11;
+    producer id --> 3; Message number --> 7;
+    producer id --> 3; Message number --> 8;
+    producer id --> 3; Message number --> 9;
+    producer id --> 1; Message number --> 9;
+    producer id --> 1; Message number --> 11;
+    producer id --> 3; Message number --> 13;
+    producer id --> 3; Message number --> 15;
+    producer id --> 4; Message number --> 16;
+    producer id --> 4; Message number --> 17;
+    producer id --> 2; Message number --> 18;
+    producer id --> 1; Message number --> 19;
+    $ cat tmp_2
+    producer id --> 1; Message number --> 0;
+    producer id --> 2; Message number --> 1;
+    producer id --> 2; Message number --> 3;
+    producer id --> 0; Message number --> 3;
+    producer id --> 1; Message number --> 1;
+    producer id --> 3; Message number --> 3;
+    producer id --> 3; Message number --> 4;
+    producer id --> 2; Message number --> 6;
+    producer id --> 4; Message number --> 5;
+    producer id --> 2; Message number --> 8;
+    producer id --> 2; Message number --> 9;
+    producer id --> 1; Message number --> 6;
+    producer id --> 4; Message number --> 6;
+    producer id --> 1; Message number --> 8;
+    producer id --> 0; Message number --> 14;
+    producer id --> 1; Message number --> 10;
+    producer id --> 3; Message number --> 12;
+    producer id --> 4; Message number --> 12;
+    producer id --> 0; Message number --> 16;
+    producer id --> 0; Message number --> 17;
+    producer id --> 4; Message number --> 15;
+    producer id --> 0; Message number --> 18;
+    producer id --> 4; Message number --> 19;
+    producer id --> 3; Message number --> 19;
+    $ cat tmp_3
+    producer id --> 2; Message number --> 2;
+    producer id --> 2; Message number --> 4;
+    producer id --> 0; Message number --> 4;
+    producer id --> 3; Message number --> 2;
+    producer id --> 4; Message number --> 2;
+    producer id --> 0; Message number --> 7;
+    producer id --> 1; Message number --> 4;
+    producer id --> 4; Message number --> 4;
+    producer id --> 0; Message number --> 9;
+    producer id --> 0; Message number --> 10;
+    producer id --> 1; Message number --> 7;
+    producer id --> 0; Message number --> 12;
+    producer id --> 0; Message number --> 13;
+    producer id --> 3; Message number --> 10;
+    producer id --> 4; Message number --> 9;
+    producer id --> 4; Message number --> 10;
+    producer id --> 4; Message number --> 11;
+    producer id --> 2; Message number --> 13;
+    producer id --> 3; Message number --> 14;
+    producer id --> 2; Message number --> 14;
+    producer id --> 4; Message number --> 14;
+    producer id --> 2; Message number --> 15;
+    producer id --> 2; Message number --> 16;
+    producer id --> 4; Message number --> 18;
+    producer id --> 2; Message number --> 17;
+    producer id --> 3; Message number --> 18;
+    producer id --> 2; Message number --> 19;
+    producer id --> 0; Message number --> 19;
+    producer id --> 1; Message number --> 17;
+    producer id --> 1; Message number --> 18;
+    $ rm tmp_*
+                \end{verbatim}
+            }
+        \end{itemize}
+
+    \end{subquestion}
+    \begin{subquestion}
+        I then examined the output files ({\tt cat}'d above for clarity) of the consumers to see if the bounded buffer problem is solved and implemented correctly.
+
+        We can see that on both runs, no indice was repeated for the same producer, and that the consumers recieved indices in numerical order on a per producer basis.
+    \end{subquestion}
+    \begin{subquestion}
+        The {\tt cat}'d results are provided above.
+    \end{subquestion}
+    \end{question}
+
+
+    \section{Mental Trace of Augmented Lab 4-3}
+    \setcounter{qsection}{0}
+    \begin{question}
+
+        List all the context switches occurred in the order of time during this test run of the Nachos. For each context switch, indicate (1) the current th read, (2) the next thread, (3) the thread function causing the context switch ( Yield() or Sleep() ), (4) the content of the ready-queue after the context switch, and (5) the value and the content of the queque of each of semaphores mutex, nempty and nfull after the context switch, by filling the table as follows:
+
+        \begin{enumerate}
+            \item {
+                \begin{itemize}
+                    \item{Current: $M$}
+                    \item{Next: $P_{0}$}
+                    \item{Function: Sleep}
+                    \item{
+                        Ready Queue: $\text{head}\longrightarrow
+                        P_{1}\longrightarrow
+                        P_{2}\longrightarrow
+                        C_{0}\longrightarrow
+                        C_{1}\longrightarrow\varnothing$
+                    } \item{
+                        Queue of semaphore {\tt mutex}: $\text{head}\longrightarrow\varnothing$
+                    }
+                    \item{
+                        Queue of semaphore {\tt nempty}: $\text{head}\longrightarrow\varnothing$
+                    }
+                    \item{
+                        Queue of semaphore {\tt nfull}: $\text{head}\longrightarrow\varnothing$
+                    }
+                \end{itemize}
+            }
+            \item {
+                \begin{itemize}
+                    \item{Current: $P_{0}$}
+                    \item{Next: $P_{1}$}
+                    \item{Function: Yield}
+                    \item{
+                        Ready Queue: $\text{head}\longrightarrow
+                        P_{2}\longrightarrow
+                        C_{0}\longrightarrow
+                        C_{1}\longrightarrow
+                        P_{0}\longrightarrow\varnothing$
+                    } \item{
+                        Queue of semaphore {\tt mutex}: $\text{head}\longrightarrow\varnothing$
+                    }
+                    \item{
+                        Queue of semaphore {\tt nempty}: $\text{head}\longrightarrow\varnothing$
+                    }
+                    \item{
+                        Queue of semaphore {\tt nfull}: $\text{head}\longrightarrow\varnothing$
+                    }
+                \end{itemize}
+            }
+            \item {
+                \begin{itemize}
+                    \item{Current: $P_{1}$}
+                    \item{Next: $P_{2}$}
+                    \item{Function: Sleep}
+                    \item{
+                        Ready Queue: $\text{head}\longrightarrow
+                        C_{0}\longrightarrow
+                        C_{1}\longrightarrow
+                        P_{0}\longrightarrow\varnothing$
+                    } \item{
+                        Queue of semaphore {\tt mutex}: $\text{head}\longrightarrow
+                        P_{1}\longrightarrow
+                        \varnothing$
+                    }
+                    \item{
+                        Queue of semaphore {\tt nempty}: $\text{head}\longrightarrow\varnothing$
+                    }
+                    \item{
+                        Queue of semaphore {\tt nfull}: $\text{head}\longrightarrow\varnothing$
+                    }
+                \end{itemize}
+            }
+            \item {
+                \begin{itemize}
+                    \item{Current: $P_{2}$}
+                    \item{Next: $C_{0}$}
+                    \item{Function: Sleep}
+                    \item{
+                        Ready Queue: $\text{head}\longrightarrow
+                        C_{1}\longrightarrow
+                        P_{0}\longrightarrow\varnothing$
+                    } \item{
+                        Queue of semaphore {\tt mutex}: $\text{head}\longrightarrow
+                        P_{1}\longrightarrow
+                        P_{2}\longrightarrow
+                        \varnothing$
+                    }
+                    \item{
+                        Queue of semaphore {\tt nempty}: $\text{head}\longrightarrow\varnothing$
+                    }
+                    \item{
+                        Queue of semaphore {\tt nfull}: $\text{head}\longrightarrow\varnothing$
+                    }
+                \end{itemize}
+            }
+            \item {
+                \begin{itemize}
+                    \item{Current: $C_{0}$}
+                    \item{Next: $C_{1}$}
+                    \item{Function: Sleep}
+                    \item{
+                        Ready Queue: $\text{head}\longrightarrow
+                        P_{0}\longrightarrow\varnothing$
+                    } \item{
+                        Queue of semaphore {\tt mutex}: $\text{head}\longrightarrow
+                        P_{1}\longrightarrow
+                        P_{2}\longrightarrow
+                        \varnothing$
+                    }
+                    \item{
+                        Queue of semaphore {\tt nempty}: $\text{head}\longrightarrow\varnothing$
+                    }
+                    \item{
+                        Queue of semaphore {\tt nfull}: $\text{head}\longrightarrow
+                        C_{0}\longrightarrow
+                        \varnothing$
+                    }
+                \end{itemize}
+                }
+                \item {
+                    \begin{itemize}
+                        \item{Current: $C_{1}$}
+                        \item{Next: $P_{0}$}
+                        \item{Function: Sleep}
+                        \item{
+                            Ready Queue: $\text{head}\longrightarrow
+                            \varnothing$
+                        } \item{
+                            Queue of semaphore {\tt mutex}: $\text{head}\longrightarrow
+                            P_{1}\longrightarrow
+                            P_{2}\longrightarrow
+                            \varnothing$
+                        }
+                        \item{
+                            Queue of semaphore {\tt nempty}: $\text{head}\longrightarrow\varnothing$
+                        }
+                        \item{
+                            Queue of semaphore {\tt nfull}: $\text{head}\longrightarrow
+                            C_{0}\longrightarrow
+                            C_{1}\longrightarrow
+                            \varnothing$
+                        }
+                \end{itemize}
+                }
+                \item {
+                    \begin{itemize}
+                        \item{Current: $P_{0}$}
+                        \item{Next: $P_{1}$}
+                        \item{Function: Sleep}
+                        \item{
+                            Ready Queue: $\text{head}\longrightarrow
+                            C_{0}\longrightarrow
+                            \varnothing$
+                        } \item{
+                            Queue of semaphore {\tt mutex}: $\text{head}\longrightarrow
+                            P_{2}\longrightarrow
+                            \varnothing$
+                        }
+                        \item{
+                            Queue of semaphore {\tt nempty}: $\text{head}\longrightarrow
+                            P_{0}\longrightarrow
+                            \varnothing$
+                        }
+                        \item{
+                            Queue of semaphore {\tt nfull}: $\text{head}\longrightarrow
+                            C_{1}\longrightarrow
+                            \varnothing$
+                        }
+                \end{itemize}
+                }
+                \item {
+                    \begin{itemize}
+                        \item{Current: $P_{1}$}
+                        \item{Next: $C_{0}$}
+                        \item{Function: Yield}
+                        \item{
+                            Ready Queue: $\text{head}\longrightarrow
+                            P_{1}\longrightarrow
+                            \varnothing$
+                        } \item{
+                            Queue of semaphore {\tt mutex}: $\text{head}\longrightarrow
+                            P_{2}\longrightarrow
+                            \varnothing$
+                        }
+                        \item{
+                            Queue of semaphore {\tt nempty}: $\text{head}\longrightarrow
+                            P_{0}\longrightarrow
+                            \varnothing$
+                        }
+                        \item{
+                            Queue of semaphore {\tt nfull}: $\text{head}\longrightarrow
+                            C_{1}\longrightarrow
+                            \varnothing$
+                        }
+                \end{itemize}
+                }
+                \item {
+                    \begin{itemize}
+                        \item{Current: $C_{0}$}
+                        \item{Next: $P_{1}$}
+                        \item{Function: Sleep}
+                        \item{
+                            Ready Queue: $\text{head}\longrightarrow
+                            \varnothing$
+                        } \item{
+                            Queue of semaphore {\tt mutex}: $\text{head}\longrightarrow
+                            P_{2}\longrightarrow
+                            C_{0}\longrightarrow
+                            \varnothing$
+                        }
+                        \item{
+                            Queue of semaphore {\tt nempty}: $\text{head}\longrightarrow
+                            P_{0}\longrightarrow
+                            \varnothing$
+                        }
+                        \item{
+                            Queue of semaphore {\tt nfull}: $\text{head}\longrightarrow
+                            C_{1}\longrightarrow
+                            \varnothing$
+                        }
+                \end{itemize}
+                }
+                % 10
+                \item {
+                    \begin{itemize}
+                        \item{Current: $P_{1}$}
+                        \item{Next: $P_{2}$}
+                        \item{Function: Sleep}
+                        \item{
+                            Ready Queue: $\text{head}\longrightarrow
+                            C_{1}\longrightarrow
+                            \varnothing$
+                        } \item{
+                            Queue of semaphore {\tt mutex}: $\text{head}\longrightarrow
+                            C_{0}\longrightarrow
+                            \varnothing$
+                        }
+                        \item{
+                            Queue of semaphore {\tt nempty}: $\text{head}\longrightarrow
+                            P_{0}\longrightarrow
+                            P_{1}\longrightarrow
+                            \varnothing$
+                        }
+                        \item{
+                            Queue of semaphore {\tt nfull}: $\text{head}\longrightarrow
+                            \varnothing$
+                        }
+                \end{itemize}
+                }
+                \item {
+                    \begin{itemize}
+                        \item{Current: $P_{2}$}
+                        \item{Next: $C_{1}$}
+                        \item{Function: Yield}
+                        \item{
+                            Ready Queue: $\text{head}\longrightarrow
+                            P_{2}\longrightarrow
+                            \varnothing$
+                        } \item{
+                            Queue of semaphore {\tt mutex}: $\text{head}\longrightarrow
+                            C_{0}\longrightarrow
+                            \varnothing$
+                        }
+                        \item{
+                            Queue of semaphore {\tt nempty}: $\text{head}\longrightarrow
+                            P_{0}\longrightarrow
+                            P_{1}\longrightarrow
+                            \varnothing$
+                        }
+                        \item{
+                            Queue of semaphore {\tt nfull}: $\text{head}\longrightarrow
+                            \varnothing$
+                        }
+                \end{itemize}
+                }
+                \item {
+                    \begin{itemize}
+                        \item{Current: $C_{1}$}
+                        \item{Next: $P_{2}$}
+                        \item{Function: Sleep}
+                        \item{
+                            Ready Queue: $\text{head}\longrightarrow
+                            \varnothing$
+                        } \item{
+                            Queue of semaphore {\tt mutex}: $\text{head}\longrightarrow
+                            C_{0}\longrightarrow
+                            C_{1}\longrightarrow
+                            \varnothing$
+                        }
+                        \item{
+                            Queue of semaphore {\tt nempty}: $\text{head}\longrightarrow
+                            P_{0}\longrightarrow
+                            P_{1}\longrightarrow
+                            \varnothing$
+                        }
+                        \item{
+                            Queue of semaphore {\tt nfull}: $\text{head}\longrightarrow
+                            \varnothing$
+                        }
+                \end{itemize}
+                }
+                \item {
+                    \begin{itemize}
+                        \item{Current: $P_{2}$}
+                        \item{Next: $C_{0}$}
+                        \item{Function: Sleep}
+                        \item{
+                            Ready Queue: $\text{head}\longrightarrow
+                            \varnothing$
+                        } \item{
+                            Queue of semaphore {\tt mutex}: $\text{head}\longrightarrow
+                            C_{1}\longrightarrow
+                            \varnothing$
+                        }
+                        \item{
+                            Queue of semaphore {\tt nempty}: $\text{head}\longrightarrow
+                            P_{0}\longrightarrow
+                            P_{1}\longrightarrow
+                            P_{2}\longrightarrow
+                            \varnothing$
+                        }
+                        \item{
+                            Queue of semaphore {\tt nfull}: $\text{head}\longrightarrow
+                            \varnothing$
+                        }
+                \end{itemize}
+                }
+                \item {
+                    \begin{itemize}
+                        \item{Current: $C_{0}$}
+                        \item{Next: $C_{1}$}
+                        \item{Function: Yield}
+                        \item{
+                            Ready Queue: $\text{head}\longrightarrow
+                            P_{0}\longrightarrow
+                            C_{0}\longrightarrow
+                            \varnothing$
+                        } \item{
+                            Queue of semaphore {\tt mutex}: $\text{head}\longrightarrow
+                            \varnothing$
+                        }
+                        \item{
+                            Queue of semaphore {\tt nempty}: $\text{head}\longrightarrow
+                            P_{1}\longrightarrow
+                            P_{2}\longrightarrow
+                            \varnothing$
+                        }
+                        \item{
+                            Queue of semaphore {\tt nfull}: $\text{head}\longrightarrow
+                            \varnothing$
+                        }
+                \end{itemize}
+                }
+                \item {
+                    \begin{itemize}
+                        \item{Current: $C_{1}$}
+                        \item{Next: $P_{0}$}
+                        \item{Function: Yield}
+                        \item{
+                            Ready Queue: $\text{head}\longrightarrow
+                            C_{0}\longrightarrow
+                            C_{1}\longrightarrow
+                            \varnothing$
+                        } \item{
+                            Queue of semaphore {\tt mutex}: $\text{head}\longrightarrow
+                            \varnothing$
+                        }
+                        \item{
+                            Queue of semaphore {\tt nempty}: $\text{head}\longrightarrow
+                            P_{1}\longrightarrow
+                            P_{2}\longrightarrow
+                            \varnothing$
+                        }
+                        \item{
+                            Queue of semaphore {\tt nfull}: $\text{head}\longrightarrow
+                            \varnothing$
+                        }
+                \end{itemize}
+                }
+                \item {
+                    \begin{itemize}
+                        \item{Current: $P_{0}$}
+                        \item{Next: $C_{0}$}
+                        \item{Function: Sleep}
+                        \item{
+                            Ready Queue: $\text{head}\longrightarrow
+                            C_{1}\longrightarrow
+                            \varnothing$
+                        } \item{
+                            Queue of semaphore {\tt mutex}: $\text{head}\longrightarrow
+                            P_{0}\longrightarrow
+                            \varnothing$
+                        }
+                        \item{
+                            Queue of semaphore {\tt nempty}: $\text{head}\longrightarrow
+                            P_{1}\longrightarrow
+                            P_{2}\longrightarrow
+                            \varnothing$
+                        }
+                        \item{
+                            Queue of semaphore {\tt nfull}: $\text{head}\longrightarrow
+                            \varnothing$
+                        }
+                \end{itemize}
+                }
+                \item {
+                    \begin{itemize}
+                        \item{Current: $C_{0}$}
+                        \item{Next: $C_{1}$}
+                        \item{Function: Sleep}
+                        \item{
+                            Ready Queue: $\text{head}\longrightarrow
+                            P_{0}\longrightarrow
+                            P_{1}\longrightarrow
+                            \varnothing$
+                        } \item{
+                            Queue of semaphore {\tt mutex}: $\text{head}\longrightarrow
+                            \varnothing$
+                        }
+                        \item{
+                            Queue of semaphore {\tt nempty}: $\text{head}\longrightarrow
+                            P_{2}\longrightarrow
+                            \varnothing$
+                        }
+                        \item{
+                            Queue of semaphore {\tt nfull}: $\text{head}\longrightarrow
+                            C_{0}\longrightarrow
+                            \varnothing$
+                        }
+                \end{itemize}
+                }
+                \item {
+                    \begin{itemize}
+                        \item{Current: $C_{1}$}
+                        \item{Next: $P_{0}$}
+                        \item{Function: Sleep}
+                        \item{
+                            Ready Queue: $\text{head}\longrightarrow
+                            P_{1}\longrightarrow
+                            P_{2}\longrightarrow
+                            \varnothing$
+                        } \item{
+                            Queue of semaphore {\tt mutex}: $\text{head}\longrightarrow
+                            \varnothing$
+                        }
+                        \item{
+                            Queue of semaphore {\tt nempty}: $\text{head}\longrightarrow
+                            \varnothing$
+                        }
+                        \item{
+                            Queue of semaphore {\tt nfull}: $\text{head}\longrightarrow
+                            C_{0}\longrightarrow
+                            C_{1}\longrightarrow
+                            \varnothing$
+                        }
+                \end{itemize}
+                }
+                \item {
+                    \begin{itemize}
+                        \item{Current: $P_{0}$}
+                        \item{Next: $P_{1}$}
+                        \item{Function: Yield}
+                        \item{
+                            Ready Queue: $\text{head}\longrightarrow
+                            P_{2}\longrightarrow
+                            P_{0}\longrightarrow
+                            \varnothing$
+                        } \item{
+                            Queue of semaphore {\tt mutex}: $\text{head}\longrightarrow
+                            \varnothing$
+                        }
+                        \item{
+                            Queue of semaphore {\tt nempty}: $\text{head}\longrightarrow
+                            \varnothing$
+                        }
+                        \item{
+                            Queue of semaphore {\tt nfull}: $\text{head}\longrightarrow
+                            C_{0}\longrightarrow
+                            C_{1}\longrightarrow
+                            \varnothing$
+                        }
+                \end{itemize}}
+                %20
+                \item {
+                    \begin{itemize}
+                        \item{Current: $P_{1}$}
+                        \item{Next: $P_{2}$}
+                        \item{Function: Yield}
+                        \item{
+                            Ready Queue: $\text{head}\longrightarrow
+                            P_{0}\longrightarrow
+                            P_{1}\longrightarrow
+                            \varnothing$
+                        } \item{
+                            Queue of semaphore {\tt mutex}: $\text{head}\longrightarrow
+                            \varnothing$
+                        }
+                        \item{
+                            Queue of semaphore {\tt nempty}: $\text{head}\longrightarrow
+                            \varnothing$
+                        }
+                        \item{
+                            Queue of semaphore {\tt nfull}: $\text{head}\longrightarrow
+                            C_{0}\longrightarrow
+                            C_{1}\longrightarrow
+                            \varnothing$
+                        }
+                \end{itemize}}
+                \item {
+                    \begin{itemize}
+                        \item{Current: $P_{2}$}
+                        \item{Next: $P_{0}$}
+                        \item{Function: Sleep}
+                        \item{
+                            Ready Queue: $\text{head}\longrightarrow
+                            P_{1}\longrightarrow
+                            \varnothing$
+                        } \item{
+                            Queue of semaphore {\tt mutex}: $\text{head}\longrightarrow
+                            P_{2}\longrightarrow
+                            \varnothing$
+                        }
+                        \item{
+                            Queue of semaphore {\tt nempty}: $\text{head}\longrightarrow
+                            \varnothing$
+                        }
+                        \item{
+                            Queue of semaphore {\tt nfull}: $\text{head}\longrightarrow
+                            C_{0}\longrightarrow
+                            C_{1}\longrightarrow
+                            \varnothing$
+                        }
+                \end{itemize}}
+                \item {
+                    \begin{itemize}
+                        \item{Current: $P_{0}$}
+                        \item{Next: $P_{1}$}
+                        \item{Function: Sleep}
+                        \item{
+                            Ready Queue: $\text{head}\longrightarrow
+                            P_{2}\longrightarrow
+                            C_{0}\longrightarrow
+                            \varnothing$
+                        } \item{
+                            Queue of semaphore {\tt mutex}: $\text{head}\longrightarrow
+                            \varnothing$
+                        }
+                        \item{
+                            Queue of semaphore {\tt nempty}: $\text{head}\longrightarrow
+                            \varnothing$
+                        }
+                        \item{
+                            Queue of semaphore {\tt nfull}: $\text{head}\longrightarrow
+                            C_{1}\longrightarrow
+                            \varnothing$
+                        }
+                \end{itemize}}
+                \item {
+                    \begin{itemize}
+                        \item{Current: $P_{1}$}
+                        \item{Next: $P_{2}$}
+                        \item{Function: Sleep}
+                        \item{
+                            Ready Queue: $\text{head}\longrightarrow
+                            C_{0}\longrightarrow
+                            C_{1}\longrightarrow
+                            \varnothing$
+                        } \item{
+                            Queue of semaphore {\tt mutex}: $\text{head}\longrightarrow
+                            \varnothing$
+                        }
+                        \item{
+                            Queue of semaphore {\tt nempty}: $\text{head}\longrightarrow
+                            \varnothing$
+                        }
+                        \item{
+                            Queue of semaphore {\tt nfull}: $\text{head}\longrightarrow
+                            \varnothing$
+                        }
+                \end{itemize}}
+                \item {
+                    \begin{itemize}
+                        \item{Current: $P_{2}$}
+                        \item{Next: $C_{0}$}
+                        \item{Function: Yield}
+                        \item{
+                            Ready Queue: $\text{head}\longrightarrow
+                            C_{1}\longrightarrow
+                            P_{2}\longrightarrow
+                            \varnothing$
+                        } \item{
+                            Queue of semaphore {\tt mutex}: $\text{head}\longrightarrow
+                            \varnothing$
+                        }
+                        \item{
+                            Queue of semaphore {\tt nempty}: $\text{head}\longrightarrow
+                            \varnothing$
+                        }
+                        \item{
+                            Queue of semaphore {\tt nfull}: $\text{head}\longrightarrow
+                            \varnothing$
+                        }
+                \end{itemize}}
+                \item {
+                    \begin{itemize}
+                        \item{Current: $C_{0}$}
+                        \item{Next: $C_{1}$}
+                        \item{Function: Yield}
+                        \item{
+                            Ready Queue: $\text{head}\longrightarrow
+                            P_{2}\longrightarrow
+                            C_{0}\longrightarrow
+                            \varnothing$
+                        } \item{
+                            Queue of semaphore {\tt mutex}: $\text{head}\longrightarrow
+                            \varnothing$
+                        }
+                        \item{
+                            Queue of semaphore {\tt nempty}: $\text{head}\longrightarrow
+                            \varnothing$
+                        }
+                        \item{
+                            Queue of semaphore {\tt nfull}: $\text{head}\longrightarrow
+                            \varnothing$
+                        }
+                \end{itemize}}
+                \item {
+                    \begin{itemize}
+                        \item{Current: $C_{1}$}
+                        \item{Next: $P_{2}$}
+                        \item{Function: Sleep}
+                        \item{
+                            Ready Queue: $\text{head}\longrightarrow
+                            C_{0}\longrightarrow
+                            \varnothing$
+                        } \item{
+                            Queue of semaphore {\tt mutex}: $\text{head}\longrightarrow
+                            C_{1}\longrightarrow
+                            \varnothing$
+                        }
+                        \item{
+                            Queue of semaphore {\tt nempty}: $\text{head}\longrightarrow
+                            \varnothing$
+                        }
+                        \item{
+                            Queue of semaphore {\tt nfull}: $\text{head}\longrightarrow
+                            \varnothing$
+                        }
+                \end{itemize}}
+                \item {
+                    \begin{itemize}
+                        \item{Current: $P_{2}$}
+                        \item{Next: $C_{0}$}
+                        \item{Function: Sleep}
+                        \item{
+                            Ready Queue: $\text{head}\longrightarrow
+                            C_{1}\longrightarrow
+                            \varnothing$
+                        } \item{
+                            Queue of semaphore {\tt mutex}: $\text{head}\longrightarrow
+                            \varnothing$
+                        }
+                        \item{
+                            Queue of semaphore {\tt nempty}: $\text{head}\longrightarrow
+                            \varnothing$
+                        }
+                        \item{
+                            Queue of semaphore {\tt nfull}: $\text{head}\longrightarrow
+                            \varnothing$
+                        }
+                \end{itemize}}
+                \item {
+                    \begin{itemize}
+                        \item{Current: $C_{0}$}
+                        \item{Next: $C_{1}$}
+                        \item{Function: Yield}
+                        \item{
+                            Ready Queue: $\text{head}\longrightarrow
+                            C_{0}\longrightarrow
+                            \varnothing$
+                        } \item{
+                            Queue of semaphore {\tt mutex}: $\text{head}\longrightarrow
+                            \varnothing$
+                        }
+                        \item{
+                            Queue of semaphore {\tt nempty}: $\text{head}\longrightarrow
+                            \varnothing$
+                        }
+                        \item{
+                            Queue of semaphore {\tt nfull}: $\text{head}\longrightarrow
+                            \varnothing$
+                        }
+                \end{itemize}}
+                \item {
+                    \begin{itemize}
+                        \item{Current: $C_{1}$}
+                        \item{Next: $C_{0}$}
+                        \item{Function: Sleep}
+                        \item{
+                            Ready Queue: $\text{head}\longrightarrow
+                            \varnothing$
+                        } \item{
+                            Queue of semaphore {\tt mutex}: $\text{head}\longrightarrow
+                            \varnothing$
+                        }
+                        \item{
+                            Queue of semaphore {\tt nempty}: $\text{head}\longrightarrow
+                            \varnothing$
+                        }
+                        \item{
+                            Queue of semaphore {\tt nfull}: $\text{head}\longrightarrow
+                            C_{1}\longrightarrow
+                            \varnothing$
+                        }
+                \end{itemize}}
+                \item{
+                    \begin{itemize}
+                        \item{Current: $C_{0}$}
+                        \item{Next: $\varnothing$}
+                        \item{Function: Sleep}
+                        \item{
+                            Ready Queue: $\text{head}\longrightarrow
+                            \varnothing$
+                        } \item{
+                            Queue of semaphore {\tt mutex}: $\text{head}\longrightarrow
+                            \varnothing$
+                        }
+                        \item{
+                            Queue of semaphore {\tt nempty}: $\text{head}\longrightarrow
+                            \varnothing$
+                        }
+                        \item{
+                            Queue of semaphore {\tt nfull}: $\text{head}\longrightarrow
+                            C_{1}\longrightarrow
+                            C_{0}\longrightarrow
+                            \varnothing$
+                        }
+                \end{itemize}}
+        \end{enumerate}
+
+    \end{question}
+
+\end{document}
