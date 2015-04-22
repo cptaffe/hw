@@ -111,6 +111,25 @@ producer id --> 2; Message number --> 2;
 
     The Mesa style condition variable algorithm is simpler than the Hoare-style algorithm as it does not wait on the signalled process. The wait function releases the mutex and P's on the {\tt sem} semaphore initialized to 0. Since the mutex is released, other threads can do work and a signalling process can signal, calling V on {\tt sem}. The important part of this is that the signalling process neither releases the mutex or the processor as it would using Hoare-style condition variables. The waiting process, now awoken, will attempt to access the semaphore. This means that the waiting process may or may not have the mutex when the waiting condition is true, and must wait once again, thusly the {\tt while} loop on the wait lines.
 
+    Another important note is that mesa style condition variables have no concept of an urgent sempahore and count (next and next-count) like Hoare outlines in ``MONITORS: AN OPERATING SYSTEM STRUCTURING CONCEPT'' as follows on Section 2 labeled ``Interpretation'':
+
+    \begin{quote}
+        \begin{verbatim}
+condcount :=condcount+l;
+if urgentcount > 0 then V(urgent) else V(mutex);
+P(condsem);
+condcount :=condcount-1.
+        \end{verbatim}
+    The signal operation may be coded:
+        \begin{verbatim}
+urgentcount :=urgentcount+l;
+if condcount > 0 then {V(condsem); P(urgent)};
+urgentcount :=urgentcount-1.
+        \end{verbatim}
+    \end{quote}
+
+    This concept is completely ignored in the Mesa style monitor, as specified in the corresponding paper ``Experience with Processes and Monitors in Mesa,'' where the simple {\it notify} concept is used to describe the {\bf signal} operation. A simple release of monitior lock (mutex), P operation on the conditon variable's semaphore (sem), and a subsequent reaquisition of lock defines {\bf wait}. This must also be accompanied by a count increment before lock (mutex) release and count decrement after release from sem to avoid the regain of the monitor when in the midst of waiting leading to an ignored signal. Also, this count must exist so that calls to signal do not ``notify'' if there is nothing waiting on the semaphore (sem).
+
 \end{question}
 
 \begin{question}
@@ -120,6 +139,27 @@ producer id --> 2; Message number --> 2;
     Here follows the Mesa style condition variable code:
 
     \begin{verbatim}
+class Condition_M {
+  public:
+    Condition_M(char* debugName, Monitor *m);   // initialize condition to
+                                                // "no one waiting"
+    ~Condition_M();                             // deallocate the condition
+    char* getName() { return (name); }
+
+    void Wait();
+    void Signal();
+
+  private:
+    char* name;
+    // plus some other stuff you'll need to define
+
+    Semaphore *sem; // semaphore for the waiting threads;
+    int  count;     // the number of waiting threads;
+
+    Monitor* mon;   // the pointer to the Monitor to which this condition
+                    // variable belongs
+};
+
 // condition variables in Mesa's style
 Condition_M::Condition_M(char *debugName, Monitor *m)
     : name(debugName),
@@ -159,6 +199,22 @@ void Condition_M::Signal()
     Here follows the monitor class:
 
     \begin{verbatim}
+class Monitor {
+public:
+    Monitor(char *debugName);   // default contructuctor
+    ~Monitor();              // default destructor
+
+    // const function attribute guarantees no side effects.
+    char *getName() const { return name; }
+private:
+    char *name;
+public:
+    Semaphore* mutex;   // the semaphore for mutual exclusion
+protected:
+    void Entry();       // The entry for critical section of monitor functions
+    void Exit();        // The exit for critical section of monitor functions
+};
+
 Monitor::Monitor(char *debugName)
     : name(debugName),
     mutex(new Semaphore(name, 1)) {}
@@ -181,6 +237,40 @@ void Monitor::Exit() {
     Here follows the ring class's changed portions:
 
     \begin{verbatim}
+// class of the slot in the ring-buffer
+class slot {
+    public:
+    slot(int id, int number);
+    slot() { thread_id = 0; value = 0;};
+
+    int thread_id;
+    int value;
+    };
+
+
+class Ring : public Monitor{
+  public:
+    Ring(char *debugName, int sz);    // Constructor:  initialize variables, allocate space.
+    ~Ring();         // Destructor:   deallocate space allocated above.
+
+
+    void Put(slot *message); // Put a message the next empty slot.
+
+    void Get(slot *message); // Get a message from the next  full slot.
+
+    int Full();       // Returns non-0 if the ring is full, 0 otherwise.
+    int Empty();      // Returns non-0 if the ring is empty, 0 otherwise.
+
+  private:
+    int size;           // The size of the ring buffer.
+    int in, out;        // Index of
+    slot *buffer;       // A pointer to an array for the ring buffer.
+    int current;        // the current number of full slots in the buffer
+
+    Condition_M *notfull;   // condition variable to wait until not full
+    Condition_M *notempty;  // condition variable to wait until not empty
+};
+
 Ring::Ring(char *debugName, int sz)
     : Monitor(debugName), size(sz), in(0), out(0), buffer(new slot[size]),
     current(0),
