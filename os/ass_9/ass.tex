@@ -128,7 +128,7 @@ urgentcount :=urgentcount-1.
         \end{verbatim}
     \end{quote}
 
-    This concept is completely ignored in the Mesa style monitor, as specified in the corresponding paper ``Experience with Processes and Monitors in Mesa,'' where the simple {\it notify} concept is used to describe the {\bf signal} operation. A simple release of monitior lock (mutex), P operation on the conditon variable's semaphore (sem), and a subsequent reaquisition of lock defines {\bf wait}. This must also be accompanied by a count increment before lock (mutex) release and count decrement after release from sem to avoid the regain of the monitor when in the midst of waiting leading to an ignored signal. Also, this count must exist so that calls to signal do not ``notify'' if there is nothing waiting on the semaphore (sem).
+    This concept is completely ignored in the Mesa style monitor, as specified in the corresponding paper ``Experience with Processes and Monitors in Mesa,'' Section 4, ``Condition variables'', where the simple {\it notify} concept is used to describe the {\bf signal} operation. The signal operation here is implemented as a V operation to the condition variable semaphore (sem). A release of monitior lock (mutex), P operation on the conditon variable's semaphore (sem), and a subsequent reaquisition of lock defines {\bf wait}. This must also be accompanied by a count increment before lock (mutex) release and count decrement after release from sem to avoid the regain of the monitor when in the midst of waiting leading to an ignored signal. Also, this count must exist so that calls to signal do not ``notify'' if there is nothing waiting on the semaphore (sem).
 
 \end{question}
 
