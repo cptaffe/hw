@@ -104,6 +104,7 @@ producer id --> 2; Message number --> 2;
 \end{question}
 
 \section{Report of Lab 4-6}
+\setcounter{qsection}{0}
 
 \begin{question}
 
@@ -111,7 +112,7 @@ producer id --> 2; Message number --> 2;
 
     The Mesa style condition variable algorithm is simpler than the Hoare-style algorithm as it does not wait on the signalled process. The wait function releases the mutex and P's on the {\tt sem} semaphore initialized to 0. Since the mutex is released, other threads can do work and a signalling process can signal, calling V on {\tt sem}. The important part of this is that the signalling process neither releases the mutex or the processor as it would using Hoare-style condition variables. The waiting process, now awoken, will attempt to access the semaphore. This means that the waiting process may or may not have the mutex when the waiting condition is true, and must wait once again, thusly the {\tt while} loop on the wait lines.
 
-    Another important note is that mesa style condition variables have no concept of an urgent sempahore and count (next and next-count) like Hoare outlines in ``MONITORS: AN OPERATING SYSTEM STRUCTURING CONCEPT'' as follows on Section 2 labeled ``Interpretation'':
+    Another important note is that mesa style condition variables have no concept of an urgent sempahore and count (next and next-count) like Hoare outlines in ``MONITORS: AN OPERATING SYSTEM STRUCTURING CONCEPT'' as follows in Section 2 labeled ``Interpretation'':
 
     \begin{quote}
         \begin{verbatim}
@@ -245,12 +246,13 @@ class slot {
 
     int thread_id;
     int value;
-    };
+ };
 
 
 class Ring : public Monitor{
   public:
-    Ring(char *debugName, int sz);    // Constructor:  initialize variables, allocate space.
+    Ring(char *debugName, int sz);    // Constructor:  initialize variables,
+                                      // allocate space.
     ~Ring();         // Destructor:   deallocate space allocated above.
 
 
@@ -270,6 +272,12 @@ class Ring : public Monitor{
     Condition_M *notfull;   // condition variable to wait until not full
     Condition_M *notempty;  // condition variable to wait until not empty
 };
+
+slot::slot(int id, int number)
+{
+    thread_id = id;
+    value = number;
+}
 
 Ring::Ring(char *debugName, int sz)
     : Monitor(debugName), size(sz), in(0), out(0), buffer(new slot[size]),
@@ -318,6 +326,14 @@ void Ring::Get(slot *message) {
     current--; // one less in ring.
     notfull->Signal();
     Exit();
+}
+
+int Ring::Empty() {
+    return current == 0;
+}
+
+int Ring::Full() {
+    return current == size;
 }
     \end{verbatim}
 
