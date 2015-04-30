@@ -45,10 +45,16 @@ Here follows an account of laboratory 4, section 6. This section follows the ori
             {\tt Wait()} method
             \begin{verbatim}
 count++;
-mutex->V();
+if (mon->next_count > 0) {
+    mon->next->V();
+} else {
+    mon->mutex->V();
+}
 sem->P();
 count--;
-mutex->P();
+mon->next_count++;
+mon->next->P();
+mon->next_count--;
             \end{verbatim}
         }
         \item{
@@ -86,16 +92,16 @@ tmp_0  tmp_1
 $ cat tmp_0
 producer id --> 0; Message number --> 0;
 producer id --> 1; Message number --> 0;
-producer id --> 0; Message number --> 1;
 producer id --> 1; Message number --> 1;
-producer id --> 1; Message number --> 2;
 producer id --> 2; Message number --> 0;
-producer id --> 2; Message number --> 1;
 producer id --> 3; Message number --> 0;
-producer id --> 3; Message number --> 1;
 producer id --> 3; Message number --> 2;
 $ cat tmp_1
+producer id --> 0; Message number --> 1;
+producer id --> 2; Message number --> 1;
 producer id --> 0; Message number --> 2;
+producer id --> 3; Message number --> 1;
+producer id --> 1; Message number --> 2;
 producer id --> 2; Message number --> 2;
     \end{verbatim}
 
@@ -110,26 +116,7 @@ producer id --> 2; Message number --> 2;
 
     I will now describe my analysis and design (including the algorithm) of Mesa style conditional variables (i.e. Section 2 of Lab4-6) using semaphores.
 
-    The Mesa style condition variable algorithm is simpler than the Hoare-style algorithm as it does not wait on the signalled process. The wait function releases the mutex and P's on the {\tt sem} semaphore initialized to 0. Since the mutex is released, other threads can do work and a signalling process can signal, calling V on {\tt sem}. The important part of this is that the signalling process neither releases the mutex or the processor as it would using Hoare-style condition variables. The waiting process, now awoken, will attempt to access the semaphore. This means that the waiting process may or may not have the mutex when the waiting condition is true, and must wait once again, thusly the {\tt while} loop on the wait lines.
-
-    Another important note is that mesa style condition variables have no concept of an urgent sempahore and count (next and next-count) like Hoare outlines in ``MONITORS: AN OPERATING SYSTEM STRUCTURING CONCEPT'' as follows in Section 2 labeled ``Interpretation'':
-
-    \begin{quote}
-        \begin{verbatim}
-condcount :=condcount+l;
-if urgentcount > 0 then V(urgent) else V(mutex);
-P(condsem);
-condcount :=condcount-1.
-        \end{verbatim}
-    The signal operation may be coded:
-        \begin{verbatim}
-urgentcount :=urgentcount+l;
-if condcount > 0 then {V(condsem); P(urgent)};
-urgentcount :=urgentcount-1.
-        \end{verbatim}
-    \end{quote}
-
-    This concept is completely ignored in the Mesa style monitor, as specified in the corresponding paper ``Experience with Processes and Monitors in Mesa,'' Section 4, ``Condition variables'', where the simple {\it notify} concept is used to describe the {\bf signal} operation. The signal operation here is implemented as a V operation to the condition variable semaphore (sem). A release of monitior lock (mutex), P operation on the conditon variable's semaphore (sem), and a subsequent reaquisition of lock defines {\bf wait}. This must also be accompanied by a count increment before lock (mutex) release and count decrement after release from sem to avoid the regain of the monitor when in the midst of waiting leading to an ignored signal. Also, this count must exist so that calls to signal do not ``notify'' if there is nothing waiting on the semaphore (sem).
+    My first submission was based on an incorrect assumption. That is that ``Experience with Processes and Monitors in Mesa,'' like the Hoare paper, specified a new monitor implementation from the ground up. Unfortunately, it was meant to be taken in context as an update over the existing Hoare monitor implementation. This aside, the first submission detailed the simpler signal method well. The main idea is to simplify and basically asynchonize the siganlling of waiting processes.
 
 \end{question}
 
@@ -178,10 +165,16 @@ void Condition_M::Wait()
     IntStatus oldLevel = interrupt->SetLevel(IntOff);
 
     count++;
-    mon->mutex->V();
+    if (mon->next_count > 0) {
+        mon->next->V();
+    } else {
+        mon->mutex->V();
+    }
     sem->P();
     count--;
-    mon->mutex->P();
+    mon->next_count++;
+    mon->next->P();
+    mon->next_count--;
 
     (void) interrupt->SetLevel(oldLevel);
 }
@@ -211,6 +204,11 @@ private:
     char *name;
 public:
     Semaphore* mutex;   // the semaphore for mutual exclusion
+    Semaphore* next;    //the semaphore to hold internal threads which are
+                        // blocked after waking up some threads in Signal()
+                        // of a condition variable
+
+    int next_count;     // the number of threads blocked in Semaphore next
 protected:
     void Entry();       // The entry for critical section of monitor functions
     void Exit();        // The exit for critical section of monitor functions
@@ -218,10 +216,13 @@ protected:
 
 Monitor::Monitor(char *debugName)
     : name(debugName),
-    mutex(new Semaphore(name, 1)) {}
+    mutex(new Semaphore(name, 1)),
+    next(new Semaphore(name, 0)),
+    next_count(0) {}
 
 Monitor::~Monitor() {
     delete mutex;
+    delete next;
 }
 
 void Monitor::Entry() {
@@ -229,7 +230,11 @@ void Monitor::Entry() {
 }
 
 void Monitor::Exit() {
-    mutex->V();
+    if (next_count > 0) {
+        next->V();
+    } else {
+        mutex->V();
+    }
 }
     \end{verbatim}
 
@@ -374,18 +379,18 @@ $ ls tmp_*
 tmp_0  tmp_1
 $ cat tmp_0
 producer id --> 0; Message number --> 0;
-producer id --> 1; Message number --> 1;
-producer id --> 1; Message number --> 2;
-producer id --> 3; Message number --> 1;
-producer id --> 2; Message number --> 0;
-producer id --> 3; Message number --> 2;
+producer id --> 0; Message number --> 2;
 producer id --> 2; Message number --> 1;
+producer id --> 3; Message number --> 1;
+producer id --> 3; Message number --> 2;
 $ cat tmp_1
 producer id --> 0; Message number --> 1;
+producer id --> 2; Message number --> 0;
 producer id --> 1; Message number --> 0;
 producer id --> 3; Message number --> 0;
-producer id --> 0; Message number --> 2;
+producer id --> 1; Message number --> 1;
 producer id --> 2; Message number --> 2;
+producer id --> 1; Message number --> 2;
     \end{verbatim}
 
     \begin{itemize}
@@ -420,15 +425,15 @@ producer id --> 0; Message number --> 0;
 producer id --> 0; Message number --> 1;
 producer id --> 1; Message number --> 0;
 producer id --> 2; Message number --> 0;
+producer id --> 0; Message number --> 2;
+producer id --> 0; Message number --> 3;
 producer id --> 1; Message number --> 2;
-producer id --> 1; Message number --> 3;
 $ cat tmp_1
 producer id --> 2; Message number --> 1;
+producer id --> 1; Message number --> 3;
 $ cat tmp_2
-producer id --> 0; Message number --> 2;
-producer id --> 2; Message number --> 2;
 producer id --> 1; Message number --> 1;
-producer id --> 0; Message number --> 3;
+producer id --> 2; Message number --> 2;
 producer id --> 2; Message number --> 3;
     \end{verbatim}
 
