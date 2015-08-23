@@ -11,6 +11,8 @@ import (
 
 const (
 	LOOPS = 25000
+	LOWERPEDESTALBOUND = 2
+	UPPERPEDESTALBOUND = 21
 )
 
 type Stat struct {
@@ -35,7 +37,9 @@ func (s *StatArray) Swap(i, j int) {
 }
 
 func main() {
-	for PEDESTALES := 2; PEDESTALES < 21; PEDESTALES++ {
+	results := make([]StatArray, UPPERPEDESTALBOUND-LOWERPEDESTALBOUND)
+
+	for p := LOWERPEDESTALBOUND; p < UPPERPEDESTALBOUND; p++ {
 		wchan := make(chan int)
 		for i := 0; i < 8; i++ {
 			jump := func(ped, nped []int, i int) {
@@ -54,7 +58,7 @@ func main() {
 
 			go func() {
 				for i := 0; i < LOOPS/8+1; i++ {
-					ped := make([]int, PEDESTALES)
+					ped := make([]int, p)
 					for i, _ := range ped {
 						ped[i] = i+1 // avoid value 0, 0 is dead.
 					}
@@ -71,38 +75,52 @@ func main() {
 			}()
 		}
 
-		s := StatArray{ s: make([]Stat, PEDESTALES) }
+		s := StatArray{ s: make([]Stat, p) }
+		results[p-LOWERPEDESTALBOUND] = s
 		for i := 0; i < LOOPS; i++ {
 			index := <-wchan
 			s.s[index].Index = index
 			s.s[index].Wins++
 		}
-
 		sort.Sort(&s)
+	}
 
+	for p := LOWERPEDESTALBOUND; p < UPPERPEDESTALBOUND; p++ {
 		// Enumerate results
-		fmt.Printf("== Running with %v pedastles ==\n", PEDESTALES)
+		fmt.Printf("== Running with %v pedastles ==\n", p)
+		for _, w := range results[p-LOWERPEDESTALBOUND].s {
+			fmt.Printf("Index: %v, Wins: %v\n", w.Index, w.Wins)
+		}
+	}
+
+	// Write svg graphs
+	dirName := "graphs"
+	if err := os.RemoveAll(dirName); err != nil {
+		log.Fatal(err)
+	}
+	if err := os.Mkdir(dirName, 0777); err != nil {
+			log.Fatal(err)
+	}
+	for p := LOWERPEDESTALBOUND; p < UPPERPEDESTALBOUND; p++ {
 		largest := 0
-		for _, w := range s.s {
+		for _, w := range results[p-LOWERPEDESTALBOUND].s {
 			if w.Wins > largest {
 				largest = w.Wins
 			}
-			fmt.Printf("Index: %v, Wins: %v\n", w.Index, w.Wins)
 		}
 
-		// Write svg graph
 		width := 800
 		height := 800
 		hd := float64(height-10)/float64(largest)
-		wd := float64(width-10)/float64(PEDESTALES)
-		file, err := os.Create(fmt.Sprintf("graph_%.2d.svg", PEDESTALES))
+		wd := float64(width-10)/float64(p-1)
+		file, err := os.Create(fmt.Sprintf("%s/graph_%.2d.svg", dirName, p))
 		if err != nil {
 			log.Fatal(err)
 		}
 		canvas := svg.New(file)
 		canvas.Start(width, height)
 		canvas.Rect(0, 0, width, height, `fill="beige"`)
-		for _, w := range s.s {
+		for _, w := range results[p-LOWERPEDESTALBOUND].s {
 			canvas.Circle(int(float64(w.Index) * wd)+5, height - (int(float64(w.Wins) * hd)+5), 2)
 		}
 		canvas.End()
