@@ -3,16 +3,18 @@ package main
 import (
 	"math/rand"
 	"sort"
-	"github.com/ajstarks/svgo"
+	"github.com/stanim/svgof/svgo2f"
 	"os"
 	"log"
 	"fmt"
+	"runtime"
+	"runtime/pprof"
 )
 
 const (
-	LOOPS = 25000
+	LOOPS = 100000
 	LOWERPEDESTALBOUND = 2
-	UPPERPEDESTALBOUND = 21
+	UPPERPEDESTALBOUND = 20+1
 )
 
 type Stat struct {
@@ -38,10 +40,10 @@ func (s *StatArray) Swap(i, j int) {
 
 func main() {
 	results := make([]StatArray, UPPERPEDESTALBOUND-LOWERPEDESTALBOUND)
-
+	schan := make(chan StatArray)
 	for p := LOWERPEDESTALBOUND; p < UPPERPEDESTALBOUND; p++ {
 		wchan := make(chan int)
-		for i := 0; i < 8; i++ {
+		for i := 0; i < runtime.NumCPU(); i++ {
 			jump := func(ped, nped []int, i int) {
 				if (ped[i] != 0) {
 					j := i - (rand.Intn(2))
@@ -56,8 +58,13 @@ func main() {
 				}
 			}
 
-			go func() {
-				for i := 0; i < LOOPS/8+1; i++ {
+			max := LOOPS/runtime.NumCPU()
+			if i == runtime.NumCPU()-1 {
+				max += LOOPS%runtime.NumCPU()
+			}
+
+			go func(w chan int, max, p int) {
+				for i := 0; i < max; i++ {
 					ped := make([]int, p)
 					for i, _ := range ped {
 						ped[i] = i+1 // avoid value 0, 0 is dead.
@@ -70,19 +77,26 @@ func main() {
 						}
 						ped = nped
 					}
-					wchan<- ped[0]-1 // counter offset
+					w<- ped[0]-1 // counter offset
 				}
-			}()
+			}(wchan, max, p)
 		}
 
-		s := StatArray{ s: make([]Stat, p) }
-		results[p-LOWERPEDESTALBOUND] = s
-		for i := 0; i < LOOPS; i++ {
-			index := <-wchan
-			s.s[index].Index = index
-			s.s[index].Wins++
-		}
-		sort.Sort(&s)
+		go func(w chan int, p int) {
+			s := StatArray{ s: make([]Stat, p) }
+			for i := 0; i < LOOPS; i++ {
+				index := <-w
+				s.s[index].Index = index
+				s.s[index].Wins++
+			}
+			sort.Sort(&s)
+			schan<- s
+		}(wchan, p)
+	}
+
+	for i := LOWERPEDESTALBOUND; i < UPPERPEDESTALBOUND; i++ {
+		s := <-schan
+		results[len(s.s)-LOWERPEDESTALBOUND] = s
 	}
 
 	for p := LOWERPEDESTALBOUND; p < UPPERPEDESTALBOUND; p++ {
@@ -109,10 +123,10 @@ func main() {
 			}
 		}
 
-		width := 800
-		height := 800
-		hd := float64(height-10)/float64(largest)
-		wd := float64(width-10)/float64(p-1)
+		width := 800.0
+		height := 800.0
+		hd := (height-10)/float64(largest)
+		wd := (width-10)/float64(p-1)
 		file, err := os.Create(fmt.Sprintf("%s/graph_%.2d.svg", dirName, p))
 		if err != nil {
 			log.Fatal(err)
@@ -121,7 +135,7 @@ func main() {
 		canvas.Start(width, height)
 		canvas.Rect(0, 0, width, height, `fill="beige"`)
 		for _, w := range results[p-LOWERPEDESTALBOUND].s {
-			canvas.Circle(int(float64(w.Index) * wd)+5, height - (int(float64(w.Wins) * hd)+5), 2)
+			canvas.Circle((float64(w.Index) * wd)+5, height - ((float64(w.Wins) * hd)+5), 2)
 		}
 		canvas.End()
 	}

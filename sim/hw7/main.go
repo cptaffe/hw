@@ -3,7 +3,7 @@ package main
 import (
 	"math/rand"
 	"fmt"
-	"github.com/ajstarks/svgo"
+	"github.com/stanim/svgof/svgo2f"
 	"os"
 	"log"
 )
@@ -111,10 +111,10 @@ func main() {
 	length /= float64(len(alives))
 	fmt.Printf("Success rate: %v%%, Average length: %v\n", float64(len(alives))/float64(len(stats)) * 100, length)
 
-	width := 800
-	height := 800
-	hd := float64(height-10)/float64(longest)
-	wd := float64(width-10)/float64(len(alives))
+	width := 800.0
+	height := 800.0
+	hd := (height-10)/float64(longest)
+	wd := (width-10)/float64(len(alives))
 	file, err := os.Create("graph.svg")
 	if err != nil {
 		log.Fatal(err)
@@ -122,10 +122,9 @@ func main() {
 	canvas := svg.New(file)
 	canvas.Start(width, height)
 	canvas.Rect(0, 0, width, height, `fill="beige"`)
-	canvas.Line(0, height - int(length*hd)+5, width, height - int(length*hd)+5, `stroke="red"`)
+	canvas.Line(0, height - (length*hd)+5, width, height - (length*hd)+5, `stroke="red"`)
 	for i, a := range alives {
-		// TODO: draw line at avg
-		canvas.Circle(int(float64(i) * wd)+5, height - (int(float64(a.Steps) * hd)+5), 2)
+		canvas.Circle((float64(i) * wd)+5, height - ((float64(a.Steps) * hd)+5), 2)
 	}
 	canvas.End()
 }

@@ -2,7 +2,7 @@ package main
 
 import (
 	"math/rand"
-	"github.com/ajstarks/svgo"
+	"github.com/stanim/svgof/svgo2f"
 	"os"
 	"log"
 	"fmt"
@@ -58,10 +58,10 @@ func main() {
 	}
 
 	// Write svg graph
-	width := 800
-	height := 800
-	hd := float64(height-10)/float64(1)
-	wd := float64(width-10)/float64(MAXPEOPLE)
+	width := 800.0
+	height := 800.0
+	hd := (height-10)/float64(1)
+	wd := (width-10)/float64(MAXPEOPLE)
 	file, err := os.Create("graph.svg")
 	if err != nil {
 		log.Fatal(err)
@@ -73,8 +73,8 @@ func main() {
 	canvas.Text(5, 45, "Simulated", "text-anchor:right;font-size:16px;fill:red")
 	canvas.Text(5, 25, "Exact", "text-anchor:right;font-size:16px;fill:blue")
 	for i, w := range p {
-		canvas.Circle(int(float64(i) * wd)+5, height - (int(float64(w.Simulated) * hd)+5), 3, `fill="red"`)
-		canvas.Circle(int(float64(i) * wd)+5, height - (int(float64(w.Exact) * hd)+5), 3, `fill="blue"`)
+		canvas.Circle((float64(i) * wd)+5, height - ((float64(w.Simulated) * hd)+5), 3, `fill="red"`)
+		canvas.Circle((float64(i) * wd)+5, height - ((float64(w.Exact) * hd)+5), 3, `fill="blue"`)
 	}
 	canvas.End()
 }

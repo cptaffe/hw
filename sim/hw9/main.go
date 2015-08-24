@@ -3,7 +3,7 @@ package main
 import (
 	"math/rand"
 	"fmt"
-	"github.com/ajstarks/svgo"
+	"github.com/stanim/svgof/svgo2f"
 	"os"
 	"log"
 )
@@ -51,8 +51,8 @@ func main() {
 		fmt.Printf("%v: Exact: %v, Simulated: %v\n", i, exact, k)
 	}
 
-	width := 800
-	height := 800
+	width := 800.0
+	height := 800.0
 	hd := float64(height-10)
 	wd := float64(width-10)/float64(len(khasAssigned))
 	file, err := os.Create("graph.svg")
@@ -64,7 +64,7 @@ func main() {
 	canvas.Rect(0, 0, width, height, `fill="beige"`)
 	for i, a := range khasAssigned {
 		// TODO: draw line at avg
-		canvas.Circle(int(float64(i) * wd)+5, height - (int(float64(a) * hd)+5), 2)
+		canvas.Circle((float64(i) * wd)+5, height - ((float64(a) * hd)+5), 2)
 	}
 	canvas.End()
 }

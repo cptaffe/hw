@@ -4,7 +4,7 @@ import (
 	"math/rand"
 	"math"
 	"fmt"
-	"github.com/ajstarks/svgo"
+	"github.com/stanim/svgof/svgo2f"
 	"os"
 	"log"
 )
@@ -82,16 +82,14 @@ func main() {
 		}
 
 		area := AREA - ((underCurve/DARTS) * ((midpoint-LOWERBOUND) * f(LOWERBOUND)))
-		fmt.Println(area)
-
 		bounds = bounds.Enclose(area)
 	}
 	fmt.Println(bounds);
 
-	width := 800
-	height := 800
-	hd := float64(height-10)/f(LOWERBOUND)
-	wd := float64(width-10)/(RIGHTEND-LOWERBOUND)
+	width := 800.0
+	height := 800.0
+	hd := (height-10)/f(LOWERBOUND)
+	wd := (width-10)/(RIGHTEND-LOWERBOUND)
 	count := 0
 	dirName := "graphs"
 	if err := os.RemoveAll(dirName); err != nil {
@@ -111,12 +109,12 @@ func main() {
 		for _, d := range b.Darts {
 			if d.y < f(d.x) {
 				if d.x > b.Left {
-					canvas.Circle(int((d.x - LOWERBOUND)*wd)+5, height - (int(d.y*hd)+5), 2, `fill="red"`)
+					canvas.Circle(((d.x - LOWERBOUND)*wd)+5, height - ((d.y*hd)+5), 2, `fill="red"`)
 				} else {
-					canvas.Circle(int((d.x - LOWERBOUND)*wd)+5, height - (int(d.y*hd)+5), 2, `fill="blue"`)
+					canvas.Circle(((d.x - LOWERBOUND)*wd)+5, height - ((d.y*hd)+5), 2, `fill="blue"`)
 				}
 			} else {
-				canvas.Circle(int((d.x - LOWERBOUND)*wd)+5, height - (int(d.y*hd)+5), 2)
+				canvas.Circle(((d.x - LOWERBOUND)*wd)+5, height - ((d.y*hd)+5), 2)
 			}
 		}
 		canvas.End()

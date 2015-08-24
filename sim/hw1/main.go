@@ -3,7 +3,7 @@ package main
 import (
 	"math/rand"
 	"fmt"
-	"github.com/ajstarks/svgo"
+	"github.com/stanim/svgof/svgo2f"
 	"os"
 	"log"
 )
@@ -30,10 +30,10 @@ func main() {
 	}
 	fmt.Printf("%f\n", (4 * inCircle)/DARTS)
 
-	width := 800
-	height := 800
-	hd := float64(height-10)
-	wd := float64(width-10)
+	width := 800.0
+	height := 800.0
+	hd := height-10
+	wd := width-10
 	file, err := os.Create("graph.svg")
 	if err != nil {
 		log.Fatal(err)
@@ -43,9 +43,9 @@ func main() {
 	canvas.Rect(0, 0, width, height, `fill="beige"`)
 	for _, d := range darts {
 		if ((d.x * d.x) + (d.y * d.y)) <= 1.0 {
-			canvas.Circle(int(float64(d.x) * wd)+5, height - (int(float64(d.y) * hd)+5), 2, "fill=\"blue\"")
+			canvas.Circle((float64(d.x) * wd)+5, height - ((float64(d.y) * hd)+5), 2, "fill=\"blue\"")
 		} else {
-			canvas.Circle(int(float64(d.x) * wd)+5, height - (int(float64(d.y) * hd)+5), 2)
+			canvas.Circle((float64(d.x) * wd)+5, height - ((float64(d.y) * hd)+5), 2)
 		}
 	}
 	canvas.End()
