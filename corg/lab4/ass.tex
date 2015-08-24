@@ -13,6 +13,9 @@
 \pgfdeclarelayer{background}
 \pgfsetlayers{background,main}
 
+% Circuit diagrams
+\usepackage{circuitikz}
+
 % Config
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newcommand{\lab}{4}
@@ -33,7 +36,7 @@
 \date{April $21^{\text{st}}$, 2015}
 
 \pagestyle{fancy}
-\rhead{Homework {\rom{\hw}}}
+\rhead{Homework {\rom{\lab}}}
 \lhead{{\name}. T no. \tno}
 
 \usepackage{hw}
@@ -44,9 +47,18 @@
 \section{Details of Lab 4}
 
 \begin{question}
+	{\bf C}. Change the gate-delay of the {\sc and} gate to 0, 3, 5. Observe the output
+	changes with respect to the changes of input $x$.
+
+	They mimic the input $x$ with an offset along the time axis associated with the time
+	of the gate delay.
+\end{question}
+
+\begin{question}
 
 	Here follows the Karnaugh map of $f$. \[f(a,b,c,d) = (a'+b)'c+d(b'+ac)\]
 
+	% K-Map for reduced circuit
 	\begin{figure}[h]
 		\begin{center}
 			\begin{tikzpicture}
@@ -86,6 +98,47 @@
 	\end{figure}
 
 	Which shows that $f$ can be represented as the sum of minterms as follows: \[f(a,b,c,d)=b'd+acd+ab'c\]
+
+	% Circuit of gates for k-map'd circuit
+	\begin{figure}[h]
+		\begin{center}
+			\begin{circuitikz} \draw
+				(-6.5, 1) node[not port] (not1) {}
+				(not1.in) node[left] {$b$}
+				(-4, 2) node[and port] (and2) {}
+				(not1.out) -| (and2.in 2)
+				(and2.in 1) node[left] {$d$}
+				(-6, -1) node[and port] (and4) {}
+				(and4.in 1) node[left] {$c$}
+				(and4.in 2) node[left] {$a$}
+				(-4, 0) node[and port] (and3) {}
+				(and4.out) -| (and3.in 2)
+				(and3.in 1) node[left] {$d$}
+
+				(-2,1) node[or port] (or2) {}
+				(and2.out) -| (or2.in 1)
+				(and3.out) -| (or2.in 2)
+
+				(-6.5, -3) node[not port] (not2) {}
+				(not2.in) node[left] {$b$}
+				(-4, -2) node[and port] (and5) {}
+				(not2.out) -| (and5.in 2)
+				(and5.in 1) node[left] {$a$}
+				(-2,-1) node[and port] (and1) {}
+				(and1.in 1) node[left] {$c$}
+				(and5.out) -| (and1.in 2)
+
+				(0,0) node[or port] (or1) {}
+				(or2.out) -| (or1.in 1)
+				(and1.out) -| (or1.in 2)
+				(or1.out) node[right] {$f_{\text{k-map}}$}
+				;
+			\end{circuitikz}
+		\end{center}
+		\caption{
+			Circuit diagram for $f$ after reduction to sum of midterms.
+		}
+	\end{figure}
 
 \end{question}
 
