@@ -12,6 +12,7 @@ import (
 var maxMargin, minMargin float64 = 0.5, 0.5
 var minDepth, maxDepth int = 10, 100
 var splitChance, horizontalChance float64 = 0.5, 0.5
+var lighterAsDescends, darkerAsDescends bool = false, false
 
 type Rect struct {
 	X, Y float64
@@ -47,12 +48,20 @@ func (r *Rect) SplitMaybe() {
 	r.splitMaybe(0)
 }
 
-func (r *Rect) Paint(canvas *svg.SVG) {
+func (r *Rect) Paint(canvas *svg.SVG, cdepth int, depth int) {
 	if r.Right == nil && r.Left == nil {
-		canvas.Rect(r.X, r.Y, r.Width, r.Height, fmt.Sprintf(`fill="rgb(%d, %d, %d)"`, rand.Intn(255), rand.Intn(255), rand.Intn(255)))
+		var scale float64
+		if lighterAsDescends {
+			scale = float64(cdepth)/float64(depth) * 100
+		} else if darkerAsDescends {
+			scale = float64(depth-cdepth)/float64(depth) * 100
+		} else {
+			scale = 100
+		}
+		canvas.Rect(r.X, r.Y, r.Width, r.Height, fmt.Sprintf(`fill="rgb(%v%%, %v%%, %v%%)"`, rand.Float64() * scale, rand.Float64() * scale, rand.Float64() * scale))
 	} else {
-		r.Right.Paint(canvas)
-		r.Left.Paint(canvas)
+		r.Right.Paint(canvas, cdepth+1, depth)
+		r.Left.Paint(canvas, cdepth+1, depth)
 	}
 }
 
@@ -77,7 +86,17 @@ func main() {
 	flag.IntVar(&maxDepth, "maxdepth", maxDepth, "Maximum recurse depth")
 	flag.Float64Var(&splitChance, "splitchance", splitChance, "Chance of splitting on a pane")
 	flag.Float64Var(&horizontalChance, "horizontalchance", horizontalChance, "Chance of splitting horizontally on a pane")
+	flag.BoolVar(&lighterAsDescends, "lighterasdescends", lighterAsDescends, "Image is lighter to depict depth")
+	flag.BoolVar(&darkerAsDescends, "darkerasdescends", darkerAsDescends, "Image is darker to depict depth")
 	flag.Parse()
+
+	// sanity checks
+	if minMargin > maxMargin {
+		log.Fatal("mimmargin must be less than maxmargin")
+	}
+	if minDepth > maxDepth {
+		log.Fatal("mindepth must be less than maxdepth")
+	}
 
 	rand.Seed(*ip)
 
@@ -85,6 +104,7 @@ func main() {
 	for r.Depth() < minDepth {
 		r.SplitMaybe()
 	}
+	depth := r.Depth()
 
 	file, err := os.Create("graph.svg")
 	if err != nil {
@@ -92,6 +112,6 @@ func main() {
 	}
 	canvas := svg.New(file)
 	canvas.Start(r.Width, r.Height)
-	r.Paint(canvas)
+	r.Paint(canvas, 0, depth)
 	canvas.End()
 }
