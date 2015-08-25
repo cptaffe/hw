@@ -6,6 +6,7 @@ import (
 	"github.com/stanim/svgof/svgo2f"
 	"os"
 	"log"
+	"flag"
 )
 
 const (
@@ -14,6 +15,10 @@ const (
 )
 
 func main() {
+	graphics := false
+	flag.BoolVar(&graphics, "graphics", graphics, "Toggle graphics")
+	flag.Parse()
+
 	matches := make([]int, LOOPS)
 	for l := 0; l < LOOPS; l++ {
 		var decks [2][]int
@@ -50,35 +55,37 @@ func main() {
 		iprob[m]++
 	}
 
-	width := 800.0
-	height := 800.0
-	hd := (height-10)/float64(DECKSIZE)
-	wd := (width-10)/float64(LOOPS)
-	file, err := os.Create("graph.svg")
-	if err != nil {
-		log.Fatal(err)
-	}
-	canvas := svg.New(file)
-	canvas.Start(width, height)
-	canvas.Rect(0, 0, width, height, `fill="beige"`)
-	for i, m := range matches {
-		canvas.Circle((float64(i)*wd)+5, height - ((float64(m)*hd)+5), 2)
-	}
-
-	largest := 0
-	for _, p := range iprob {
-		if p > largest {
-			largest = p
+	if graphics {
+		width := 800.0
+		height := 800.0
+		hd := (height-10)/float64(DECKSIZE)
+		wd := (width-10)/float64(LOOPS)
+		file, err := os.Create("graph.svg")
+		if err != nil {
+			log.Fatal(err)
 		}
-	}
-
-	hd = (height-10)/float64(DECKSIZE)
-	wd = (width-10)/float64(largest)
-
-	for i, p := range iprob {
-		if p > 0 {
-			canvas.Circle((float64(p)*wd)+5, height - ((float64(i)*hd)+5), 4, `fill="red"`)
+		canvas := svg.New(file)
+		canvas.Start(width, height)
+		canvas.Rect(0, 0, width, height, `fill="beige"`)
+		for i, m := range matches {
+			canvas.Circle((float64(i)*wd)+5, height - ((float64(m)*hd)+5), 2)
 		}
+
+		largest := 0
+		for _, p := range iprob {
+			if p > largest {
+				largest = p
+			}
+		}
+
+		hd = (height-10)/float64(DECKSIZE)
+		wd = (width-10)/float64(largest)
+
+		for i, p := range iprob {
+			if p > 0 {
+				canvas.Circle((float64(p)*wd)+5, height - ((float64(i)*hd)+5), 4, `fill="red"`)
+			}
+		}
+		canvas.End()
 	}
-	canvas.End()
 }
