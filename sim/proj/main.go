@@ -11,7 +11,7 @@ import (
 
 var maxMargin float64 = 0.5
 var minMargin float64 = 0.5
-var minDepth int = 50
+var minDepth int = 10
 var maxDepth int = 100
 
 type Rect struct {
