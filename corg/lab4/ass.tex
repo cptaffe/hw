@@ -50,8 +50,9 @@
 	{\bf C}. Change the gate-delay of the {\sc and} gate to 0, 3, 5. Observe the output
 	changes with respect to the changes of input $x$.
 
-	They mimic the input $x$ with an offset along the time axis associated with the time
-	of the gate delay.
+	The output mimics the input $x$ with an offset along the time axis associated with the time
+	of the gate delay. E.g. a 3ns gate delay results in a 3ns shift between the input $x$ and the
+	output.
 \end{question}
 
 \begin{question}
@@ -80,7 +81,34 @@
 
 \begin{question}
 
-	Here follows the Karnaugh map of $f$. \[f(a,b,c,d) = (a'+b)'c+d(b'+ac)\]
+	Here follows the logical truth table (figure \ref{ttable}), Karnaugh map (figure \ref{kmap}), and direct circuit
+	implementation (figure \ref{cdiagram}) of said K. map of $f$. \[f(a,b,c,d) = (a'+b)'c+d(b'+ac)\]
+
+	% Logical Truth Table
+	\begin{figure}[h]
+		\begin{center}
+			\begin{tabular} {c c c c c c c c c c c}
+				$a$ & $b$ & $c$ & $d$ & $a'+b$ & $(a'+b)'c$ & $ac$ & $b'+ac$ & $d(b'+ac)$ & $(a'+b)'c+d(b'+ac)$ \\
+				1 & 1 & 1 & 1 & 1 & 0 & 1 & 1 & 1 & 1 \\
+				1 & 1 & 1 & 0 & 1 & 0 & 1 & 1 & 0 & 0 \\
+				1 & 1 & 0 & 1 & 1 & 0 & 0 & 0 & 0 & 0 \\
+				1 & 1 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+				1 & 0 & 1 & 1 & 0 & 1 & 1 & 1 & 1 & 1 \\
+				1 & 0 & 1 & 0 & 0 & 1 & 1 & 1 & 0 & 1 \\
+				1 & 0 & 0 & 1 & 0 & 0 & 0 & 1 & 1 & 1 \\
+				1 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\
+				0 & 1 & 1 & 1 & 1 & 0 & 0 & 0 & 0 & 0 \\
+				0 & 1 & 1 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+				0 & 1 & 0 & 1 & 1 & 0 & 0 & 0 & 0 & 0 \\
+				0 & 1 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+				0 & 0 & 1 & 1 & 1 & 0 & 0 & 1 & 1 & 1 \\
+				0 & 0 & 1 & 0 & 1 & 0 & 0 & 1 & 0 & 0 \\
+				0 & 0 & 0 & 1 & 1 & 0 & 0 & 1 & 1 & 1 \\
+				0 & 0 & 0 & 0 & 1 & 0 & 0 & 1 & 0 & 0 \\
+			\end{tabular}
+		\end{center}
+		\caption{\label{ttable} Truth table for $(a'+b)'c+d(b'+ac)$}
+	\end{figure}
 
 	% K-Map for reduced circuit
 	\begin{figure}[h]
@@ -119,6 +147,7 @@
 				\end{pgfonlayer}
 			\end{tikzpicture}
 		\end{center}
+		\caption{\label{kmap} Karnaugh map of figure \ref{ttable}}
 	\end{figure}
 
 	Which shows that $f$ can be represented as the sum of minterms as follows: \[f(a,b,c,d)=b'd+acd+ab'c\]
@@ -155,11 +184,12 @@
 				(0,0) node[or port] (or1) {}
 				(or2.out) -| (or1.in 1)
 				(and1.out) -| (or1.in 2)
-				(or1.out) node[right] {$f_{\text{k-map}}$}
+				(or1.out) node[right] {$f_{\sum\text{minterms}}$}
 				;
 			\end{circuitikz}
 		\end{center}
 		\caption{
+			\label{cdiagram}
 			Circuit diagram for $f$ after reduction to sum of midterms.
 		}
 	\end{figure}
