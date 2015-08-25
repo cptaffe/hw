@@ -9,10 +9,10 @@ import (
 	"flag"
 )
 
-var maxMargin float64 = 0.8
-var minMargin float64 = 0.2
-var minDepth int = 5
-var maxDepth int = 15
+var maxMargin float64 = 0.5
+var minMargin float64 = 0.5
+var minDepth int = 50
+var maxDepth int = 100
 
 type Rect struct {
 	X, Y float64
@@ -26,11 +26,7 @@ func (r *Rect) splitMaybe(depth int) {
 	}
 	// 60% chance of descending
 	if (rand.Float64() <= 0.5) {
-		s := 0.0
-		for s < minMargin || s > maxMargin {
-			// No tiny lines in the margins
-			s = rand.Float64()
-		}
+		s := (rand.Float64() * (maxMargin-minMargin)) + minMargin
 		if (rand.Intn(2) == 1) {
 			// split horizontally
 			s *= r.Height
@@ -76,10 +72,10 @@ func (r *Rect) Depth() int {
 
 func main() {
 	var ip = flag.Int64("seed", 33, "Seeds random number generator")
-	flag.Float64Var(&maxMargin, "maxmargin", 0.8, "Maximum split margin")
-	flag.Float64Var(&minMargin, "minmargin", 0.2, "Minimum split margin")
-	flag.IntVar(&minDepth, "mindepth", 5, "Minumum recurse depth")
-	flag.IntVar(&maxDepth, "maxdepth", 15, "Maximum recurse depth")
+	flag.Float64Var(&maxMargin, "maxmargin", maxMargin, "Maximum split margin")
+	flag.Float64Var(&minMargin, "minmargin", minMargin, "Minimum split margin")
+	flag.IntVar(&minDepth, "mindepth", minDepth, "Minumum recurse depth")
+	flag.IntVar(&maxDepth, "maxdepth", maxDepth, "Maximum recurse depth")
 	flag.Parse()
 
 	rand.Seed(*ip)
