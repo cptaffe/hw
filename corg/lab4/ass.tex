@@ -81,8 +81,8 @@
 
 \begin{question}
 
-	Here follows the logical truth table (figure \ref{ttable}), Karnaugh map (figure \ref{kmap}), and direct circuit
-	implementation (figure \ref{cdiagram}) of said K. map of $f$. \[f(a,b,c,d) = (a'+b)'c+d(b'+ac)\]
+	Here follows the logical truth table (figure \ref{fig:ttable}), Karnaugh map (figure \ref{fig:kmap}), and direct circuit
+	implementation (figure \ref{fig:cdiagram}) of said K. map of $f$. \begin{equation} \label{eq:booleanexpression} f(a,b,c,d) = (a'+b)'c+d(b'+ac) \end{equation}
 
 	% Logical Truth Table
 	\begin{figure}[h]
@@ -108,7 +108,7 @@
 				0 & 0 & 0 & 0 & 1 & 0 & 0 & 1 & 0 & 0 \\
 			\end{tabular}
 		\end{center}
-		\caption{\label{ttable} Truth table for $(a'+b)'c+d(b'+ac)$}
+		\caption{\label{fig:ttable} Truth table for equation \ref{eq:booleanexpression}}
 	\end{figure}
 
 	% K-Map for reduced circuit
@@ -148,10 +148,10 @@
 				\end{pgfonlayer}
 			\end{tikzpicture}
 		\end{center}
-		\caption{\label{kmap} Karnaugh map of figure \ref{ttable}}
+		\caption{\label{fig:kmap} Karnaugh map of figure \ref{fig:ttable}}
 	\end{figure}
 
-	Which shows that $f$ can be represented as the sum of minterms as follows: \[f(a,b,c,d)=b'd+acd+ab'c\]
+	Which shows that equation \ref{eq:booleanexpression} can be represented as the sum of minterms as follows: \begin{equation} f(a,b,c,d)=b'd+acd+ab'c \end{equation}
 
 	% Circuit of gates for k-map'd circuit
 	\begin{figure}[h]
@@ -190,8 +190,8 @@
 			\end{circuitikz}
 		\end{center}
 		\caption{
-			\label{cdiagram}
-			Circuit diagram for $f$ after reduction to sum of midterms.
+			\label{fig:cdiagram}
+			Circuit diagram for equation \ref{eq:booleanexpression} after reduction to sum of midterms.
 		}
 	\end{figure}
 
