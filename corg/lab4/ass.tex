@@ -57,7 +57,11 @@
 
 \begin{question}
 	Draw the circuit to implement the Boolean function as follows
-	\[f(a,b,c,d) = (a' + b)'c + d(b' + ac)\] according to the expression directly.
+	\begin{equation}
+		\label{eq:booleanexpression}
+		f(a,b,c,d) = (a' + b)'c + d(b' + ac)
+	\end{equation}
+	according to the expression directly.
 	Connect $b$, $c$ and $d$ to binary switches and make them to be 0, 1 and 0, respectively.
 	Connect $a$ to a clock.
 
@@ -82,7 +86,7 @@
 \begin{question}
 
 	Here follows the logical truth table (figure \ref{fig:ttable}), Karnaugh map (figure \ref{fig:kmap}), and direct circuit
-	implementation (figure \ref{fig:cdiagram}) of said K. map of $f$. \begin{equation} \label{eq:booleanexpression} f(a,b,c,d) = (a'+b)'c+d(b'+ac) \end{equation}
+	implementation (figure \ref{fig:cdiagram}) of said K. map of equation \ref{eq:booleanexpression}.
 
 	% Logical Truth Table
 	\begin{figure}[h]
