@@ -55,6 +55,30 @@
 \end{question}
 
 \begin{question}
+	Draw the circuit to implement the Boolean function as follows
+	\[f(a,b,c,d) = (a' + b)'c + d(b' + ac)\] according to the expression directly.
+	Connect $b$, $c$ and $d$ to binary switches and make them to be 0, 1 and 0, respectively.
+	Connect $a$ to a clock.
+
+	\begin{subquestion}
+		According to your simulation, how much time does it take for the change of $a$ to be
+		reflected in the output $f$?
+
+		Five nanoseconds.
+	\end{subquestion}
+
+	\begin{subquestion}
+		Change the gate delays of all the gates along the path from $a$ to $f$ to 0, 2 and 4.
+		Verify that the total delays from $a$ to $f$ you observed are correct.
+
+		For a 0ns delay, $a$ and $f$ corresponded exactly. For a 2ns delay, $a$ and $f$ differed by a 10ns delay.
+		For a 5ns delay, $a$ and $f$ differed by a 45ns delay.
+	\end{subquestion}
+
+
+\end{question}
+
+\begin{question}
 
 	Here follows the Karnaugh map of $f$. \[f(a,b,c,d) = (a'+b)'c+d(b'+ac)\]
 
@@ -140,6 +164,13 @@
 		}
 	\end{figure}
 
+\end{question}
+
+\begin{question}
+	Compare the circuits.
+
+	Testing all 16 possible input combinations resulted in identical outputs
+	if the gate delay is set to 0ns.
 \end{question}
 
 \end{document}
