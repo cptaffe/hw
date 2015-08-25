@@ -4,18 +4,18 @@
      xmlns="http://www.w3.org/2000/svg" 
      xmlns:xlink="http://www.w3.org/1999/xlink">
 <rect x="0.00" y="0.00" width="800.00" height="800.00" fill="beige" />
-<circle cx="430.38" cy="5.00" r="2.00" />
-<circle cx="369.62" cy="11.48" r="2.00" />
-<circle cx="308.85" cy="37.92" r="2.00" />
-<circle cx="491.15" cy="52.43" r="2.00" />
-<circle cx="551.92" cy="102.50" r="2.00" />
-<circle cx="248.08" cy="105.87" r="2.00" />
-<circle cx="5.00" cy="123.29" r="2.00" />
-<circle cx="795.00" cy="134.69" r="2.00" />
-<circle cx="187.31" cy="166.16" r="2.00" />
-<circle cx="612.69" cy="168.34" r="2.00" />
-<circle cx="126.54" cy="235.74" r="2.00" />
-<circle cx="673.46" cy="250.61" r="2.00" />
-<circle cx="65.77" cy="300.41" r="2.00" />
-<circle cx="734.23" cy="315.27" r="2.00" />
+<circle cx="369.62" cy="5.00" r="2.00" />
+<circle cx="430.38" cy="12.03" r="2.00" />
+<circle cx="491.15" cy="20.35" r="2.00" />
+<circle cx="308.85" cy="57.41" r="2.00" />
+<circle cx="551.92" cy="86.44" r="2.00" />
+<circle cx="248.08" cy="94.21" r="2.00" />
+<circle cx="795.00" cy="106.87" r="2.00" />
+<circle cx="5.00" cy="120.55" r="2.00" />
+<circle cx="187.31" cy="158.27" r="2.00" />
+<circle cx="612.69" cy="159.84" r="2.00" />
+<circle cx="126.54" cy="239.43" r="2.00" />
+<circle cx="673.46" cy="242.11" r="2.00" />
+<circle cx="734.23" cy="284.73" r="2.00" />
+<circle cx="65.77" cy="298.68" r="2.00" />
 </svg>

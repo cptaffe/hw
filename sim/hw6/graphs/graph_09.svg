@@ -4,13 +4,13 @@
      xmlns="http://www.w3.org/2000/svg" 
      xmlns:xlink="http://www.w3.org/1999/xlink">
 <rect x="0.00" y="0.00" width="800.00" height="800.00" fill="beige" />
-<circle cx="5.00" cy="5.00" r="2.00" />
-<circle cx="795.00" cy="27.05" r="2.00" />
-<circle cx="400.00" cy="111.52" r="2.00" />
-<circle cx="498.75" cy="130.43" r="2.00" />
-<circle cx="301.25" cy="148.20" r="2.00" />
-<circle cx="597.50" cy="168.47" r="2.00" />
-<circle cx="202.50" cy="172.69" r="2.00" />
-<circle cx="696.25" cy="221.19" r="2.00" />
-<circle cx="103.75" cy="226.13" r="2.00" />
+<circle cx="795.00" cy="5.00" r="2.00" />
+<circle cx="5.00" cy="8.97" r="2.00" />
+<circle cx="400.00" cy="107.45" r="2.00" />
+<circle cx="301.25" cy="126.57" r="2.00" />
+<circle cx="498.75" cy="137.51" r="2.00" />
+<circle cx="597.50" cy="163.48" r="2.00" />
+<circle cx="202.50" cy="170.52" r="2.00" />
+<circle cx="103.75" cy="206.89" r="2.00" />
+<circle cx="696.25" cy="216.45" r="2.00" />
 </svg>

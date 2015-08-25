@@ -8,7 +8,6 @@ import (
 	"log"
 	"fmt"
 	"runtime"
-	"runtime/pprof"
 )
 
 const (

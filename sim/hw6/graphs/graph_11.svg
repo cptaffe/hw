@@ -5,14 +5,14 @@
      xmlns:xlink="http://www.w3.org/1999/xlink">
 <rect x="0.00" y="0.00" width="800.00" height="800.00" fill="beige" />
 <circle cx="5.00" cy="5.00" r="2.00" />
-<circle cx="795.00" cy="10.35" r="2.00" />
-<circle cx="400.00" cy="35.90" r="2.00" />
-<circle cx="321.00" cy="47.84" r="2.00" />
-<circle cx="479.00" cy="48.06" r="2.00" />
-<circle cx="558.00" cy="87.99" r="2.00" />
-<circle cx="242.00" cy="103.44" r="2.00" />
-<circle cx="637.00" cy="158.06" r="2.00" />
-<circle cx="163.00" cy="162.72" r="2.00" />
-<circle cx="84.00" cy="216.27" r="2.00" />
-<circle cx="716.00" cy="220.25" r="2.00" />
+<circle cx="400.00" cy="19.73" r="2.00" />
+<circle cx="795.00" cy="22.12" r="2.00" />
+<circle cx="479.00" cy="41.54" r="2.00" />
+<circle cx="321.00" cy="53.18" r="2.00" />
+<circle cx="558.00" cy="82.17" r="2.00" />
+<circle cx="242.00" cy="88.42" r="2.00" />
+<circle cx="163.00" cy="142.85" r="2.00" />
+<circle cx="637.00" cy="149.63" r="2.00" />
+<circle cx="84.00" cy="210.92" r="2.00" />
+<circle cx="716.00" cy="219.87" r="2.00" />
 </svg>

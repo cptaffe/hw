@@ -4,12 +4,12 @@
      xmlns="http://www.w3.org/2000/svg" 
      xmlns:xlink="http://www.w3.org/1999/xlink">
 <rect x="0.00" y="0.00" width="800.00" height="800.00" fill="beige" />
-<circle cx="5.00" cy="5.00" r="2.00" />
-<circle cx="795.00" cy="9.70" r="2.00" />
-<circle cx="456.43" cy="143.27" r="2.00" />
-<circle cx="343.57" cy="151.56" r="2.00" />
-<circle cx="569.29" cy="169.82" r="2.00" />
-<circle cx="230.71" cy="176.57" r="2.00" />
-<circle cx="682.14" cy="208.34" r="2.00" />
-<circle cx="117.86" cy="218.16" r="2.00" />
+<circle cx="795.00" cy="5.00" r="2.00" />
+<circle cx="5.00" cy="8.62" r="2.00" />
+<circle cx="343.57" cy="152.80" r="2.00" />
+<circle cx="456.43" cy="160.40" r="2.00" />
+<circle cx="230.71" cy="177.32" r="2.00" />
+<circle cx="569.29" cy="181.67" r="2.00" />
+<circle cx="682.14" cy="216.67" r="2.00" />
+<circle cx="117.86" cy="218.09" r="2.00" />
 </svg>
