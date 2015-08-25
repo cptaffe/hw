@@ -9,10 +9,9 @@ import (
 	"flag"
 )
 
-var maxMargin float64 = 0.5
-var minMargin float64 = 0.5
-var minDepth int = 10
-var maxDepth int = 100
+var maxMargin, minMargin float64 = 0.5, 0.5
+var minDepth, maxDepth int = 10, 100
+var splitChance, horizontalChance float64 = 0.5, 0.5
 
 type Rect struct {
 	X, Y float64
@@ -25,9 +24,9 @@ func (r *Rect) splitMaybe(depth int) {
 		return
 	}
 	// 60% chance of descending
-	if (rand.Float64() <= 0.5) {
+	if (rand.Float64() < splitChance) {
 		s := (rand.Float64() * (maxMargin-minMargin)) + minMargin
-		if (rand.Intn(2) == 1) {
+		if (rand.Float64() < horizontalChance) {
 			// split horizontally
 			s *= r.Height
 			r.Right = &Rect { Width: r.Width, Height: s, X: r.X, Y: r.Y }
@@ -76,6 +75,8 @@ func main() {
 	flag.Float64Var(&minMargin, "minmargin", minMargin, "Minimum split margin")
 	flag.IntVar(&minDepth, "mindepth", minDepth, "Minumum recurse depth")
 	flag.IntVar(&maxDepth, "maxdepth", maxDepth, "Maximum recurse depth")
+	flag.Float64Var(&splitChance, "splitchance", splitChance, "Chance of splitting on a pane")
+	flag.Float64Var(&horizontalChance, "horizontalchance", horizontalChance, "Chance of splitting horizontally on a pane")
 	flag.Parse()
 
 	rand.Seed(*ip)
