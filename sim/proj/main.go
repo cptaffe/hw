@@ -9,8 +9,8 @@ import (
 	"flag"
 )
 
-var maxMargin, minMargin float64 = 0.5, 0.5
-var minDepth, maxDepth int = 10, 100
+var maxMargin, minMargin float64 = 1.0, 0.0
+var minDepth, maxDepth int = 2, 100
 var splitChance, horizontalChance float64 = 0.5, 0.5
 var lighterAsDescends, darkerAsDescends bool = false, false
 
@@ -78,17 +78,31 @@ func (r *Rect) Depth() int {
 	}
 }
 
+func (r *Rect) Count() int {
+	if r.Left == nil && r.Right == nil {
+		return 1
+	} else {
+		return r.Left.Count() + r.Right.Count()
+	}
+}
+
 func main() {
-	var ip = flag.Int64("seed", 33, "Seeds random number generator")
+	rects := 50
+	ip := flag.Int64("seed", 33, "Seeds random number generator")
 	flag.Float64Var(&maxMargin, "maxmargin", maxMargin, "Maximum split margin")
 	flag.Float64Var(&minMargin, "minmargin", minMargin, "Minimum split margin")
-	flag.IntVar(&minDepth, "mindepth", minDepth, "Minumum recurse depth")
 	flag.IntVar(&maxDepth, "maxdepth", maxDepth, "Maximum recurse depth")
-	flag.Float64Var(&splitChance, "splitchance", splitChance, "Chance of splitting on a pane")
-	flag.Float64Var(&horizontalChance, "horizontalchance", horizontalChance, "Chance of splitting horizontally on a pane")
 	flag.BoolVar(&lighterAsDescends, "lighterasdescends", lighterAsDescends, "Image is lighter to depict depth")
 	flag.BoolVar(&darkerAsDescends, "darkerasdescends", darkerAsDescends, "Image is darker to depict depth")
+	flag.IntVar(&rects, "rects", rects, "Expected value of number of rectangles")
 	flag.Parse()
+
+	if rects <= 0 {
+		log.Fatal("rects must be a positive number")
+	} else {
+		splitChance = (1-float64(rects))/(1-(2*float64(rects)))
+		fmt.Printf("Split Probability: %v\n", splitChance)
+	}
 
 	// sanity checks
 	if minMargin > maxMargin {
@@ -101,9 +115,13 @@ func main() {
 	rand.Seed(*ip)
 
 	r := Rect { Width: 800, Height: 800 }
-	for r.Depth() < minDepth {
+	loops := 0
+	for r.Count() != rects {
 		r.SplitMaybe()
+		loops++
+		fmt.Printf("Tries: %v\r", loops)
 	}
+	fmt.Printf("\n")
 	depth := r.Depth()
 
 	file, err := os.Create("graph.svg")

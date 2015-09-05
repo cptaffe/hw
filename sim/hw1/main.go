@@ -1,12 +1,12 @@
 package main
 
 import (
-	"math/rand"
+	"flag"
 	"fmt"
 	"github.com/stanim/svgof/svgo2f"
-	"os"
 	"log"
-	"flag"
+	"math/rand"
+	"os"
 )
 
 const (
@@ -25,7 +25,7 @@ func main() {
 
 	darts := make([]Dart, DARTS)
 	for i := 0; i < DARTS; i++ {
-		darts[i] = Dart{ x: rand.Float64(), y: rand.Float64() }
+		darts[i] = Dart{x: rand.Float64(), y: rand.Float64()}
 	}
 	inCircle := float64(0)
 	for _, d := range darts {
@@ -33,13 +33,13 @@ func main() {
 			inCircle++
 		}
 	}
-	fmt.Printf("%f\n", (4 * inCircle)/DARTS)
+	fmt.Printf("%f\n", (4*inCircle)/DARTS)
 
 	if graphics {
 		width := 800.0
 		height := 800.0
-		hd := height-10
-		wd := width-10
+		hd := height - 10
+		wd := width - 10
 		file, err := os.Create("graph.svg")
 		if err != nil {
 			log.Fatal(err)
@@ -49,9 +49,9 @@ func main() {
 		canvas.Rect(0, 0, width, height, `fill="beige"`)
 		for _, d := range darts {
 			if ((d.x * d.x) + (d.y * d.y)) <= 1.0 {
-				canvas.Circle((float64(d.x) * wd)+5, height - ((float64(d.y) * hd)+5), 2, "fill=\"blue\"")
+				canvas.Circle((float64(d.x)*wd)+5, height-((float64(d.y)*hd)+5), 2, "fill=\"blue\"")
 			} else {
-				canvas.Circle((float64(d.x) * wd)+5, height - ((float64(d.y) * hd)+5), 2)
+				canvas.Circle((float64(d.x)*wd)+5, height-((float64(d.y)*hd)+5), 2)
 			}
 		}
 		canvas.End()

@@ -10,6 +10,7 @@
 \usetikzlibrary{calc}
 \usetikzlibrary{positioning}
 \usetikzlibrary{matrix}
+\usetikzlibrary{circuits.logic.US,circuits.logic.IEC}
 \pgfdeclarelayer{background}
 \pgfsetlayers{background,main}
 
@@ -82,8 +83,7 @@
 
 \begin{question}
 
-	Here follows the logical truth table (figure \ref{fig:ttable}), Karnaugh map (figure \ref{fig:kmap}), and direct circuit
-	implementation (figure \ref{fig:cdiagram}) of said K. map of equation \ref{eq:booleanexpression}.
+	Here follows the logical truth table (figure \ref{fig:ttable}) of equation \ref{eq:booleanexpression}.
 
 	% Logical Truth Table
 	\begin{figure}[h]
@@ -91,22 +91,22 @@
 			\begin{tabular} {c c c c | c c c c c c c}
 				$a$ & $b$ & $c$ & $d$ & $a'+b$ & $(a'+b)'c$ & $ac$ & $b'+ac$ & $d(b'+ac)$ & $(a'+b)'c+d(b'+ac)$ \\
 				\hline
-				1 & 1 & 1 & 1 & 1 & 0 & 1 & 1 & 1 & 1 \\
-				1 & 1 & 1 & 0 & 1 & 0 & 1 & 1 & 0 & 0 \\
-				1 & 1 & 0 & 1 & 1 & 0 & 0 & 0 & 0 & 0 \\
-				1 & 1 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
-				1 & 0 & 1 & 1 & 0 & 1 & 1 & 1 & 1 & 1 \\
-				1 & 0 & 1 & 0 & 0 & 1 & 1 & 1 & 0 & 1 \\
-				1 & 0 & 0 & 1 & 0 & 0 & 0 & 1 & 1 & 1 \\
-				1 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\
-				0 & 1 & 1 & 1 & 1 & 0 & 0 & 0 & 0 & 0 \\
-				0 & 1 & 1 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
-				0 & 1 & 0 & 1 & 1 & 0 & 0 & 0 & 0 & 0 \\
-				0 & 1 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
-				0 & 0 & 1 & 1 & 1 & 0 & 0 & 1 & 1 & 1 \\
-				0 & 0 & 1 & 0 & 1 & 0 & 0 & 1 & 0 & 0 \\
-				0 & 0 & 0 & 1 & 1 & 0 & 0 & 1 & 1 & 1 \\
 				0 & 0 & 0 & 0 & 1 & 0 & 0 & 1 & 0 & 0 \\
+				0 & 0 & 0 & 1 & 1 & 0 & 0 & 1 & 1 & 1 \\
+				0 & 0 & 1 & 0 & 1 & 0 & 0 & 1 & 0 & 0 \\
+				0 & 0 & 1 & 1 & 1 & 0 & 0 & 1 & 1 & 1 \\
+				0 & 1 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+				0 & 1 & 0 & 1 & 1 & 0 & 0 & 0 & 0 & 0 \\
+				0 & 1 & 1 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+				0 & 1 & 1 & 1 & 1 & 0 & 0 & 0 & 0 & 0 \\
+				1 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\
+				1 & 0 & 0 & 1 & 0 & 0 & 0 & 1 & 1 & 1 \\
+				1 & 0 & 1 & 0 & 0 & 1 & 1 & 1 & 0 & 1 \\
+				1 & 0 & 1 & 1 & 0 & 1 & 1 & 1 & 1 & 1 \\
+				1 & 1 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+				1 & 1 & 0 & 1 & 1 & 0 & 0 & 0 & 0 & 0 \\
+				1 & 1 & 1 & 0 & 1 & 0 & 1 & 1 & 0 & 0 \\
+				1 & 1 & 1 & 1 & 1 & 0 & 1 & 1 & 1 & 1 \\
 			\end{tabular}
 		\end{center}
 		\caption{
@@ -115,92 +115,18 @@
 		}
 	\end{figure}
 
-	% K-Map for reduced circuit
-	\begin{figure}[h]
-		\begin{center}
-			\begin{tikzpicture}
-				\matrix (karnaugh) [matrix of math nodes] {
-					0 & 1 & 1 & 0 \\
-					0 & 0 & 0 & 0 \\
-					0 & 0 & 1 & 0 \\
-					0 & 1 & 1 & 1 \\
-				};
-
-				\foreach \i/\bits in {1/00,2/01,3/11,4/10} {
-					\node [left  = 2mm of karnaugh-\i-1] {$\bits$};
-					\node [above = 2mm of karnaugh-1-\i] {$\bits$};
-				}
-
-				\node [left  = .6cm of karnaugh.west]  (AB) {$AB$};
-				\node [above = .5cm of karnaugh.north] (CD) {$CD$};
-
-				\draw	($(CD.north -| karnaugh.west)  + (-.75mm,0)$)
-						-- ($(karnaugh.south -| karnaugh.west)  + (-.75mm,0)$)
-						($(AB.west |- karnaugh.north) + (0,+.40mm)$)
-						-- ($(karnaugh.east |- karnaugh.north) + (0,+.40mm)$);
-
-				\begin{pgfonlayer}{background}
-					\begin{scope}[opacity=.3]
-						\fill [red]
-							(karnaugh-1-2.north west) rectangle (karnaugh-1-3.south east)
-							(karnaugh-4-2.north west) rectangle (karnaugh-4-3.south east);
-						\fill [yellow]
-							(karnaugh-4-3.north west) rectangle (karnaugh-4-4.south east);
-						\fill [green]
-							(karnaugh-3-3.north west) rectangle (karnaugh-4-3.south east);
-					\end{scope}
-				\end{pgfonlayer}
-			\end{tikzpicture}
-		\end{center}
-		\caption{
-			\label{fig:kmap}
-			Karnaugh map of figure \ref{fig:ttable}.
-		}
-	\end{figure}
-
-	Which shows that equation \ref{eq:booleanexpression} can be represented as the sum of minterms as follows: \begin{equation} f(a,b,c,d)=b'd+acd+ab'c \end{equation}
-
-	% Circuit of gates for k-map'd circuit
-	\begin{figure}[h]
-		\begin{center}
-			\begin{circuitikz} \draw
-				(-6.5, 1) node[not port] (not1) {}
-				(not1.in) node[left] {$b$}
-				(-4, 2) node[and port] (and2) {}
-				(not1.out) -| (and2.in 2)
-				(and2.in 1) node[left] {$d$}
-				(-6, -1) node[and port] (and4) {}
-				(and4.in 1) node[left] {$c$}
-				(and4.in 2) node[left] {$a$}
-				(-4, 0) node[and port] (and3) {}
-				(and4.out) -| (and3.in 2)
-				(and3.in 1) node[left] {$d$}
-
-				(-2,1) node[or port] (or2) {}
-				(and2.out) -| (or2.in 1)
-				(and3.out) -| (or2.in 2)
-
-				(-6.5, -3) node[not port] (not2) {}
-				(not2.in) node[left] {$b$}
-				(-4, -2) node[and port] (and5) {}
-				(not2.out) -| (and5.in 2)
-				(and5.in 1) node[left] {$a$}
-				(-2,-1) node[and port] (and1) {}
-				(and1.in 1) node[left] {$c$}
-				(and5.out) -| (and1.in 2)
-
-				(0,0) node[or port] (or1) {}
-				(or2.out) -| (or1.in 1)
-				(and1.out) -| (or1.in 2)
-				(or1.out) node[right] {$f_{\sum\text{minterms}}$}
-				;
-			\end{circuitikz}
-		\end{center}
-		\caption{
-			\label{fig:cdiagram}
-			Circuit diagram for equation \ref{eq:booleanexpression} after reduction to sum of midterms.
-		}
-	\end{figure}
+	Using figure \ref{fig:ttable} we can express equation \ref{eq:booleanexpression}
+	as the sum of minterms shown in equation \ref{eq:minterms}.
+	\begin{equation}
+		f_{\sum\text{minterms}}(a,b,c,d) =
+		a'b'c'd
+		+a'b'cd
+		+ab'c'd
+		+ab'cd'
+		+ab'cd
+		+abcd
+		\label{eq:minterms}
+	\end{equation}
 
 \end{question}
 
@@ -210,5 +136,108 @@
 	Testing all 16 possible input combinations resulted in identical outputs
 	if the gate delay is set to 0ns.
 \end{question}
+
+\subsection{Extraneous Information Involving Question 3}
+
+Here follows the Karnaugh map (figure \ref{fig:kmap}) and direct circuit
+implementation (figure \ref{fig:cdiagram}) of said K. map for equation \ref{eq:booleanexpression}.
+
+% K-Map for reduced circuit
+\begin{figure}[h]
+	\begin{center}
+		\begin{tikzpicture}
+			\matrix (karnaugh) [matrix of math nodes] {
+				0 & 1 & 1 & 0 \\
+				0 & 0 & 0 & 0 \\
+				0 & 0 & 1 & 0 \\
+				0 & 1 & 1 & 1 \\
+			};
+
+			\foreach \i/\bits in {1/00,2/01,3/11,4/10} {
+				\node [left  = 2mm of karnaugh-\i-1] {$\bits$};
+				\node [above = 2mm of karnaugh-1-\i] {$\bits$};
+			}
+
+			\node [left  = .6cm of karnaugh.west]  (AB) {$AB$};
+			\node [above = .5cm of karnaugh.north] (CD) {$CD$};
+
+			\draw	($(CD.north -| karnaugh.west)  + (-.75mm,0)$)
+					-- ($(karnaugh.south -| karnaugh.west)  + (-.75mm,0)$)
+					($(AB.west |- karnaugh.north) + (0,+.40mm)$)
+					-- ($(karnaugh.east |- karnaugh.north) + (0,+.40mm)$);
+
+			\begin{pgfonlayer}{background}
+				\begin{scope}[opacity=.3]
+					\fill [red]
+						(karnaugh-1-2.north west) rectangle (karnaugh-1-3.south east)
+						(karnaugh-4-2.north west) rectangle (karnaugh-4-3.south east);
+					\fill [yellow]
+						(karnaugh-4-3.north west) rectangle (karnaugh-4-4.south east);
+					\fill [green]
+						(karnaugh-3-3.north west) rectangle (karnaugh-4-3.south east);
+				\end{scope}
+			\end{pgfonlayer}
+		\end{tikzpicture}
+	\end{center}
+	\caption{
+		\label{fig:kmap}
+		Karnaugh map of figure \ref{fig:ttable}.
+	}
+\end{figure}
+
+Which shows that equation \ref{eq:booleanexpression} can be represented as the sum of minterms as follows: \begin{equation} f(a,b,c,d)=b'd+acd+ab'c \end{equation}
+
+% Circuit of gates for k-map'd circuit
+\begin{figure}[h]
+	\begin{center}
+		\begin{circuitikz} \draw
+			(-6.5, 1) node[not port] (not1) {}
+			(not1.in) node[left] {$b$}
+			(-4, 2) node[and port] (and2) {}
+			(not1.out) -| (and2.in 2)
+			(and2.in 1) node[left] {$d$}
+			(-6, -1) node[and port] (and4) {}
+			(and4.in 1) node[left] {$c$}
+			(and4.in 2) node[left] {$a$}
+			(-4, 0) node[and port] (and3) {}
+			(and4.out) -| (and3.in 2)
+			(and3.in 1) node[left] {$d$}
+
+			(-2,1) node[or port] (or2) {}
+			(and2.out) -| (or2.in 1)
+			(and3.out) -| (or2.in 2)
+
+			(-6.5, -3) node[not port] (not2) {}
+			(not2.in) node[left] {$b$}
+			(-4, -2) node[and port] (and5) {}
+			(not2.out) -| (and5.in 2)
+			(and5.in 1) node[left] {$a$}
+			(-2,-1) node[and port] (and1) {}
+			(and1.in 1) node[left] {$c$}
+			(and5.out) -| (and1.in 2)
+
+			(0,0) node[or port] (or1) {}
+			(or2.out) -| (or1.in 1)
+			(and1.out) -| (or1.in 2)
+			(or1.out) node[right] {$f_{\sum\text{minterms}}$}
+			;
+		\end{circuitikz}
+	\end{center}
+	\caption{
+		\label{fig:cdiagram}
+		Circuit diagram for equation \ref{eq:booleanexpression} after reduction to sum of midterms.
+	}
+\end{figure}
+
+\begin{figure}[h]
+	\begin{center}
+		\begin{tikzpicture}[minimum height=0.75cm]
+			\node[or gate US, draw,logic gate inputs=nnn] (A) {};
+			\foreach \a in {1,...,3}
+				\draw (A.input \a -| -1,0) -- (A.input \a);
+			\draw (A.output) -- ([xshift=0.5cm]A.output);
+		\end{tikzpicture}
+	\end{center}
+\end{figure}
 
 \end{document}
