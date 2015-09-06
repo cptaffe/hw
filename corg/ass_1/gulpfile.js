@@ -21,4 +21,4 @@ gulp.task('watch', function() {
 	return gulp.watch(paths.sources, ['latex'])
 })
 
-gulp.task('default', ['watch', 'latex'])
+gulp.task('default', ['latex'])
