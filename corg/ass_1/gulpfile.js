@@ -1,19 +1,24 @@
 var gulp = require('gulp'),
+	changed = require('gulp-changed'),
+	filter = require('gulp-filter'),
 	latex = require('gulp-latex')
 
 var paths = {
 	sources: ['ass.tex'],
-	output: 'compiled'
+	dest: 'compiled'
 }
 
 gulp.task('latex', function() {
 	return gulp.src('ass.tex')
+		.pipe(changed(paths.dest))
 		.pipe(latex())
-		.pipe(gulp.dest('compiled'))
+		.pipe(gulp.dest(paths.dest))
+		.pipe(filter('*.pdf'))
+		.pipe(gulp.dest('./'))
 })
 
 gulp.task('watch', function() {
-	gulp.watch(paths.sources, ['latex'])
+	return gulp.watch(paths.sources, ['latex'])
 })
 
-gulp.task('default', ['latex'])
+gulp.task('default', ['watch', 'latex'])
