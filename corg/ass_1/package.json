@@ -1,0 +1,15 @@
+{
+  "name": "ass_1",
+  "version": "1.0.0",
+  "description": "Assignment one for CS 3482",
+  "main": "gulpfile.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Connor Taffe",
+  "license": "MIT",
+  "devDependencies": {
+    "gulp": "^3.9.0",
+    "gulp-latex": "^1.0.1"
+  }
+}
