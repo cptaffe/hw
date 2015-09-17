@@ -41,7 +41,7 @@ c             Calculate probability
                   pr = pr + probs(k)
 14                continue
               sim = sim + (1.0-(pr/(real(loops)*real(days))))
-              print *, i, ' sim: ', sim
+c             print *, i, ' sim: ', sim
 10            continue
           return
       end
