@@ -1,15 +1,17 @@
 
 OBJ= rand.o main.o
 BIN= main
+FORT= gfortran
+FFLAGS= -Wall -Wsurprising -pedantic -std=legacy
 
 %.o: %.f
-	gfortran -c -o $@ $<
+	$(FORT) $(FFLAGS) -c -o $@ $<
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 $(BIN): $(OBJ)
-	gfortran $(LDFLAGS) -o $@ $^
+	$(FORT) $(LDFLAGS) -o $@ $^
 
 clean:
 	$(RM) $(OBJ) main
