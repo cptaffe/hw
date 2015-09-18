@@ -12,41 +12,44 @@
           print *, 'Simulated: ', sim()
       end
 
-      real function distribution(days)
-          integer days, rnd, dist(days)
+* Returns number of days that were unique out of days.
+      integer function distribution(days)
+          integer days, rnd
+          logical dist(days)
+          
+          distribution = 0
 * Zero out dist array
           do 10 i=1, days
-              dist(i) = 0
+              dist(i) = .false.
 10            continue
-
 * Keep tally of unique days
           do 20 i=1, days
               rnd = int(rand() * (days-1))+1
-              dist(rnd) = dist(rnd)+1
-              if (dist(rnd) == 1) then
+              if (.not. dist(rnd)) then
+* Increment one on unseen
+* they are unique for now
                   distribution = distribution+1
-              else if (dist(rnd) > 1) then
+                  dist(rnd) = .true.
+              else
+* Decrement one on previously seen
+* they are no longer unique
                   distribution = distribution-1
               end if
 20            continue
-              distribution = 1-distribution/days
-              print *, distribution
           return
       end
 
 * Simulation function,
 * returns mean
       real function sim()
-          integer days, loops
-          parameter(days = 365, loops = 1000)
-
-          do 10 i=1, days
+          integer days, loops, distribution
+          parameter(days = 365, loops = 10000)
+          sim = 0
 * Loop through simulations
-              do 20 j=1, loops
-* Sum unique days for each 
-                  sim = sim + distribution(days)
-20                continue
+          do 10 j=1, loops
+* Sum unique days for each
+              sim = sim + distribution(days)
 10            continue
-          sim = sim/loops
+          sim = days-sim/loops
           return
       end
