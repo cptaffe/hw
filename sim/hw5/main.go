@@ -1,43 +1,49 @@
 package main
 
+/*
+*
+* Homework 5
+* CPSC 4399-11; Special Topics: Monte Carlo Simulation
+* Professor Minsker
+* Connor P. Taffe
+* T no. 00563742
+*
+*/
+
 import (
 	"math/rand"
 	"fmt"
 )
 
 const (
-	LOOPS = 1000
 	DAYS = 365
+	LOOPS = 100000
 )
 
-func simulated(n int) float64 {
-	sum := 0.0
-	for k := 0; k < n; k++ {
-		// Find probability of getting k distinct answers
-		probs := make([]float64, LOOPS)
-		// Find many
-		for i := 0; i < LOOPS; i++ {
-			dist := make([]int, DAYS)
-			for i := 0; i < n; i++ {
-				dist[rand.Intn(DAYS)]++
-			}
+func distribution() int {
+	dist := make([]int, DAYS)
+	d := 0
 
-			for _, d := range dist {
-				// a distinct answer
-				if d == 1 {
-					probs[i]++
-				}
-			}
+	for _, _ = range dist {
+		r := rand.Intn(DAYS)
+		if dist[r] == 0 {
+			d++
+		} else if dist[r] == 1 {
+			d--
 		}
-		pr := 0.0
-		for _, p := range probs {
-			pr += p
-		}
-		sum += 1-(pr/float64(LOOPS * DAYS))
+		dist[r]++
 	}
-	return sum
+	return d
+}
+
+func sim() float64 {
+	s := 0
+	for i := 0; i < LOOPS; i++ {
+		s += distribution()
+	}
+	return DAYS-float64(s)/LOOPS
 }
 
 func main() {
-		fmt.Printf("%2d: Simulated: %20v\n", DAYS, simulated(DAYS))
+	fmt.Println("Simulation: ", sim())
 }

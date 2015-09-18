@@ -1,5 +1,5 @@
 
-OBJ= rand.o main.o
+OBJ= rand.a main.o
 BIN= main
 FORT= gfortran
 FFLAGS= -Wall -Wsurprising -pedantic -std=legacy
@@ -7,8 +7,8 @@ FFLAGS= -Wall -Wsurprising -pedantic -std=legacy
 %.o: %.f
 	$(FORT) $(FFLAGS) -c -o $@ $<
 
-%.o: %.c
-	$(CC) $(CFLAGS) -c -o $@ $<
+%.o: %.go
+	gccgo -o $@ -c $<
 
 $(BIN): $(OBJ)
 	$(FORT) $(LDFLAGS) -o $@ $^
