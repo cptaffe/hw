@@ -1,42 +1,52 @@
 
-* This program is an implementation of
-* Monte Carlo Simulation's Homework 5.
+*
+* Homework 5
+* CPSC 4399-11; Special Topics: Monte Carlo Simulation
+* Professor Minsker
+*
+* Connor P. Taffe
+* T no. 00563742
+*
+
       program main
           print *, 'Simulated: ', sim()
       end
 
-* Function to do simulation
-      real function sim()
-          integer days, loops
-          parameter(days = 365, loops = 1000)
-          integer s, dist(days), rnd
-
-          s = 0
+      real function distribution(days)
+          integer days, rnd, dist(days)
+* Zero out dist array
           do 10 i=1, days
-* Do loops simulations
-              do 30 j=1, loops
-* Zero dist array
-                  do 40 k=1, days
-                      dist(k) = 0
-40                    continue
-* Randomly generate birthdays
-                  do 50 k=1, days
-* Random number between 0 and 1, multiplied by n-1,
-* and shifted up by 1 to be between 1 and n inclusive.
-                      rnd = int(rand() * (days-1))+1
-                      dist(rnd) = dist(rnd)+1
-* Keep updated sum based on dist
-                      if (dist(rnd) .eq. 1) then
-                          s = s + 1
-                      else if (dist(rnd) .gt. 1) then
-                          s = s - 1
-                      end if
-50                    continue
-30                continue
-* Calculate probability
+              dist(i) = 0
 10            continue
-          print *,s
-          sim = days-real(s)/(loops*days)
+
+* Keep tally of unique days
+          do 20 i=1, days
+              rnd = int(rand() * (days-1))+1
+              dist(rnd) = dist(rnd)+1
+              if (dist(rnd) == 1) then
+                  distribution = distribution+1
+              else if (dist(rnd) > 1) then
+                  distribution = distribution-1
+              end if
+20            continue
+              distribution = 1-distribution/days
+              print *, distribution
           return
       end
 
+* Simulation function,
+* returns mean
+      real function sim()
+          integer days, loops
+          parameter(days = 365, loops = 1000)
+
+          do 10 i=1, days
+* Loop through simulations
+              do 20 j=1, loops
+* Sum unique days for each 
+                  sim = sim + distribution(days)
+20                continue
+10            continue
+          sim = sim/loops
+          return
+      end
