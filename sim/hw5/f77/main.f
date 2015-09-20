@@ -70,14 +70,20 @@
 
 * Simulation function, returns mean.
       double precision function sim()
-          integer days, loops, unique
-          parameter(days = 365, loops = 100000)
+          integer n, m, unique
+          parameter(m = 365, n = 100000)
           sim = 0
-* Loop through simulations.
-          do 10 j=1, loops
-* Sum unique days for distribution.
-              sim = sim + unique(days)
+*
+* Loop over n simulations.
+* Sums unique values out of m trials.
+*
+          do 10 j=1, n
+              sim = sim + unique(m)
 10            continue
-          sim = days-sim/loops
+*
+* Value of the simulation is the number of trails
+* minus the total uniques out of the total simulations.
+*
+          sim = m-sim/n
           return
       end
