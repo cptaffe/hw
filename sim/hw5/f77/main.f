@@ -20,6 +20,8 @@
       integer function unique(n)
           integer n, rnd
           integer seen(n)
+          external rand
+          double precision rand
 
 * Intialize local variables.
           unique = 0
