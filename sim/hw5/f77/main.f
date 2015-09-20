@@ -12,41 +12,69 @@
           print *, 'Simulated: ', sim()
       end
 
-* Returns number of days that were unique out of days.
-      integer function distribution(days)
-          integer days, rnd
-          integer dist(days)
+*
+* Generates n random numbers on the range [1,n].
+* returns the cardinality of the set of unique
+* numbers generated.
+*
+      integer function unique(n)
+          integer n, rnd
+          integer seen(n)
 
-          distribution = 0
-* Zero out dist array.
-          do 10 i=1, days
-              dist(i) = 0
+* Intialize local variables.
+          unique = 0
+          do 10 i=1, n
+              seen(i) = 0
 10            continue
-* Keep tally of unique days.
-          do 20 i=1, days
-* Random number on range 1-365.
-              rnd = int(rand() * (days-1))+1
-              if (dist(rnd) == 0) then
-* Increment one on unseen they are unique for now.
-                  distribution = distribution+1
-              else if (dist(rnd) == 1) then
-* Decrement one on previously seen they are no long unique.
-                  distribution = distribution-1
+
+
+*
+* Loop n times, generating n random numbers
+* on the range [1, n]. Returns the number of unique
+* numbers (numbers only generated once).
+*
+          do 20 i=1, n
+*
+* Random number on range [1, 365].
+* The rand function is implemented in C code using the C
+* standard library's rand function, which returns
+* on the range [0, RAND_MAX].
+* The rand function divides that by RAND_MAX cast to a double
+* to get a double precision floating point on the
+* range [0, 1].
+* ([0, 1] * (n-1))+1 => [1,n].
+*
+              rnd = int(rand() * (n-1))+1
+*
+* "dist" is an array of size n, indexed on
+* the range [1, n]. For each index, the corresponding
+* entry is the number of times that index has been generated
+* by this loop.
+* On no previous generations, it is a unique value,
+* so the unique count is incremented.
+* On one previous generation, it is no longer unique,
+* so the unique count is decremented.
+*
+              if (seen(rnd) == 0) then
+                  unique = unique+1
+              else if (seen(rnd) == 1) then
+                  unique = unique-1
               end if
-              dist(rnd) = dist(rnd)+1
+              seen(rnd) = seen(rnd)+1
+
 20            continue
           return
       end
 
 * Simulation function, returns mean.
       double precision function sim()
-          integer days, loops, distribution
+          integer days, loops, unique
           parameter(days = 365, loops = 100000)
           sim = 0
 * Loop through simulations.
           do 10 j=1, loops
 * Sum unique days for distribution.
-              sim = sim + distribution(days)
+              sim = sim + unique(days)
 10            continue
           sim = days-sim/loops
           return
