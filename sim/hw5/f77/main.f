@@ -63,7 +63,6 @@
                   unique = unique-1
               end if
               seen(rnd) = seen(rnd)+1
-
 20            continue
           return
       end
