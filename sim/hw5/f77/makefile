@@ -2,7 +2,8 @@
 OBJ= rand.o main.o
 BIN= main
 FC= gfortran
-FFLAGS= -Wall -Wsurprising -pedantic -std=legacy
+FFLAGS= -Wall -Wsurprising -pedantic -std=legacy -fopenmp
+LDFLAGS= -lgomp
 
 %.o: %.f
 	$(FC) $(FFLAGS) -c -o $@ $<

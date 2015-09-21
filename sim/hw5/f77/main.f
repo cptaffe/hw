@@ -9,7 +9,7 @@
 
       program main
           double precision sim
-          print *, 'Simulated: ', sim()
+          print *, 'Simulated: ', 365*sim()
       end
 
 *
@@ -19,14 +19,14 @@
 *
       integer function unique(n)
           integer n, rnd
-          integer seen(n)
+          logical seen(n)
           external rand
           double precision rand
 
 * Intialize local variables.
           unique = 0
           do 10 i=1, n
-              seen(i) = 0
+              seen(i) = .false.
 10            continue
 
 
@@ -57,12 +57,10 @@
 * On one previous generation, it is no longer unique,
 * so the unique count is decremented.
 *
-              if (seen(rnd) == 0) then
+              if (.not. seen(rnd)) then
                   unique = unique+1
-              else if (seen(rnd) == 1) then
-                  unique = unique-1
+                  seen(rnd) = .true.
               end if
-              seen(rnd) = seen(rnd)+1
 20            continue
           return
       end
@@ -70,19 +68,21 @@
 * Simulation function, returns mean.
       double precision function sim()
           integer n, m, unique
-          parameter(m = 365, n = 100000)
+          parameter(m = 365, n = 1000000)
           sim = 0
 *
 * Loop over n simulations.
 * Sums unique values out of m trials.
 *
+*$omp parallel do
           do 10 j=1, n
               sim = sim + unique(m)
 10            continue
+*$omp end parallel do
 *
 * Value of the simulation is the number of trails
 * minus the total uniques out of the total simulations.
 *
-          sim = m-sim/n
+          sim = sim/n/m
           return
       end
