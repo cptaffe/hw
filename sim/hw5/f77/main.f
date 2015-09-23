@@ -44,9 +44,16 @@
 * The rand function divides that by RAND_MAX cast to a double
 * to get a double precision floating point on the
 * range [0, 1].
-* ([0, 1] * (n-1))+1 => [1,n].
+* Multiply with integer truncation yilds equal probablility
+* of 0-n-1 and almost 0 proability of n. Thusly
+* ([0, 1] * n)+1 => [1,n].
+* Loop to avoid n's
 *
+          rnd = n+1
+          do 30 while (rnd .eq. n+1)
               rnd = int(rand() * n)+1
+30            continue
+
 *
 * "dist" is an array of size n, indexed on
 * the range [1, n]. For each index, the corresponding
@@ -68,17 +75,15 @@
 * Simulation function, returns mean.
       double precision function sim()
           integer n, m, unique
-          parameter(m = 365, n = 100000)
+          parameter(m = 2, n = 100000000)
           sim = 0
 *
 * Loop over n simulations.
 * Sums unique values out of m trials.
 *
-*$omp parallel do
           do 10 j=1, n
               sim = sim + unique(m)
 10            continue
-*$omp end parallel do
 *
 * Value of the simulation is the number of trails
 * minus the total uniques out of the total simulations.
