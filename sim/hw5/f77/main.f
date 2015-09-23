@@ -9,7 +9,7 @@
 
       program main
           double precision sim
-          print *, 'Simulated: ', 365*sim()
+          print *, 'Simulated: ', sim()
       end
 
 *
@@ -46,7 +46,7 @@
 * range [0, 1].
 * ([0, 1] * (n-1))+1 => [1,n].
 *
-              rnd = int(rand() * (n-1))+1
+              rnd = int(rand() * n)+1
 *
 * "dist" is an array of size n, indexed on
 * the range [1, n]. For each index, the corresponding
@@ -68,7 +68,7 @@
 * Simulation function, returns mean.
       double precision function sim()
           integer n, m, unique
-          parameter(m = 365, n = 1000000)
+          parameter(m = 365, n = 100000)
           sim = 0
 *
 * Loop over n simulations.
@@ -83,6 +83,6 @@
 * Value of the simulation is the number of trails
 * minus the total uniques out of the total simulations.
 *
-          sim = sim/n/m
+          sim = sim/n
           return
       end
