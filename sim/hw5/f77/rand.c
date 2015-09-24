@@ -37,6 +37,7 @@ RandomGeneratorState *makeRandomGeneratorState(Random *r) {
 		.lmask = (1 << r->r) - 1,
 		.umask = ~((1 << r->r) - 1) & lowestWBits(r),
 	};
+	return s;
 }
 
 void randomGeneratorStateSeed(RandomGeneratorState *s, uint64_t seed) {
@@ -88,6 +89,7 @@ Random *makeMT199364Random() {
 		.l = 43,
 		.f = 6364136223846793005
 	};
+	return r;
 }
 
 RandomGeneratorState *randomState;
