@@ -75,7 +75,7 @@
 * Simulation function, returns mean.
       double precision function sim()
           integer n, m, unique
-          parameter(m = 365, n = 1000000)
+          parameter(m = 365, n = 100000)
           sim = 0
 *
 * Loop over n simulations.
