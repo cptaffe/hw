@@ -5,6 +5,7 @@
 #include <assert.h>
 #include <math.h>
 #include <pthread.h>
+#include <unistd.h>
 #include "rand.c"
 
 typedef struct {
@@ -104,14 +105,17 @@ void *searchThread(void *stp) {
 
 // Returns an array of S result tuples
 Result *search(size_t S) {
-	enum { THREADS = 8 };
+	const int threads = sysconf(_SC_NPROCESSORS_ONLN);
 	Result *r = calloc(sizeof(Result), S);
-	pthread_t ts[THREADS];
-	struct SearchThreadParams params[THREADS];
-	for (int i = 0; i < THREADS; i++) {
+	pthread_t ts[threads];
+	struct SearchThreadParams params[threads];
+
+	printf("Running with %d threads.\n", threads);
+
+	for (int i = 0; i < threads; i++) {
 		params[i] = (struct SearchThreadParams){
-			.S = S/THREADS,
-			.r = &r[i*(S/THREADS)]
+			.S = S/threads,
+			.r = &r[i*(S/threads)]
 		};
 		if (pthread_create(
 			&ts[i],
@@ -123,7 +127,17 @@ Result *search(size_t S) {
 			exit(1);
 		}
 	}
-	for (int i = 0; i < THREADS; i++) {
+
+	// Possible that S did not divide evenly
+	// Run the remaining ones in this thread.
+	if (S%threads > 0) {
+		searchThread(&(struct SearchThreadParams){
+			.S = S%threads,
+			.r = &r[S-S%threads]
+		});
+	}
+
+	for (int i = 0; i < threads; i++) {
 		pthread_join(ts[i], NULL);
 	}
 	return r;
