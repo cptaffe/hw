@@ -104,14 +104,10 @@ void *searchThread(void *stp) {
 }
 
 // Returns an array of S result tuples
-Result *search(size_t S) {
-	const int threads = sysconf(_SC_NPROCESSORS_ONLN);
+Result *search(size_t S, const int threads) {
 	Result *r = calloc(sizeof(Result), S);
 	pthread_t ts[threads];
 	struct SearchThreadParams params[threads];
-
-	printf("Running with %d threads.\n", threads);
-
 	for (int i = 0; i < threads; i++) {
 		params[i] = (struct SearchThreadParams){
 			.S = S/threads,
@@ -144,10 +140,11 @@ Result *search(size_t S) {
 }
 
 int main() {
-	const int max = 1000;
-	Result *t = search(max);
+	// Program initialization
+	const int max = 1000, threads = sysconf(_SC_NPROCESSORS_ONLN);
+	printf("Running with %d threads.\n", threads);
+	Result *t = search(max, threads);
 	for (int i = 0; i < max; i++) {
-		printf("%d: ", i);
 		resultPprint(&t[i]);
 	}
 }
