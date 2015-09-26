@@ -74,25 +74,57 @@ Result hyperSpaceNext(HyperSpace *h) {
 	return t;
 }
 
-// Returns an array of S result tuples
-Result *search(size_t S) {
-	Result *r = calloc(sizeof(Result), S);
-	for (int s = 0; s < S; s++) {
-		r[s] = (Result){
+struct SearchThreadParams {
+	size_t S;
+	Result *r;
+};
+
+void *searchThread(void *stp) {
+	struct SearchThreadParams *p = (struct SearchThreadParams *) stp;
+	for (int s = 0; s < p->S; s++) {
+		Result l = {
 			.h = hyperSpaceFromBits(randDouble() * 0xffffffffffffff),
-			.cost = hyperSpaceCost(&r[s].h),
+			.cost = hyperSpaceCost(&l.h),
 			.evals = 1
 		};
 		for (;;) {
 			// Keep running total of evals
-			Result n = hyperSpaceNext(&r[s].h);
-			if (r[s].h.bits == n.h.bits) {
+			Result n = hyperSpaceNext(&l.h);
+			if (l.h.bits == n.h.bits) {
 				break;
 			}
-			uint64_t e = r[s].evals;
-			r[s] = n;
-			r[s].evals += e;
+			uint64_t e = l.evals;
+			l = n;
+			l.evals += e;
 		}
+		p->r[s] = l;
+	}
+	return NULL;
+}
+
+// Returns an array of S result tuples
+Result *search(size_t S) {
+	enum { THREADS = 8 };
+	Result *r = calloc(sizeof(Result), S);
+	pthread_t ts[THREADS];
+	struct SearchThreadParams params[THREADS];
+	for (int i = 0; i < THREADS; i++) {
+		params[i] = (struct SearchThreadParams){
+			.S = S/THREADS,
+			.r = &r[i*(S/THREADS)]
+		};
+		if (pthread_create(
+			&ts[i],
+			NULL,
+			searchThread,
+			(void *) &params[i]
+		) != 0) {
+			fprintf(stderr, "Failed to spawn thread %d!\n", i);
+			exit(1);
+		}
+	}
+	for (int i = 0; i < THREADS; i++) {
+		pthread_join(ts[i], NULL);
 	}
 	return r;
 }
@@ -101,6 +133,7 @@ int main() {
 	const int max = 1000;
 	Result *t = search(max);
 	for (int i = 0; i < max; i++) {
+		printf("%d: ", i);
 		resultPprint(&t[i]);
 	}
 }
