@@ -100,10 +100,8 @@ void *searchThread(void *stp) {
 			.cost = hyperSpaceCost(&l.h),
 			.evals = 1
 		};
-		while (hyperSpaceNext(&l)) {
-			// Next keeps running total of evals
-			hyperSpaceNext(&l);
-		}
+		// Keeps a running total of evals
+		while (hyperSpaceNext(&l)) {}
 		p->r[s] = l;
 	}
 	return NULL;
