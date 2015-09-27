@@ -7,12 +7,10 @@ BIN=main
 all: $(BIN)
 
 clean:
-	$(RM) main.o $(BIN)
-
-main.o: main.c
+	$(RM) $(BIN)
 
 $(PCGDIR)/src/libpcg_random.a:
 	$(MAKE) -C $(PCGDIR)
 
-$(BIN): main.o $(PCGDIR)/src/libpcg_random.a
-	$(CC) -o $@ $^
+$(BIN): main.c $(PCGDIR)/src/libpcg_random.a
+	$(CC) $(CFLAGS) -o $@ $^
