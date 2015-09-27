@@ -1,6 +1,18 @@
 
+CFLAGS=-I$(PCGDIR)/include
 PCGDIR=pcg-c
+PCGLIB=$(PCGDIR)/src/libpcg_random.a
+BIN=main
 
-all:
+all: $(BIN)
+
+clean:
+	$(RM) main.o $(BIN)
+
+main.o: main.c
+
+$(PCGDIR)/src/libpcg_random.a:
 	$(MAKE) -C $(PCGDIR)
-	$(CC) main.c $(PCGDIR)/src/libpcg_random.a -I$(PCGDIR)/include
+
+$(BIN): main.o $(PCGDIR)/src/libpcg_random.a
+	$(CC) -o $@ $^
