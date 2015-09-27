@@ -1,3 +1,6 @@
 [submodule "ai/hw1/c/pcg-c"]
 	path = ai/hw1/c/pcg-c
 	url = git@github.com:imneme/pcg-c
+[submodule "ai/hw1/pcg-c"]
+	path = ai/hw1/pcg-c
+	url = git@github.com:imneme/pcg-c
