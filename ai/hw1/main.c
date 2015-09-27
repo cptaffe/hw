@@ -62,7 +62,6 @@ void resultPprint(Result *r) {
 bool hyperSpaceNext(Result *r) {
 	Result t = *r;
 	const int blen = 56;
-	bool haveAdvanced = false;
 	uint64_t bits = t.h.bits, evals = t.evals; // Original bits
 	for (int i = 0; i < blen; i++) {
 		Result lt = {
@@ -70,10 +69,10 @@ bool hyperSpaceNext(Result *r) {
 			.cost = hyperSpaceCost(&lt.h)
 		};
 		if (lt.cost < t.cost) {
-			haveAdvanced = true;
 			t = lt;
 		}
 	}
+	bool haveAdvanced = r->h.bits != t.h.bits;
 	*r = (Result){
 		.h = t.h,
 		.cost = t.cost,
