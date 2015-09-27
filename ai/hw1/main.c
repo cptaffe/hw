@@ -73,7 +73,6 @@ Result hyperSpaceNext(HyperSpace *h) {
 			t = lt;
 		}
 	}
-	t.evals = blen;
 	return t;
 }
 
@@ -99,11 +98,12 @@ void *searchThread(void *stp) {
 			// Keep running total of evals
 			Result n = hyperSpaceNext(&l.h);
 			if (l.h.bits == n.h.bits) {
+				// If have not advanced, at local maxima.
 				break;
 			}
 			uint64_t e = l.evals;
 			l = n;
-			l.evals += e;
+			l.evals = e + 1;
 		}
 		p->r[s] = l;
 	}
