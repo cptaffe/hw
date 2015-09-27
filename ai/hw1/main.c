@@ -102,7 +102,7 @@ void *searchThread(void *stp) {
 			.evals = 1
 		};
 		while (hyperSpaceNext(&l)) {
-			// Keep running total of evals
+			// Next keeps running total of evals
 			hyperSpaceNext(&l);
 		}
 		p->r[s] = l;
