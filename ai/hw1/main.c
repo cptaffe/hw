@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <stdbool.h>
 #include <assert.h>
 #include <math.h>
 #include <pthread.h>
@@ -58,22 +59,28 @@ void resultPprint(Result *r) {
 // and selects the best one.
 // Slight optimization combines neighborhood generation
 // and greedy descent selection for O(1) vs O(n) space.
-Result hyperSpaceNext(HyperSpace *h) {
+bool hyperSpaceNext(Result *r) {
+	Result t = *r;
 	const int blen = 56;
-	Result t = {
-		.h = *h,
-		.cost = hyperSpaceCost(&t.h),
-	};
+	bool haveAdvanced = false;
+	uint64_t bits = t.h.bits, evals = t.evals; // Original bits
 	for (int i = 0; i < blen; i++) {
 		Result lt = {
-			.h = hyperSpaceFromBits(h->bits ^ (1 << i)),
+			.h = hyperSpaceFromBits(bits ^ (1 << i)),
 			.cost = hyperSpaceCost(&lt.h)
 		};
 		if (lt.cost < t.cost) {
+			haveAdvanced = true;
 			t = lt;
 		}
 	}
-	return t;
+	*r = (Result){
+		.h = t.h,
+		.cost = t.cost,
+		// Accumulate evals
+		.evals = r->evals + blen
+	};
+	return haveAdvanced;
 }
 
 // Search thread parameters
@@ -94,16 +101,9 @@ void *searchThread(void *stp) {
 			.cost = hyperSpaceCost(&l.h),
 			.evals = 1
 		};
-		for (;;) {
+		while (hyperSpaceNext(&l)) {
 			// Keep running total of evals
-			Result n = hyperSpaceNext(&l.h);
-			if (l.h.bits == n.h.bits) {
-				// If have not advanced, at local maxima.
-				break;
-			}
-			uint64_t e = l.evals;
-			l = n;
-			l.evals = e + 1;
+			hyperSpaceNext(&l);
 		}
 		p->r[s] = l;
 	}
