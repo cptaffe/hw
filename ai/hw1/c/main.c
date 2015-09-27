@@ -6,7 +6,9 @@
 #include <math.h>
 #include <pthread.h>
 #include <unistd.h>
-#include "rand.c"
+
+// PCG random numbers
+#include "pcg_variants.h"
 
 typedef struct {
 	long double x, y, z, T;
@@ -75,16 +77,20 @@ Result hyperSpaceNext(HyperSpace *h) {
 	return t;
 }
 
+// Search thread parameters
 struct SearchThreadParams {
 	size_t S;
 	Result *r;
 };
 
+// search thread function
+// for use with pthread_create
+// void* cast to a SearchThreadParams*
 void *searchThread(void *stp) {
 	struct SearchThreadParams *p = (struct SearchThreadParams *) stp;
 	for (int s = 0; s < p->S; s++) {
 		Result l = {
-			.h = hyperSpaceFromBits(randDouble() * 0xffffffffffffff),
+			.h = hyperSpaceFromBits(pcg64_boundedrand(0xffffffffffffff)),
 			.cost = hyperSpaceCost(&l.h),
 			.evals = 1
 		};
