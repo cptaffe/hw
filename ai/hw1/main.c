@@ -90,7 +90,8 @@ void *searchThread(void *stp) {
 	struct SearchThreadParams *p = (struct SearchThreadParams *) stp;
 	for (int s = 0; s < p->S; s++) {
 		Result l = {
-			.h = hyperSpaceFromBits(pcg64_boundedrand(0xffffffffffffff)),
+			// PCG bounded rand is on the range [0, bound).
+			.h = hyperSpaceFromBits(pcg64_boundedrand(0x100000000000000)),
 			.cost = hyperSpaceCost(&l.h),
 			.evals = 1
 		};
