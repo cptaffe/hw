@@ -94,15 +94,20 @@ uint64_t randomPCG() {
 	return pcg64_boundedrand(0x100000000000000);
 }
 
+uint64_t randomC() {
+	return ((double) rand())/RAND_MAX * 0x100000000000000;
+}
+
 // Global program configuration
 struct {
 	HyperSpace (*simulate)(HyperSpace *h);
 	uint64_t (*random)();
-	int threads;
+	int threads, restarts;
 } Config = {
 	.simulate = hyperSpaceSimulateForwardEuler,
 	.random = randomPCG,
-	.threads = 1
+	.threads = 1,
+	.restarts = 1000 // S
 };
 
 long double hyperSpaceCost(HyperSpace *h) {
@@ -150,7 +155,7 @@ bool hyperSpaceNext(Result *r) {
 
 // Search thread parameters
 struct SearchThreadParams {
-	size_t S;
+	int S;
 	Result *r;
 };
 
@@ -159,7 +164,7 @@ struct SearchThreadParams {
 // void* cast to a SearchThreadParams*
 void *searchThread(void *stp) {
 	struct SearchThreadParams *p = (struct SearchThreadParams *) stp;
-	for (unsigned int s = 0; s < p->S; s++) {
+	for (int s = 0; s < p->S; s++) {
 		Result l = {
 			// PCG bounded rand is on the range [0, bound).
 			.h = hyperSpaceFromBits(Config.random()),
@@ -174,7 +179,8 @@ void *searchThread(void *stp) {
 }
 
 // Returns an array of S result tuples
-Result *search(size_t S) {
+Result *search() {
+	int S = Config.restarts;
 	Result *r = calloc(sizeof(Result), S);
 	pthread_t ts[Config.threads];
 	struct SearchThreadParams params[Config.threads];
@@ -215,13 +221,11 @@ Result *search(size_t S) {
 }
 
 void usage() {
-	printf("main [-s|--simulate algorithm(rc4|euler)] [-r|--random function(pcg)] [-t|--threads [nthreads]]\n");
+	printf("main [-s|--simulate algorithm(rc4|euler)] [-r|--random function(pcg)] [-n|--restarts nrestarts] [-t|--threads [nthreads]] [-h|--help]\n");
 	exit(1);
 }
 
 int main(int argc, char *argv[]) {
-	const int max = 1000;
-
 	// Parse command line options
 	for (int i = 1; i < argc; i++) {
 		if (strcmp(argv[i], "-s") == 0 || strcmp(argv[i], "--simulate") == 0) {
@@ -242,6 +246,8 @@ int main(int argc, char *argv[]) {
 				i++;
 				if (strcmp(argv[i], "pcg") == 0) {
 					Config.random = randomPCG;
+				} else if (strcmp(argv[i], "crand") == 0) {
+					Config.random = randomC;
 				} else {
 					usage();
 				}
@@ -249,7 +255,7 @@ int main(int argc, char *argv[]) {
 				usage();
 			}
 		} else if (strcmp(argv[i], "-t") == 0 || strcmp(argv[i], "--threads") == 0) {
-			if ((i + 1) < argc) {
+			if ((i + 1) < argc && argv[i+1][0] > '0' && argv[i+1][0] < '9') {
 				i++;
 				int t = strtol(argv[i], NULL, 10);
 				if (t > 0) {
@@ -262,14 +268,43 @@ int main(int argc, char *argv[]) {
 				// Default number of threads
 				Config.threads = sysconf(_SC_NPROCESSORS_ONLN);
 			}
+		} else if (strcmp(argv[i], "-n") == 0 || strcmp(argv[i], "--restarts") == 0) {
+			if ((i + 1) < argc) {
+				i++;
+				int t = strtol(argv[i], NULL, 10);
+				if (t > 0) {
+					Config.restarts = t;
+				} else {
+					printf("Restarts must be on the range [1, %d)\n", INT_MAX);
+					usage();
+				}
+			} else {
+				usage();
+			}
+		} else if (strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "--help") == 0) {
+			printf(
+				"[-s|--simulate algorithm(rc4|euler)]\n"
+				"    Simulate system using forward euler or the more accurate RC4 algorithm.\n"
+				"[-r|--random function(pcg|crand)]\n"
+				"    Select a source of randomness.\n"
+				"    PCG random (default) is the best avaliable pseudo-random number generator,\n"
+				"        while the stdlib C rand is very poor.\n"
+				"[-n|--restarts nrestarts]\n"
+				"    Number of random restarts, defaults to 1000 as per assignment.\n"
+				"[-t|--threads [nthreads]]\n"
+				"    Turn on threading, specifying no argument defaults to the machine's core number.\n"
+				"[-h|--help]\n"
+				"    Prints this help page.\n"
+			);
+			usage();
 		} else {
 			usage();
 		}
 	}
 
 	printf("Running with %d %s.\n", Config.threads, (Config.threads > 1) ? "threads" : "thread");
-	Result *t = search(max);
-	for (int i = 0; i < max; i++) {
+	Result *t = search();
+	for (int i = 0; i < Config.restarts; i++) {
 		resultPprint(&t[i]);
 	}
 }
