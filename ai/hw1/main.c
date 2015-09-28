@@ -221,7 +221,7 @@ Result *search() {
 }
 
 void usage() {
-	printf("main [-s|--simulate algorithm(rc4|euler)] [-r|--random function(pcg)] [-n|--restarts nrestarts] [-t|--threads [nthreads]] [-h|--help]\n");
+	printf("main [-s|--simulate algorithm(rk4|euler)] [-r|--random function(pcg)] [-n|--restarts nrestarts] [-t|--threads [nthreads]] [-h|--help]\n");
 	exit(1);
 }
 
@@ -231,7 +231,7 @@ int main(int argc, char *argv[]) {
 		if (strcmp(argv[i], "-s") == 0 || strcmp(argv[i], "--simulate") == 0) {
 			if ((i + 1) < argc) {
 				i++;
-				if (strcmp(argv[i], "rc4") == 0) {
+				if (strcmp(argv[i], "rk4") == 0) {
 					Config.simulate = hyperSpaceSimulateRK4;
 				} else if (strcmp(argv[i], "euler") == 0) {
 					Config.simulate = hyperSpaceSimulateForwardEuler;
@@ -283,7 +283,7 @@ int main(int argc, char *argv[]) {
 			}
 		} else if (strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "--help") == 0) {
 			printf(
-				"[-s|--simulate algorithm(rc4|euler)]\n"
+				"[-s|--simulate algorithm(rk4|euler)]\n"
 				"    Simulate system using forward euler or the more accurate RC4 algorithm.\n"
 				"[-r|--random function(pcg|crand)]\n"
 				"    Select a source of randomness.\n"
