@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <inttypes.h>
 #include <stdbool.h>
 #include <assert.h>
 #include <math.h>
@@ -52,7 +53,7 @@ typedef struct {
 } Result;
 
 void resultPprint(Result *r) {
-	printf("%llu, %Lf, %Lf, %Lf, %Lf, %Lf\n", r->evals, r->cost, r->h.x, r->h.y, r->h.z, r->h.T);
+	printf("%"PRIu64", %Lf, %Lf, %Lf, %Lf, %Lf\n", r->evals, r->cost, r->h.x, r->h.y, r->h.z, r->h.T);
 }
 
 // Generates all single-hamming-distance solutions
@@ -62,7 +63,7 @@ void resultPprint(Result *r) {
 bool hyperSpaceNext(Result *r) {
 	Result t = *r;
 	const int blen = 56;
-	uint64_t bits = t.h.bits, evals = t.evals; // Original bits
+	uint64_t bits = t.h.bits; // Original bits
 	for (int i = 0; i < blen; i++) {
 		Result lt = {
 			.h = hyperSpaceFromBits(bits ^ (1 << i)),
@@ -93,7 +94,7 @@ struct SearchThreadParams {
 // void* cast to a SearchThreadParams*
 void *searchThread(void *stp) {
 	struct SearchThreadParams *p = (struct SearchThreadParams *) stp;
-	for (int s = 0; s < p->S; s++) {
+	for (unsigned int s = 0; s < p->S; s++) {
 		Result l = {
 			// PCG bounded rand is on the range [0, bound).
 			.h = hyperSpaceFromBits(pcg64_boundedrand(0x100000000000000)),
