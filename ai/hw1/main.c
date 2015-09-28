@@ -267,7 +267,7 @@ int main(int argc, char *argv[]) {
 		}
 	}
 
-	printf("Running with %d threads.\n", Config.threads);
+	printf("Running with %d %s.\n", Config.threads, (Config.threads > 1) ? "threads" : "thread");
 	Result *t = search(max);
 	for (int i = 0; i < max; i++) {
 		resultPprint(&t[i]);
