@@ -1,5 +1,6 @@
 
 CFLAGS=-I$(PCGDIR)/include
+LDFLAGS=-lm -lpthread
 PCGDIR=pcg-c
 PCGLIB=$(PCGDIR)/src/libpcg_random.a
 BIN=main
@@ -13,4 +14,4 @@ $(PCGDIR)/src/libpcg_random.a:
 	$(MAKE) -C $(PCGDIR)
 
 $(BIN): main.c $(PCGDIR)/src/libpcg_random.a
-	$(CC) $(CFLAGS) -o $@ $^
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
