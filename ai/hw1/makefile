@@ -1,5 +1,5 @@
 
-CFLAGS=-I$(PCGDIR)/include -std=c99 -Wpedantic -Wall -Wextra -Wformat=2
+CFLAGS=-I$(PCGDIR)/include -std=c99 -Wpedantic -Wall -Wextra -Wformat=2 -O3
 LDFLAGS=-lm -lpthread
 PCGDIR=pcg-c
 PCGLIB=$(PCGDIR)/src/libpcg_random.a
