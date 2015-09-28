@@ -29,11 +29,11 @@ HyperSpace hyperSpaceFromBits(uint64_t b) {
 	};
 }
 
-inline long double simX(long double x, long double y);
+inline long double simX(long double x, long double y, long double z);
 inline long double simY(long double x, long double y, long double z);
 inline long double simZ(long double x, long double y, long double z);
 
-long double simX(long double x, long double y) {
+long double simX(long double x, long double y, long double z) {
 	const long double o = 10;
 	return o * (y-x);
 }
@@ -44,48 +44,108 @@ long double simY(long double x, long double y, long double z) {
 }
 
 long double simZ(long double x, long double y, long double z) {
-	const long double b = 8.0/3.0;
+	const long double b = 8l/3l;
 	return x*y - b*z;
 }
 
+// Forward Euler
 HyperSpace hyperSpaceSimulateForwardEuler(HyperSpace *h) {
 	const long double dt = 0.01;
 	HyperSpace n = *h;
 	for (long double t = 0; t < h->T; t += dt) {
 		HyperSpace m = n;
 		// Forward Euler
-		n.x += dt * simX(m.x, m.y);
+		n.x += dt * simX(m.x, m.y, m.z);
 		n.y += dt * simY(m.x, m.y, m.z);
 		n.z += dt * simZ(m.x, m.y, m.z);
 	}
 	return n;
 }
 
+// Classical 4th order Runge-Kutta method
 HyperSpace hyperSpaceSimulateRK4(HyperSpace *h) {
 	const long double dt = 0.01;
 	HyperSpace n = *h;
 	for (long double t = 0; t < h->T; t += dt) {
 		HyperSpace m = n;
 		long double
-			k1x = simX(m.x, m.y),
+			k1x = simX(m.x, m.y, m.z),
 			k1y = simY(m.x, m.y, m.z),
 			k1z = simZ(m.x, m.y, m.z),
 
-			k2x = simX(m.x + dt/2*k1x, m.y + dt/2*k1y),
+			k2x = simX(m.x + dt/2*k1x, m.y + dt/2*k1y, m.z + dt/2*k1z),
 			k2y = simY(m.x + dt/2*k1x, m.y + dt/2*k1y, m.z + dt/2*k1z),
 			k2z = simZ(m.x + dt/2*k1x, m.y + dt/2*k1y, m.z + dt/2*k1z),
 
-			k3x = simX(m.x + dt/2*k2x, m.y + dt/2*k2y),
+			k3x = simX(m.x + dt/2*k2x, m.y + dt/2*k2y, m.z + dt/2*k2z),
 			k3y = simY(m.x + dt/2*k2x, m.y + dt/2*k2y, m.z + dt/2*k2z),
 			k3z = simZ(m.x + dt/2*k2x, m.y + dt/2*k2y, m.z + dt/2*k2z),
 
-			k4x = simX(m.x + dt*k3x, m.y + dt*k3y),
+			k4x = simX(m.x + dt*k3x, m.y + dt*k3y, m.z + dt*k3z),
 			k4y = simY(m.x + dt*k3x, m.y + dt*k3y, m.z + dt*k3z),
 			k4z = simZ(m.x + dt*k3x, m.y + dt*k3y, m.z + dt*k3z);
 
 		n.x += dt/6*(k1x + 2*k2x + 2*k3x + k4x);
 		n.y += dt/6*(k1y + 2*k2y + 2*k3y + k4y);
 		n.z += dt/6*(k1z + 2*k2z + 2*k3z + k4z);
+	}
+	return n;
+}
+
+// Dormand-Prince method
+HyperSpace hyperSpaceSimulateDP(HyperSpace *h) {
+	HyperSpace n = *h;
+	long double dt = 0.01;
+	for (long double t = 0; t < h->T; t += dt) {
+		long double v[] = { n.x, n.y, n.z };
+		long double (*f[])(long double, long double, long double) = { simX, simY, simZ };
+		long double k[7][3]; // k1-7 for x,y,z
+		const long double c[7][7] = {
+			{1l/5l},
+			{3l/4l, 9l/4l},
+			{44l/45l, -56l/15l, 32l/9l},
+			{19372l/6561l, -25360l/2187l, 64448l/6561l, -212l/729l},
+			{9017l/3168l, -355l/33l, -46732l/5247l, 49l/176l, -5103l/18656l},
+			{35l/384l, 0, 500l/1113l, 125l/192l, -2187l/6784l, 11l/84l}
+		};
+		for (int i = 0; i < 7; i++) {
+			for (int j = 0; j < 3; j++) {
+				long double o = 0;
+				for (int a = 0; a < i; a++) {
+					o += c[i][a]*k[a][j];
+				}
+				k[i][j] = f[j](v[0]+o, v[1]+o, v[2]+o);
+			}
+		}
+		// Order 4 & 5 step calculation constants
+		const long double sc[2][7] = {
+			{ 35l/384l, 0, 500l/1113l, 125l/192l, -2187l/6784l, 11l/84l },
+			{ 5179l/57600l, 0, 7571l/16695l, 393l/640l, -92097l/339200l, 187l/2100l, 1l/40l }
+		};
+		long double sv[2][3]; // step values (this, and next for x,y,z)
+		for (int i = 0; i < 2; i++) {
+			for (int j = 0; j < 3; j++) {
+				long double o = 0;
+				for (int a = 0; a < 7; a++) {
+					o += sc[i][a]*k[a][j];
+				}
+				sv[i][j] = v[j] + o;
+			}
+		}
+		// Calculate difference and error
+		long double d[3];
+		for (int i = 0; i < 3; i++) {
+			d[i] = fabsl(sv[0][i] - sv[0][i]);
+		}
+		// Calculate optimum time difference
+		long double s[3];
+		for (int i = 0; i < 3; i++) {
+			s[i] = powl(0.000001l*0.1l/(2*d[i]), 1l/5l);
+		}
+		dt = (s[0]+s[1]+s[2])/3*dt;
+		n.x = sv[0][0];
+		n.y = sv[0][1];
+		n.z = sv[0][2];
 	}
 	return n;
 }
@@ -225,6 +285,13 @@ void usage() {
 	exit(1);
 }
 
+int comp(const void *a0, const void *a1) {
+	Result *a = (Result*) a0, *b = (Result*) a1;
+	if (a->cost < b->cost) return 1;
+	if (a->cost > b->cost) return -1;
+	return 0;
+}
+
 int main(int argc, char *argv[]) {
 	// Parse command line options
 	for (int i = 1; i < argc; i++) {
@@ -302,9 +369,18 @@ int main(int argc, char *argv[]) {
 		}
 	}
 
-	printf("Running with %d %s.\n", Config.threads, (Config.threads > 1) ? "threads" : "thread");
-	Result *t = search();
-	for (int i = 0; i < Config.restarts; i++) {
-		resultPprint(&t[i]);
-	}
+	// printf("Running with %d %s.\n", Config.threads, (Config.threads > 1) ? "threads" : "thread");
+	// Result *t = search();
+	// qsort(t, Config.restarts, sizeof(Result), comp);
+	// for (int i = 0; i < Config.restarts; i++) {
+	// 	resultPprint(&t[i]);
+	// }
+	// free(t);
+	HyperSpace h = hyperSpaceFromBits(0x8FED66B63E53DE);
+	Config.simulate = hyperSpaceSimulateForwardEuler;
+	printf("cost: %Lf\n", hyperSpaceCost(&h));
+	Config.simulate = hyperSpaceSimulateRK4;
+	printf("cost: %Lf\n", hyperSpaceCost(&h));
+	Config.simulate = hyperSpaceSimulateDP;
+	printf("cost: %Lf\n", hyperSpaceCost(&h));
 }
