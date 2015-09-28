@@ -3,8 +3,9 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <inttypes.h>
+#include <limits.h>
 #include <stdbool.h>
-#include <strings.h>
+#include <string.h>
 #include <assert.h>
 #include <math.h>
 #include <pthread.h>
@@ -28,7 +29,11 @@ HyperSpace hyperSpaceFromBits(uint64_t b) {
 	};
 }
 
-long double simX(long double x, long double y, long double z) {
+inline long double simX(long double x, long double y);
+inline long double simY(long double x, long double y, long double z);
+inline long double simZ(long double x, long double y, long double z);
+
+long double simX(long double x, long double y) {
 	const long double o = 10;
 	return o * (y-x);
 }
@@ -44,12 +49,12 @@ long double simZ(long double x, long double y, long double z) {
 }
 
 HyperSpace hyperSpaceSimulateForwardEuler(HyperSpace *h) {
-	const long double dt = 0.01, o = 10, r = 28, b = 8.0/3.0;
+	const long double dt = 0.01;
 	HyperSpace n = *h;
 	for (long double t = 0; t < h->T; t += dt) {
 		HyperSpace m = n;
 		// Forward Euler
-		n.x += dt * simX(m.x, m.y, m.z);
+		n.x += dt * simX(m.x, m.y);
 		n.y += dt * simY(m.x, m.y, m.z);
 		n.z += dt * simZ(m.x, m.y, m.z);
 	}
@@ -57,24 +62,24 @@ HyperSpace hyperSpaceSimulateForwardEuler(HyperSpace *h) {
 }
 
 HyperSpace hyperSpaceSimulateRK4(HyperSpace *h) {
-	const long double dt = 0.01, o = 10, r = 28, b = 8.0/3.0;
+	const long double dt = 0.01;
 	HyperSpace n = *h;
 	for (long double t = 0; t < h->T; t += dt) {
 		HyperSpace m = n;
 		long double
-			k1x = simX(m.x, m.y, m.z),
+			k1x = simX(m.x, m.y),
 			k1y = simY(m.x, m.y, m.z),
 			k1z = simZ(m.x, m.y, m.z),
 
-			k2x = simX(m.x + dt/2*k1x, m.y + dt/2*k1y, m.z + dt/2*k1z),
+			k2x = simX(m.x + dt/2*k1x, m.y + dt/2*k1y),
 			k2y = simY(m.x + dt/2*k1x, m.y + dt/2*k1y, m.z + dt/2*k1z),
 			k2z = simZ(m.x + dt/2*k1x, m.y + dt/2*k1y, m.z + dt/2*k1z),
 
-			k3x = simX(m.x + dt/2*k2x, m.y + dt/2*k2y, m.z + dt/2*k2z),
+			k3x = simX(m.x + dt/2*k2x, m.y + dt/2*k2y),
 			k3y = simY(m.x + dt/2*k2x, m.y + dt/2*k2y, m.z + dt/2*k2z),
 			k3z = simZ(m.x + dt/2*k2x, m.y + dt/2*k2y, m.z + dt/2*k2z),
 
-			k4x = simX(m.x + dt*k3x, m.y + dt*k3y, m.z + dt*k3z),
+			k4x = simX(m.x + dt*k3x, m.y + dt*k3y),
 			k4y = simY(m.x + dt*k3x, m.y + dt*k3y, m.z + dt*k3z),
 			k4z = simZ(m.x + dt*k3x, m.y + dt*k3y, m.z + dt*k3z);
 
@@ -93,9 +98,11 @@ uint64_t randomPCG() {
 struct {
 	HyperSpace (*simulate)(HyperSpace *h);
 	uint64_t (*random)();
+	int threads;
 } Config = {
 	.simulate = hyperSpaceSimulateForwardEuler,
-	.random = randomPCG
+	.random = randomPCG,
+	.threads = 1
 };
 
 long double hyperSpaceCost(HyperSpace *h) {
@@ -167,16 +174,16 @@ void *searchThread(void *stp) {
 }
 
 // Returns an array of S result tuples
-Result *search(size_t S, const int threads) {
+Result *search(size_t S) {
 	Result *r = calloc(sizeof(Result), S);
-	pthread_t ts[threads];
-	struct SearchThreadParams params[threads];
-	bool spawnThreads = S/threads > 0;
+	pthread_t ts[Config.threads];
+	struct SearchThreadParams params[Config.threads];
+	bool spawnThreads = S/Config.threads > 0;
 	if (spawnThreads) {
-		for (int i = 0; i < threads; i++) {
+		for (int i = 0; i < Config.threads; i++) {
 			params[i] = (struct SearchThreadParams){
-				.S = S/threads,
-				.r = &r[i*(S/threads)]
+				.S = S/Config.threads,
+				.r = &r[i*(S/Config.threads)]
 			};
 			if (pthread_create(
 				&ts[i],
@@ -192,15 +199,15 @@ Result *search(size_t S, const int threads) {
 
 	// Possible that S did not divide evenly
 	// Run the remaining ones in this thread.
-	if (S%threads > 0) {
+	if (S%Config.threads > 0) {
 		searchThread(&(struct SearchThreadParams){
-			.S = S%threads,
-			.r = &r[S-S%threads]
+			.S = S%Config.threads,
+			.r = &r[S-S%Config.threads]
 		});
 	}
 
 	if (spawnThreads) {
-		for (int i = 0; i < threads; i++) {
+		for (int i = 0; i < Config.threads; i++) {
 			pthread_join(ts[i], NULL);
 		}
 	}
@@ -208,12 +215,12 @@ Result *search(size_t S, const int threads) {
 }
 
 void usage() {
-	printf("main [-s|--simulate algorithm(rc4|euler)] [-r|--random function(pcg)].\n");
+	printf("main [-s|--simulate algorithm(rc4|euler)] [-r|--random function(pcg)] [-t|--threads [nthreads]]\n");
 	exit(1);
 }
 
 int main(int argc, char *argv[]) {
-	const int max = 1000, threads = sysconf(_SC_NPROCESSORS_ONLN);
+	const int max = 1000;
 
 	// Parse command line options
 	for (int i = 1; i < argc; i++) {
@@ -241,13 +248,27 @@ int main(int argc, char *argv[]) {
 			} else {
 				usage();
 			}
+		} else if (strcmp(argv[i], "-t") == 0 || strcmp(argv[i], "--threads") == 0) {
+			if ((i + 1) < argc) {
+				i++;
+				int t = strtol(argv[i], NULL, 10);
+				if (t > 0) {
+					Config.threads = t;
+				} else {
+					printf("Threads must be on the range [1, %d)\n", INT_MAX);
+					usage();
+				}
+			} else {
+				// Default number of threads
+				Config.threads = sysconf(_SC_NPROCESSORS_ONLN);
+			}
 		} else {
 			usage();
 		}
 	}
 
-	// printf("Running with %d threads.\n", threads);
-	Result *t = search(max, threads);
+	printf("Running with %d threads.\n", Config.threads);
+	Result *t = search(max);
 	for (int i = 0; i < max; i++) {
 		resultPprint(&t[i]);
 	}
