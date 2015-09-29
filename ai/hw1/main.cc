@@ -1,6 +1,5 @@
 
 #include <random>
-#include <functional>
 #include <iostream>
 
 namespace {
@@ -44,10 +43,10 @@ public:
 };
 
 HyperSpace::HyperSpace(uint64_t b)
-	: x((long double) ((b & 0xffff0000000000) >> 40) / 0xffff * 40 - 20),
-	y((long double) ((b & 0xffff000000) >> 24) / 0xffff * 60 - 30),
-	z((long double) ((b & 0xffff00) >> 8) / 0xffff * 50),
-	T((long double) (b & 0xff) / 0xff * 5),
+	: x(static_cast<long double>((b & 0xffff0000000000) >> 40) / 0xffff * 40 - 20),
+	y(static_cast<long double>((b & 0xffff000000) >> 24) / 0xffff * 60 - 30),
+	z(static_cast<long double>((b & 0xffff00) >> 8) / 0xffff * 50),
+	T(static_cast<long double>(b & 0xff) / 0xff * 5),
 	bits(b) {}
 
 long double HyperSpace::Cost() {
@@ -86,9 +85,9 @@ bool HyperSpace::Next(Result *r) {
 	return haveAdvanced;
 }
 
-std::random_device rd;
-std::mt19937 gen(rd());
-std::uniform_int_distribution<uint64_t> dis(0, 0x100000000000000);
+static std::random_device rd;
+static std::mt19937 gen(rd());
+static std::uniform_int_distribution<uint64_t> dis(0, 0x100000000000000);
 
 void HyperSpace::Search(int S) {
 	for (int s = 0; s < S; s++) {

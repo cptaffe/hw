@@ -92,65 +92,6 @@ HyperSpace hyperSpaceSimulateRK4(HyperSpace *h) {
 	return n;
 }
 
-// Dormand-Prince method
-HyperSpace hyperSpaceSimulateDP(HyperSpace *h) {
-	HyperSpace n = *h;
-	long double *const v[] = { &n.x, &n.y, &n.z };
-	long double dt = 0.01;
-	for (long double t = 0; t < h->T; t += dt) {
-		long double (*f[])(long double, long double, long double) = { simX, simY, simZ };
-		long double k[7][3] = {}; // k1-7 for x,y,z
-		const long double c[7][7] = {
-			{ 1.0/5.0 },
-			{ 3.0/40.0, 9.0/40.0 },
-			{ 44.0/45.0, -56.0/15.0, 32.0/9.0 },
-			{ 19372.0/6561.0, -25360.0/2187.0, 64448.0/6561.0, -212.0/729.0 },
-			{ 9017.0/3168.0, -355.0/33.0, -46732.0/5247.0, 49.0/176.0, -5103.0/18656.0 },
-			{ 35.0/384.0, 0, 500.0/1113.0, 125.0/192.0, -2187.0/6784.0, 11.0/84.0 }
-		};
-		for (int i = 0; i < 7; i++) {
-			for (int j = 0; j < 3; j++) {
-				long double o = 0;
-				for (int a = 0; a < i+1; a++) {
-					o += c[i][a]*k[a][j];
-				}
-				k[i][j] = dt*f[j](*v[0]+o, *v[1]+o, *v[2]+o);
-			}
-		}
-		// Order 4 & 5 step calculation constants
-		const long double sc[2][7] = {
-			{ 35.0/384.0, 0, 500.0/1113.0, 125.0/192.0, -2187.0/6784.0, 11.0/84.0 },
-			{ 5179.0/57600.0, 0, 7571.0/16695.0, 393.0/640.0, -92097.0/339200.0, 187.0/2100.0, 1.0/40.0 }
-		};
-		long double sv[2][3]; // step values (this, and next for x,y,z)
-		for (int i = 0; i < 2; i++) {
-			for (int j = 0; j < 3; j++) {
-				long double o = 0;
-				for (int a = 0; a < 7; a++) {
-					o += sc[i][a]*k[a][j];
-				}
-				sv[i][j] = *v[j] + o;
-			}
-		}
-		// Calculate difference and error
-		long double d[3];
-		for (int i = 0; i < 3; i++) {
-			d[i] = fabsl(sv[1][i] - sv[0][i]);
-		}
-		// Calculate optimum time difference
-		long double s = 0;
-		for (int i = 0; i < 3; i++) {
-			s += powl(0.000001*dt/(2*d[i]), 1.0/5.0);
-		}
-		// dt *= s/3.0;
-		for (int i = 0; i < 3; i++) {
-			*v[i] = sv[0][i];
-		}
-		printf("x: %Lf, y: %Lf, z: %Lf, t: %Lf, dt: %Lf\n", n.x, n.y, n.z, t, dt);
-	}
-	return n;
-}
-
 uint64_t randomPCG() {
 	return pcg64_boundedrand(0x100000000000000);
 }
