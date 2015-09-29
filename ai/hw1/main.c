@@ -44,7 +44,7 @@ long double simY(long double x, long double y, long double z) {
 }
 
 long double simZ(long double x, long double y, long double z) {
-	const long double b = 8l/3l;
+	const long double b = 8.0/3.0;
 	return x*y - b*z;
 }
 
@@ -95,32 +95,32 @@ HyperSpace hyperSpaceSimulateRK4(HyperSpace *h) {
 // Dormand-Prince method
 HyperSpace hyperSpaceSimulateDP(HyperSpace *h) {
 	HyperSpace n = *h;
+	long double *const v[] = { &n.x, &n.y, &n.z };
 	long double dt = 0.01;
 	for (long double t = 0; t < h->T; t += dt) {
-		long double v[] = { n.x, n.y, n.z };
 		long double (*f[])(long double, long double, long double) = { simX, simY, simZ };
-		long double k[7][3]; // k1-7 for x,y,z
+		long double k[7][3] = {}; // k1-7 for x,y,z
 		const long double c[7][7] = {
-			{1l/5l},
-			{3l/4l, 9l/4l},
-			{44l/45l, -56l/15l, 32l/9l},
-			{19372l/6561l, -25360l/2187l, 64448l/6561l, -212l/729l},
-			{9017l/3168l, -355l/33l, -46732l/5247l, 49l/176l, -5103l/18656l},
-			{35l/384l, 0, 500l/1113l, 125l/192l, -2187l/6784l, 11l/84l}
+			{ 1.0/5.0 },
+			{ 3.0/40.0, 9.0/40.0 },
+			{ 44.0/45.0, -56.0/15.0, 32.0/9.0 },
+			{ 19372.0/6561.0, -25360.0/2187.0, 64448.0/6561.0, -212.0/729.0 },
+			{ 9017.0/3168.0, -355.0/33.0, -46732.0/5247.0, 49.0/176.0, -5103.0/18656.0 },
+			{ 35.0/384.0, 0, 500.0/1113.0, 125.0/192.0, -2187.0/6784.0, 11.0/84.0 }
 		};
 		for (int i = 0; i < 7; i++) {
 			for (int j = 0; j < 3; j++) {
 				long double o = 0;
-				for (int a = 0; a < i; a++) {
+				for (int a = 0; a < i+1; a++) {
 					o += c[i][a]*k[a][j];
 				}
-				k[i][j] = f[j](v[0]+o, v[1]+o, v[2]+o);
+				k[i][j] = dt*f[j](*v[0]+o, *v[1]+o, *v[2]+o);
 			}
 		}
 		// Order 4 & 5 step calculation constants
 		const long double sc[2][7] = {
-			{ 35l/384l, 0, 500l/1113l, 125l/192l, -2187l/6784l, 11l/84l },
-			{ 5179l/57600l, 0, 7571l/16695l, 393l/640l, -92097l/339200l, 187l/2100l, 1l/40l }
+			{ 35.0/384.0, 0, 500.0/1113.0, 125.0/192.0, -2187.0/6784.0, 11.0/84.0 },
+			{ 5179.0/57600.0, 0, 7571.0/16695.0, 393.0/640.0, -92097.0/339200.0, 187.0/2100.0, 1.0/40.0 }
 		};
 		long double sv[2][3]; // step values (this, and next for x,y,z)
 		for (int i = 0; i < 2; i++) {
@@ -129,23 +129,24 @@ HyperSpace hyperSpaceSimulateDP(HyperSpace *h) {
 				for (int a = 0; a < 7; a++) {
 					o += sc[i][a]*k[a][j];
 				}
-				sv[i][j] = v[j] + o;
+				sv[i][j] = *v[j] + o;
 			}
 		}
 		// Calculate difference and error
 		long double d[3];
 		for (int i = 0; i < 3; i++) {
-			d[i] = fabsl(sv[0][i] - sv[0][i]);
+			d[i] = fabsl(sv[1][i] - sv[0][i]);
 		}
 		// Calculate optimum time difference
-		long double s[3];
+		long double s = 0;
 		for (int i = 0; i < 3; i++) {
-			s[i] = powl(0.000001l*0.1l/(2*d[i]), 1l/5l);
+			s += powl(0.000001*dt/(2*d[i]), 1.0/5.0);
 		}
-		dt = (s[0]+s[1]+s[2])/3*dt;
-		n.x = sv[0][0];
-		n.y = sv[0][1];
-		n.z = sv[0][2];
+		// dt *= s/3.0;
+		for (int i = 0; i < 3; i++) {
+			*v[i] = sv[0][i];
+		}
+		printf("x: %Lf, y: %Lf, z: %Lf, t: %Lf, dt: %Lf\n", n.x, n.y, n.z, t, dt);
 	}
 	return n;
 }
@@ -299,7 +300,9 @@ int main(int argc, char *argv[]) {
 			if ((i + 1) < argc) {
 				i++;
 				if (strcmp(argv[i], "dp") == 0) {
-					Config.simulate = hyperSpaceSimulateDP;
+					printf("Dormand-Prince is currently unimplemented.\n");
+					usage();
+					// Config.simulate = hyperSpaceSimulateDP;
 				} else if (strcmp(argv[i], "rk4") == 0) {
 					Config.simulate = hyperSpaceSimulateRK4;
 				} else if (strcmp(argv[i], "euler") == 0) {
@@ -353,8 +356,8 @@ int main(int argc, char *argv[]) {
 		} else if (strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "--help") == 0) {
 			printf(
 				"[-s|--simulate algorithm(dp|rk4|euler)]\n"
-				"    Simulate system using forward euler, the more accurate RK4 algorithm,\n"
-				"        or the even more accurate Dormand-Prince.\n"
+				"    Simulate system using forward euler, the more accurate (but slower) \n"
+				"        RK4 algorithm, or the even more accurate (but slowest) Dormand-Prince.\n"
 				"[-r|--random function(pcg|crand)]\n"
 				"    Select a source of randomness.\n"
 				"    PCG random (default) is the best avaliable pseudo-random number generator,\n"
@@ -379,11 +382,4 @@ int main(int argc, char *argv[]) {
 		resultPprint(&t[i]);
 	}
 	free(t);
-	// HyperSpace h = hyperSpaceFromBits(0x8FED66B63E53DE);
-	// Config.simulate = hyperSpaceSimulateForwardEuler;
-	// printf("cost: %Lf\n", hyperSpaceCost(&h));
-	// Config.simulate = hyperSpaceSimulateRK4;
-	// printf("cost: %Lf\n", hyperSpaceCost(&h));
-	// Config.simulate = hyperSpaceSimulateDP;
-	// printf("cost: %Lf\n", hyperSpaceCost(&h));
 }
