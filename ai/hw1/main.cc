@@ -2,6 +2,9 @@
 #include <random>
 #include <iostream>
 
+// Winders is stupid
+typedef unsigned long long int uint64_t;
+
 namespace {
 long double simX(long double x, long double y, long double z) {
 	const long double o = 10;
