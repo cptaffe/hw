@@ -316,7 +316,7 @@ int main(int argc, char *argv[]) {
 		}
 	}
 
-	printf("Running with %d %s.\n", Config.threads, (Config.threads > 1) ? "threads" : "thread");
+	fprintf(stderr, "Running with %d %s.\n", Config.threads, (Config.threads > 1) ? "threads" : "thread");
 	Result *t = search();
 	qsort(t, Config.restarts, sizeof(Result), comp);
 	for (int i = 0; i < Config.restarts; i++) {
