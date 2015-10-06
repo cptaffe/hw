@@ -4,7 +4,7 @@
      xmlns="http://www.w3.org/2000/svg" 
      xmlns:xlink="http://www.w3.org/1999/xlink">
 <rect x="0.00" y="0.00" width="800.00" height="800.00" fill="beige" />
-<circle cx="5.00" cy="5.00" r="2.00" />
-<circle cx="795.00" cy="8.87" r="2.00" />
-<circle cx="400.00" cy="265.30" r="2.00" />
+<circle cx="795.00" cy="5.00" r="2.00" />
+<circle cx="5.00" cy="16.24" r="2.00" />
+<circle cx="400.00" cy="274.36" r="2.00" />
 </svg>

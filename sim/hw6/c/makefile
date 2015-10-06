@@ -1,9 +1,11 @@
 
-CFLAGS=--std=c89 -Wall -Wextra -Wpedantic -Wno-long-long -g
+CFLAGS=--std=c89 -Wall -Wextra -Wpedantic -Wno-long-long -Os
 
 .PHONY: clean
 
-main: main.c mt19937ar.c
+main: main.c
+
+main.c: mt19937ar.c
 
 clean:
 	$(RM) main

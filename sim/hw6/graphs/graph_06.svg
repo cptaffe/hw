@@ -5,9 +5,9 @@
      xmlns:xlink="http://www.w3.org/1999/xlink">
 <rect x="0.00" y="0.00" width="800.00" height="800.00" fill="beige" />
 <circle cx="5.00" cy="5.00" r="2.00" />
-<circle cx="795.00" cy="14.83" r="2.00" />
-<circle cx="321.00" cy="221.22" r="2.00" />
-<circle cx="479.00" cy="223.37" r="2.00" />
-<circle cx="637.00" cy="231.78" r="2.00" />
-<circle cx="163.00" cy="232.70" r="2.00" />
+<circle cx="795.00" cy="18.18" r="2.00" />
+<circle cx="321.00" cy="214.24" r="2.00" />
+<circle cx="479.00" cy="217.05" r="2.00" />
+<circle cx="637.00" cy="226.22" r="2.00" />
+<circle cx="163.00" cy="235.28" r="2.00" />
 </svg>
