@@ -1,0 +1,57 @@
+\documentclass{memoir}
+
+\usepackage{enumerate}
+\usepackage{soul}
+
+\title{
+A Reflective Memo on Instructions
+\\\vspace{2mm}
+\large
+A Technical Writing Assignment
+}
+\author{Connor Taffe}
+
+\begin{document}
+	\maketitle
+
+	\emph{Note:} underlines and footnotes denote techniques from Chapter 10.\vspace{2mm}
+
+This assignment was illustrative of the orderly, though out nature of instructional documents. The knowledge gained can be most easily split into two categories: a description of the knowledge itself, and the future uses and implications of said knowledge.
+
+\section{Knowledge}
+
+This project provided a good proving ground for the practices we have learned so far in technical writing. Easy to read, concise instructions performed better in usability tests, therefore, almost as if by natural selection, improving instructions and showing which tactics were most effective.
+
+\section{Future implications}
+
+In computer science, escpecially the portion that is writing programs, there is a small portion of time dedicated to an extremely important task: documentation. Documentation can take several forms: comments in source code, UNIX manual pages, or ``README'' documents in source repositories.
+
+\begin{itemize}
+	\item{
+		\emph{Source code comments give meaning to code.} Source code can be difficult to decipher, especially in large collaborative projects that require a bit of background reading. \ul{In these types of environments, it is important that a developer can come upon a piece of code he has never touched and know what it does almost instantaneously.}\footnote{
+			This sentence emphasized new information by placing it at the end of the sentence.
+		}
+		This is the purpose of source code comments. \ul{Source code comments outline the purpose of code.}\footnote{
+			This sentence focused on the ``real'' verb \emph{outline}.
+		}
+		They must be concise, simple, short, and thusly easy to read.
+	}
+	\item{
+		\emph{\ul{Manual pages give descriptions of programs.}\footnote{
+			This sentense uses parallel structure. \emph{Something gives something} has been the structure of each leading sentence in the list.
+		}} Programs in UNIX/Linux do not inherently have any user interface besides a blinking cursor on a black screen (nongraphical, I mean). \ul{Thusly, it is important that there be manual pages a user can read to learn the options and usage of a program.}\footnote{
+			This sentence is specific by using ``user,'' ``manual pages,'' and ``program.'' It does not use less specific general terms like ``informational material'' or ``human.''
+		}
+		Writing manual pages requires consice writing and simple explanation. Like instructions, they must convey the operations a user must perform in order for some goal to be achieved.
+	}
+	\item{
+		\emph{``README'' documents give directions to developers.} ``README'' documents are historically meant to be read before mucking around in a source directory. They give instructions on compiling code, making changes and sometimes contributing back those changes. Developers must be attentive to these files as they will instruct all those who visit this folder afterwards.
+	}
+\end{itemize}
+
+In conclusion, it is easy to see that writing instructional material for others is a useful and valued skill in Computer Science. It is a most important part of conveying knowledge from one party to another. In an efficient company, no time can be wasted relearning or debugging what should have already been documented.
+
+\vspace{5mm}
+--- Connor Taffe
+
+\end{document}
