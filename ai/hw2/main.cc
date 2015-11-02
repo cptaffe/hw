@@ -3,42 +3,11 @@
 #include <iostream>
 #include <fstream>
 #include <memory>
+#include <map>
 
 using namespace std;
 
 namespace aihw2 {
-
-// Inverse graph,
-// Directed connections are stored as references
-// to parents instead of children.
-class Node {
-public:
-  Node(string n) : _name(n) {}
-  void addParent(shared_ptr<Node> p) {
-    parents.push_back(p);
-  }
-  string name() const { return _name; }
-  long double value() const { return _value; }
-  void set_value(long double val) { _value = val; }
-private:
-  string _name;
-  long double _value = 0;
-  vector<shared_ptr<Node>> parents;
-};
-
-ostream& operator<<(ostream& os, const Node& node) {
-  os << "node(" << node.name() << "): " << node.value();
-  return os;
-}
-
-class Network {
-public:
-  void addNode(shared_ptr<Node> n) {
-    nodes.push_back(n);
-  }
-private:
-  vector<shared_ptr<Node>> nodes;
-};
 
 class Homework {
 public:
@@ -49,36 +18,72 @@ public:
       return;
     }
     auto input = ifstream(args[1]);
-    auto gn = shared_ptr<Node>(new Node("G")),
-      hn = shared_ptr<Node>(new Node("H")),
-      tn = shared_ptr<Node>(new Node("T")),
-      mn = shared_ptr<Node>(new Node("M")),
-      pn = shared_ptr<Node>(new Node("P")),
-      cn = shared_ptr<Node>(new Node("C"));
-    cn->addParent(gn);
-    cn->addParent(pn);
-    cn->addParent(mn);
-    pn->addParent(hn);
-    pn->addParent(tn);
-    vector<shared_ptr<Node>> vec = { gn, hn, tn, mn, pn, cn };
+    vector<int> vec; // g,h,t,m,p,c
 
     int lines;
     for (lines = 0; !input.eof(); lines++) {
-      for (auto i = 0; i < vec.size(); i++) {
+      int entry = 0;
+      char l[100];
+      input.getline(l, 100);
+      for (auto i = 0; i < 6; i++) {
+        char c = l[(i*2)];
         int j;
-        input >> j;
-        vec[i]->set_value(vec[i]->value() + j);
+        if (c == '1') j = 1;
+        if (c == '0') j = 0;
+        entry |= j << (5-i);
+      }
+      vec.push_back(entry);
+    }
+
+    vector<long double> c(8);
+    vector<int> cc(8);
+    vector<long double> p(4);
+    vector<int> cp(8);
+    vector<int> all(6);
+    vector<int> call(6);
+    for (auto n : vec) {
+      for (int i = 0; i < 6; i++) {
+        all[i] += (n & (1 << i)) >> i;
+        call[i]++;
+        int j, val;
+        // j is c's parents
+        j = ((n & (1 << 5)) >> 5) << 2 | ((n & (1 << 2)) >> 2) << 1 | ((n & (1 << 1)) >> 1);
+        val = n & 1;
+        c[j] += val;
+        cc[j]++;
+        // j is p's parents
+        j = ((n & (1 << 4)) >> 4) << 1 | ((n & (1 << 3)) >> 3);
+        val = (n & (1 << 1)) >> 1;
+        p[j] += val;
+        cp[j]++;
       }
     }
-    for (n : vec) {
-      n->set_value(n->value()/lines);
-    }
-    cout << "Got the following values" << endl;
-    for (n : vec) cout << *n << endl;
+    for (int i = 0; i < c.size(); i++) c[i]/=cc[i];
+    for (int i = 0; i < p.size(); i++) p[i]/=cp[i];
 
-    // Create Network.
-    auto net = new Network();
-    for (n : vec) net->addNode(n);
+    // Proportion true on each
+    for (int i = 0; i < 6; i++) {
+      all[i] /= call[i];
+    }
+
+    long double sum = 0;
+    for (int m = 0; m < 2; m++) {
+      for (int g = 0; g < 2; g++) {
+        for (int t = 0; t < 2; t++) {
+          for (int pn = 0; pn < 2; pn++) {
+            int h = 1;
+            long double pm = m ? all[2] : 1-all[2],
+              pg = g ? all[5] : 1-all[5],
+              pt = t ? all[3] : 1-all[3],
+              pp = pn ? all[1] : 1-all[1],
+              pc = c[g << 2 | m << 1 | pn],
+              ppp = p[h << 1 | t];
+            sum += pm*pg*pt*pp*pc*ppp;
+          }
+        }
+      }
+    }
+    cout << "sum: " << sum << endl;
   }
 };
 
