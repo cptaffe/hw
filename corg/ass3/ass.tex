@@ -31,193 +31,34 @@
 \maketitle
 
 \begin{enumerate}
-\item{
-	{\bf Question:}
+\item {
+	To test the circuits, we will assure that the $Q$ only changes when $G$
+	is 1 and $D$ is changed. $Q$ should reflect the value of $D$ while $G$
+	is on, and then lock when $Q$ is 0. $G$ should serve as the {\it latch}
+	in the D latch circuit.
 
-	Construct and package D Flip-flop (call it {\tt D-FF}) and D Latch
-	(call it {\tt Dlatch}).
-	Compare the functions of your {\tt D-FF} and D-latch using the following
-	circuit\footnote{
-		Question related diagrams and graphics have been omitted. \label{qfoot}
-	}.
-	Show your test circuit and a wave form that demonstrates that
-	\begin{enumerate}[(a)]
-		\item{
-			{\tt D-FF} changes its value {\tt Q(FF)} from 0 to 1 and 1 to 0 at
-			rising edges of $D$,
-		}\item{
-			D-latch changes its values {\tt Q(Latch)} from 0 to 1 and 1 to 0
-			(following $D$) when $G = 1$.
-		}
-	\end{enumerate}
-	You need to annotate on the wave form for the changes above.
-
-	{\bf Answer:}
-
-
-
-	Insert Answer here
+	The D flip flop is edge triggered rather than level triggered as the
+	D latch is. This means that the D flip flop should only change on rising
+	edges of $G$. $Q$ only reflects $D$ if it is at the rising edge of $G$,
+	otherwise it is locked.
 }
-
+\item{}
 \item{
-	{\bf Question:}
+	Each row of output $D$ bits is the input $Q$ bits of the last state
+	plus 1. The sum of minterms obtained from the Karnaugh maps of each of
+	the four $D$s are as follows:
 
-	Build and package a 4-bit register (call it {\tt Reg-4}).
-	Test your 4-bit register using the following
-	circuit\footnote{See footnote \ref{qfoot}}.
-	Show your simulation to demonstrate that your register can transfer its
-	data to another one at the same time it receives new data.
-
-	You need to build and package a quadruple 2-to-1 multiplexer without
-	enable control first.
-	Name it as {\tt 4mux-2} with the corresponding pin names in the circuit.
-
-	Show your test circuit and a wave form to demonstrate that
-	registers A, B and C store and rotate
-	hex B, 6 and A at each rising edges of {\tt CLK}.
-	You need to annotate on the wave form for the changes of registers.
-
-	{\bf Answer:}
-
-	Insert Answer here
-}
-
-\item{
-	{\bf Question:}
-
-	Design and implement a 4-bit up counter (call it {\tt UCT4}) as a
-	finite-state machine using D flip-flops following the steps as follows:
-	\begin{enumerate}[(a)]
-		\item {
-			Draw the truth tables for $D_3$, $D_2$, $D_1$, $D_0$ of the flip-flops in terms of
-			$Q_3$, $Q_2$, $Q_1$, $Q_0$ of the previous cycle.
-		} \item {
-			Use Karnaugh map to find the simplest sum-of-product equations for
-			$D_3$, $D_2$, $D_1$, $D_0$.
-		} \item {
-			Implement the counter using the equations obtained and show the internal
-			circuit of the counter.
-		} \item {
-			Build a circuit to test your {\tt UCT4}. Show the test circuit and a wave form to
-			demonstrate that
-		}
-	\end{enumerate}
-	\begin{enumerate}[i.]
-		\item {
-			The counter {\tt UCT-4} can increase the counter output from hex 0 to F and
-			goes back to 0 after F.
-		} \item {
-			The $Q_3$, $Q_2$, $Q_1$ and $Q_0$ changes values at the same time
-			when the output changes from F to 0.
-		}
-	\end{enumerate}
-
-	You need to annotate on the wave form for the two points above.
-
-	{\bf Answer:}
-
-	Insert Answer here
-}
-
-\item{
-	{\bf Question:}
-
-	Design and implement a 4-bit up counter with parallel load
-	(call it {\tt UCT4-LD}) based on the up-counter of finite-state
-	machine you built above with the following pins:
-	\begin{itemize}
-		\item {
-			{\tt CLR} for the active-low clear to set the counter to all 0.
-		} \item {
-			$G$ for the input to change the counter value at the rising edge of clock cycle
-		} \item {
-			$D_{3−0}$ for the parallel load data input 1
-		} \item {
-			{\tt LD} to control the parallel data load.
-			When $\text{\tt LD} = 1$, the counter receives the parallel
-			data from $D_{3−0}$ at the rising edge of $G$.
-			When $\text{\tt LD} = 0$, the counter value is incremented
-			at the rising edge of $G$.
-		} \item {
-			$Q_{3−0}$ to output the 4-bit value of the counter
-		}
-	\end{itemize}
-
-	You need to use the quadruple 2-to-1 multiplexer you built in lab 4.
-	\begin{enumerate}[(a)]
-		\item {
-			Build the {\tt UCT4-LD} and show the internal circuit of the counter.
-		} \item {
-			Build a circuit to test your {\tt UCT4-LD}.
-			Show the test circuit and a wave form to demonstrate that
-			\begin{enumerate}[i.]
-				\item {
-					The counter {\tt UCT4-LD} can increase the counter output from hex
-					0 to 5, then load hex A to the counter, and then switch to the counting
-					mode to count from A to F and then to 0.
-				}
-			\end{enumerate}
-		}
-	\end{enumerate}
-
-	You need to annotate on the wave form for the time of each change.
-
-	{\bf Answer:}
-
-	Insert Answer here
-}
-
-\item{
-	{\bf Question:}
-
-	Build and package a 16x8 RAM memory array called {\tt RAM16x8}
-	using D-latches and package.
-	Show the internal circuit of your {\tt RAM16x8}. (Use the reduced size).
-
-	{\bf Answer:}
-
-	Insert Answer here
-}
-
-\item{
-	{\bf Question:}
-
-	Use the following test circuit\footnote{See footnote \ref{qfoot}} to test your 16x8 bi-directional memory system.
-
-	Show your test circuit and a wave form of test that writes hex 37 and A7 to
-	memory locations 7 and 8, respectively, and then reads locations 7 and 8.
-
-	You need to annotate on the wave form for the relevant times of these writings
-	and readings.
-
-	{\bf Answer:}
-
-	Insert Answer here
-}
-
-\item{
-	{\bf Question:}
-
-	Then remove all the input devices and replace them with input and bi-directional
-	pins and package and call it {\tt MyMemoryChip}.
-	\begin{enumerate}[(a)]
-		\item {
-			Show the internal circuit of {\tt MyMemoryChip}.
-		} \item {
-			Test your {\tt MyMemoryChip} with the following
-			circuit\footnote{See footnote \ref{qfoot}}.
-		}
-	\end{enumerate}
-
-	Show your test circuit and a wave form of the test that writes hex 8C and
-	6E to location 9 and A, respectively, and then reads locations 9 and A.
-
-	You need to annotate on the wave for the relevant times of the writings and
-	readings.
-
-	{\bf Answer:}
-
-	Insert Answer here
+	\[
+		D_{0}=Q_{0}'
+	\] \[
+		D_{1}=Q_{0}'Q_{1}+Q_{1}Q_{1}'
+	\] \[
+		D_{2}=Q_{3}'Q_{2}'Q_{1}Q_{0}+Q_{3}'Q_{2}Q_{1}'+Q_{3}'Q_{2}Q_{1}Q_{0}'
+			+Q_{3}Q_{2}Q_{1}Q_{0}+Q_{3}Q_{2}'Q_{1}'+Q_{3}Q_{2}'Q_{1}Q_{0}'
+	\] \[
+		D_{3}=Q_{3}Q_{2}+Q_{3}Q_{2}'Q_{1}'+Q_{3}Q_{2}'Q_{1}Q_{0}'
+			+Q_{3}'Q_{2}Q_{1}Q_{0}
+	\]
 }
 
 \end{enumerate}
