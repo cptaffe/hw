@@ -1,0 +1,176 @@
+
+% Copyright (c) 2014 Connor Taffe <cpaynetaffe@gmail.com>
+% licensed under the MIT license <opensource.org/licenses/MIT>
+
+% Imports, etc.
+
+\documentclass{resume} % Use the custom resume.cls style
+
+\usepackage[left=0.75in,top=0.6in,right=0.75in,bottom=0.6in]{geometry} % Document margins
+
+\usepackage{fontspec}
+\setmainfont{Liberation Serif}
+
+% add tabular command
+
+\newcommand{\btab}[2]{
+	\bgroup
+	\def\arraystretch{#1}
+	\begin{tabular}{#2}
+}
+
+\newcommand{\etab}{
+	\end{tabular} \smallskip
+	\egroup
+}
+
+\name{Connor Taffe} % Your name
+\address{(501) 606-1807 \\ cpaynetaffe@gmail.com \\
+byteflame.org} % Your phone number and email
+
+\begin{document}
+
+% Work Experience
+\begin{rSection}{Experience}
+
+% Acxiom ITO
+\begin{rSubsection}{Acxiom ITO}{October 2015, current}{Entry Application Developer}{Conway, AR}
+
+	\item Wrote and maintained software in C\# for the .NET platform.
+	\item Versioned software in Git and maintained repository via Enterprise Github.
+\end{rSubsection}
+
+% EIT IT
+\begin{rSubsection}{UALR EIT IT}{August - October 2015}{Student Worker}{Little Rock, AR}
+
+	\item Resolved technology related issues for staff and students.
+	\item Tracked issues in ticketing system.
+	\item Installed and Setup Microsoft Windows, including joining to Active Directory domain.
+\end{rSubsection}
+
+% SUPER Program
+\begin{rSubsection}{EIT SUPER, UALR}{Summer 2015}{SUPER Scholar}{Little Rock, AR}
+	\item Summer Undergraduate Program of Entrepreneurship and Research (SUPER).
+	\item Creation of an Android application, written in Scala, to interface with a vehicle's OBD-II system via Bluetooth transmitter.
+\end{rSubsection}
+
+% Emerging Analytics Center
+\begin{rSubsection}{Emerging Analytics Center (EAC), UALR}{October 2014 - May 2015}{Software Engineering Intern}{Little Rock, AR}
+	\item Presented at IEEE VR 2015 on the integration of Unity 3D, Qualcomm's Vuforia, and Intel's OpenCV to create interactive Augmented Reality (AR) applications.
+	\item Used Unity 3D (scripting with C\#) for 3D programming and model manipulation.
+\end{rSubsection}
+
+% Research Assistant
+\begin{rSubsection}{UALR Bioinformatics}{August - October 2014}{Research Assistant}{Little Rock, AR}
+
+	\item Preliminary work on refactoring a genetic algorithm codebase with an emphasis on common stylistic guidelines and concurrency.
+\end{rSubsection}
+
+% CentOS freelance
+\begin{rSubsection}{CentOS Server Wordpress Installation}{August 2014}{Freelance Developer}{}
+
+	\item Installed Wordpress on a pre-imaged CentOS server.
+	\item Set up a mysql database and edited Wordpress configs.
+\end{rSubsection}
+
+% % Mesher freelance
+% \begin{rSubsection}{\href{http://github.com/cptaffe/Mesher}{Mesher}}{July - August 2014}{Freelance Developer}{}
+%
+% 	\item Client side stl-editing application built atop THREE.js, a popular WebGL interface.
+% 	\item Provides a clean interface to many of the common operations done on STL models before 3D printing.
+% 	\item This application provides a interactable 3D interface for models generated from STL files.
+% 	\item Provides multiple modification and save options.
+% \end{rSubsection}
+
+% % Future Tek
+% \begin{rSubsection}{Future Tek Inc.}{June - August 2012}{Contract Graphic Designer}{Columbus, MS}
+%
+% 	\item Worked as a contract graphic designer to produce a new catalog, logo, and social media presence. All graphics were designed personally with Inkscape and Gimp.
+% 	\item This catalog is still in use (\href{http://www.futuretekinc.com/wp-content/uploads/2014/08/Future-Tek-Catalog.pdf}{link}).
+% \end{rSubsection}
+
+\end{rSection}
+
+% Education Section
+
+\begin{rSection}{Education}
+
+\begin{rSubsection}{University of Arkansas, Little Rock}{June 2018}{B.S. in Computer Science}
+
+	\item Substantail Completed Courses: Data Structures and Algorithms, Computer Systems and Assembly Language, Calculus II, Operating Systems, Databases, and Discrete Math.
+\end{rSubsection}
+
+\end{rSection}
+
+% sections wrapping pages looks junky
+\clearpage
+
+% Personal Projects
+\begin{rSection}{Personal Projects}
+
+% Lispy project
+\begin{rSubsection}{Lispy}{September - November 2014}{}{}
+
+	\item Lisp-like interpreter written in Python
+	\item Producer-consumer threading optimizes stages
+	\item Lazy-evaluation of defined variables
+	\item lambda functions and recursive lambdas
+	\item EBNF formal definition of the language
+\end{rSubsection}
+
+% utf8 project
+\begin{rSubsection}{utf8 / utf8plus}{February 2015 - Present}{}{}
+
+	\item utf8 parser written in C, and C++ wrapper.
+	\item RFC 3629 compliant.
+	\item Quick encoding/decoding of runes, rune validation, and string parsing.
+	\item Reports errors within the rune and codepoint (int32\_t) types using approprate non-valid values in C.
+	\item Use of the \verb!utf8::rune::exception! class to report errors in C++, or appropriate C++ standard exception.
+\end{rSubsection}
+
+% bf project
+\begin{rSubsection}{bf}{November 2014}{}{}
+
+	\item Optimizing BrainFuck just-in-time compiler
+	\item Emits x86\_64 instructions to executable mmap'd pages
+	\item Producer-Consumer concurrent architecture with a REPL interface
+\end{rSubsection}
+
+\end{rSection}
+
+% Technical Strengths
+
+\begin{rSection}{Technical Strengths}
+
+{\bf General Programming}
+
+\btab{1.1}{ l l }
+	Languages: &  C\#, C++, C, Go, Java, Scala, Python \\
+	Libraries: & Android SDK \\
+	Version Control Systems: & git \\
+	Build Systems: & Make, CMake, Gradle \\
+\etab
+
+{\bf Operating Systems}
+
+\btab{1.1}{ l l }
+	Android: & Familiarity with Android, the Android build toolchain, debugging, etc. \\
+	BSDs: & OpenBSD, FreeBSD, Dragonfly BSD, OS X \\
+	Linux: & CentOS, Debian, Ubuntu, Fedora, Red Hat Linux \\
+\etab
+
+{\bf Unix/Linux Systems}
+
+Longtime Linux user. Experienced with system utilities, system administration,
+userspace programming, and light kernel programming.
+
+{\bf Web Programming}
+
+\btab{1.1}{ l l }
+	Server side: & Python, Go, Php, SQL (MySQL, PostgreSQL) \\
+	Client side: & JavaScript (JQuery, THREE.js, etc.), CSS, (X)HTML \\
+\etab
+
+\end{rSection}
+
+\end{document}

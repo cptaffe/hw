@@ -34,7 +34,7 @@
 \item {
 	To test the circuits, we will assure that the $Q$ only changes when $G$
 	is 1 and $D$ is changed. $Q$ should reflect the value of $D$ while $G$
-	is on, and then lock when $Q$ is 0. $G$ should serve as the {\it latch}
+	is on (1), and then lock when $G$ is off (0). $G$ should serve as the {\it latch}
 	in the D latch circuit.
 
 	The D flip flop is edge triggered rather than level triggered as the
@@ -51,14 +51,46 @@
 	\[
 		D_{0}=Q_{0}'
 	\] \[
-		D_{1}=Q_{0}'Q_{1}+Q_{1}Q_{1}'
+		D_{1}=Q_{1}'Q_{0}+Q_{1}Q_{0}'
 	\] \[
-		D_{2}=Q_{3}'Q_{2}'Q_{1}Q_{0}+Q_{3}'Q_{2}Q_{1}'+Q_{3}'Q_{2}Q_{1}Q_{0}'
-			+Q_{3}Q_{2}Q_{1}Q_{0}+Q_{3}Q_{2}'Q_{1}'+Q_{3}Q_{2}'Q_{1}Q_{0}'
+		\begin{aligned}
+		D_{2}&=Q_{3}'Q_{2}'Q_{1}Q_{0}+Q_{3}'Q_{2}Q_{1}'+Q_{3}'Q_{2}Q_{1}Q_{0}'
+			+Q_{3}Q_{2}Q_{1}Q_{0}+Q_{3}Q_{2}'Q_{1}'+Q_{3}Q_{2}'Q_{1}Q_{0}' \\
+			& = Q_{3}'(Q_{2}'Q_{1}Q_{0}+Q_{2}Q_{1}'+Q_{2}Q_{1}Q_{0}')
+				+ Q_{3}(Q_{2}'Q_{1}Q_{0}+Q_{2}Q_{1}'+Q_{2}Q_{1}Q_{0}') \\
+			& = (Q_{3}'+Q_{3})(Q_{2}'Q_{1}Q_{0}+Q_{2}Q_{1}'+Q_{2}Q_{1}Q_{0}') \\
+			& = \top(Q_{2}'Q_{1}Q_{0}+Q_{2}Q_{1}'+Q_{2}Q_{1}Q_{0}') \\
+			& = Q_{2}'Q_{1}Q_{0}+Q_{2}Q_{1}'+Q_{2}Q_{1}Q_{0}' \\
+		\end{aligned}
 	\] \[
-		D_{3}=Q_{3}Q_{2}+Q_{3}Q_{2}'Q_{1}'+Q_{3}Q_{2}'Q_{1}Q_{0}'
+		D_{3}=Q_{3}Q_{2}'+Q_{3}Q_{2}Q_{1}'+Q_{3}Q_{2}Q_{1}Q_{0}'
 			+Q_{3}'Q_{2}Q_{1}Q_{0}
 	\]
+
+	Note I did some quick extra algebra to save myself some duplicate gates. As
+	the $Q_{3}$s factor out and become a tautology because a thing or it's inverse
+	must be true.
+
+	For the resulting circuit, I've built one with $G$ and $CLR$ inputs, and $D$
+	and $Q$ outputs, as per your instructions that they must be testable. The $D$
+	output in this circuit is unrelated to the $D$ inputs in the next question.
+
+	For each clock cycle you can see that on the rising edge of the input clock
+	$G$, the counter increments it's four bit internal state. The finite state
+	machine chugs along preserving its state in the D flip flop memory units. When
+	the previous state is hexadecimal F or 16, all the bits are used up and the
+	state returns to 0 as per the truth table I originally came up with the sum
+	of minterms specified with.
+}
+\item{
+	This version of the circuit adds a quadruple two to one muliplexer which
+	exposes a $LD$ switch to the circuit. When on, this switches the current state
+	from the calculated next state from the state machine logic, to one provided
+	by a user, allowing the counter to be ``set.''
+
+	Testing reaveals a fully
+	functioning implementation which can take a user provided number and count
+	from it, properly wrapping as it would with its own counter.
 }
 
 \end{enumerate}
