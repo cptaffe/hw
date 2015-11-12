@@ -1,0 +1,72 @@
+\documentclass{article}
+
+\usepackage{enumerate}
+
+% Header macro
+\def\AssignmentHeader#1#2#3{
+  \title{
+    % Assignment number
+    % Provided in A sub n notation an standard english
+    % using roman numerals.
+    $A_{#1}$ \\ {\large Assignment \uppercase\expandafter{\romannumeral #1}} \\
+    % Professor name and class.
+    {\normalsize Prof. #2; #3}
+  }
+  \author{Connor Taffe}
+}
+% Configuration information
+\AssignmentHeader{4}{P. Tang}{Computer Organization I}
+
+\begin{document}
+  \maketitle
+
+  \begin{enumerate}
+    % Describe the design, implementation and testing of the
+    % task (b) of lab 11 as follows:
+
+    % 1. Show the block diagram and function table of your ALU.
+    \item{}
+
+    % 2. Show the internal circuits of your ALU.
+    \item{}
+
+    % 3. Show the block diagram of your datapath and
+    % list all the control points.
+    \item{}
+
+    % 4. Show the circuit of you Datapath.
+    \item{}
+
+    % 5. Show the control points activation table and derive
+    % the Boolean equations of all control points.
+    \item{}
+
+    % 6. Show the internal circuit of your control unit.
+    \item{}
+
+    % 7. Testing your register transfer system under the
+    % control of clock as follows:
+    \item{
+      \begin{enumerate}[(a)]
+
+        % (a) Set the registers X, Y and Z to be hex 4, 1 and 7, respectively
+        \item{}
+
+        % (b) Show your testing circuit.
+        \item{}
+
+        % (c) Calculate the register value changes if we perform α, β, γ,
+        % δ, ǫ and θ operations at 6 consecutive rising edges of G.
+        \item{}
+
+        %(d) Show the waveform showing that the system performs α, β, γ,
+        % δ, ǫ and θ, at 6 consecutive rising edges of G to confirm that
+        % the system does make the register value changes as you calculated
+        % in 7(c). You need to annotate the waveform to show these 6 changes.
+        \item{}
+
+      \end{enumerate}
+    }
+  \end{enumerate}
+
+\end{document}
