@@ -92,6 +92,7 @@ int main() {
     {{ 2, 4, 0, 3, 2 }}
   }};
 
+  // Horse priors
   array<Prior, horsen> horses;
   horses.fill([=]()->Prior {
     Prior p;
@@ -99,31 +100,39 @@ int main() {
     return p;
   }());
 
+  // Horse probabilities
   array<double, horsen> horseProb;
   horseProb.fill(0);
 
+  // Horse names
   array<string, horsen> horseNames {{
-    "Sigaldry",
+    "DinklageLives",
     "Strider",
-    "Labor Day",
-    "Dinklage Lives",
-    "Thundercat"
+    "Thundercat",
+    "Sigaldry",
+    "LaborDay"
   }};
 
+  // Predict horse outcomes from Observed Races
   for (int i = 0; i < horses.size(); i++) {
     for (int j = 0; j < races.size(); j++) {
+      // Update horses prior for this race observation
+      // Predict->Refine
       horses[i] = Filterer::Instance()->Refine(Filterer::Instance()->Predict(horses[i], tm), om, races[i][j]);
     }
+    // Create Horse probabilities
     for (int k = 0; k < horses[i].size(); k++) {
       horseProb[i] += k*horses[i][k];
     }
   }
 
+  // Map double->string, for sorting
   map<double, string> prediction;
   for (int i = 0; i < horseProb.size(); i++) {
     prediction[horseProb[i]] = horseNames[i];
   }
 
+  // Print horse name : horse probabilities
   for (auto h : prediction) {
     cout << h.second << ":" << h.first << endl;
   }
