@@ -1,30 +1,57 @@
 \documentclass{letter}
 
-\usepackage{hyperref}
-\usepackage[backend=bibtex]{biblatex}
-\bibliography{bib.bib}
+\usepackage[hidelinks]{hyperref}
+% \hypersetup{
+%   colorlinks = true, %Colours links instead of ugly boxes
+%   urlcolor = blue, %Colour for external hyperlinks
+%   linkcolor = green, %Colour of internal links
+%   citecolor = red %Colour of citations
+% }
+\usepackage[british]{babel}
+\usepackage[backend=biber]{biblatex}
+\DeclareLanguageMapping{british}{british-apa}
+\addbibresource{bib.bib}
+\usepackage[acronym]{glossaries}
+\usepackage{csquotes}
 
 % Junk to fix letter being a bitch
 \usepackage{letterbib}
+\usepackage{sections}
+\usepackage{glosscompat}
+
+% Import glossary
+\include{glossary}
+\makeglossaries
 
 \signature{Connor Taffe}
 \address{ 243 Booker Dr. \\ Lonoke, Arkansas 72086 }
 
-
 \begin{document}
+
   \begin{letter}{
     Dept. Chair Prof. Dr. Yoshigoe \\
     UALR, College of EIT, Dept. of CS \\
     2801 S. University Ave \\
     Little Rock, Arkansas 72204
   }
-    \opening{Dear Sir,}
+    \opening{Dear Prof. Dr. Yoshigoe,}
 
     % Summary
     The use of Unix-like operating systems is a hallmark of a computer science program, as well as a vital skill required of computer science students in their careers. For both historical and modern reasons, much of the most influential education material on topics such as operating system design, compilers, and networking exists solely or superiorly for Unix-like operating systems. Some of the most prestigious universities such as Princeton, Stanford, M.I.T. \cite{MITLinux}, UC Berkeley, et al., and as a growing computer science college, we benefit from following in their footsteps. As well, many of our best professors and those we wish to entice learned and prefer Unix-like systems.
 
+    In this proposal I will establish an argument against the use of \gls{win}, and an argument for the use of Unix-like operating systems.
+
+    \section{Argument Against \gls{win}}
+
+    \gls{win} is a popular operating system originally designed for the Intel $x$86 series of \gls{cpu} \cite{WindowsMarketShare}. It's long history has lead from \gls{dos} to \gls{win} version 3 to the newest \gls{win} versions running the \gls{nt} kernel.
+
+    \subsection{Proprietary Nature}
+    \gls{win} is a proprietary operating system. This restricts a user's ability to understand to functioning of the underlying operating system because it is inherently illegal to investigate, e.g. use a debugger to dissassemle it. This is starkly contrast to the goal of an educational institution such as \gls{ualr}. See Richard Stallman's short story depicting a dystopian world where this mindset is carried to an extreme \cite{RightToRead}.
+
     % Introduction
-    The UALR Department of Computer Science teaches exclusively on the Windows platform. Educating using a proprietary and shrinking platform not only restricts the student's ability to understand the underlying operating system, but stunts his understanding of Unix-like systems he will likely have to work with in his career. Not only is the student disadvantaged, but he has been exposed to and taught that proprietary software is good. These teachings undermine the purpose of the university in computer science as well as the free software movement. This proposal will outline the history of Unix and its associated creations as well as Unix-like operating systems and the involvement of the free software movement, the growing market share that Linux posesses, and the moral highground that free software posseses. Following this, it will outline the changes needed to bring about a solely Unix-like OS based environment.
+    \section{Introduction}
+
+    The \gls{ualr} Department of Computer Science teaches exclusively on the Microsoft Windows platform. Educating using a proprietary and shrinking platform not only restricts the student's ability to understand the underlying operating system, but stunts his understanding of Unix-like systems he will likely have to work with in his career. Not only is the student disadvantaged, but he has been exposed to and taught that proprietary software is good. These teachings undermine the purpose of the university in computer science as well as the free software movement. This proposal will outline the history of Unix and its associated creations as well as Unix-like operating systems and the involvement of the free software movement, the growing market share that Linux posesses, and the moral highground that free software posseses. Following this, it will outline the changes needed to bring about a solely Unix-like OS based environment.
 
     As a Linux user and avid developer and programmer, I have installed and maintained many personal Linux, OpenBSD, and other Unix-like systems. I have also programmed in many languages and produced many small programs for Linux systems. I have experience in IT as well as professional development work. In this way, I have the expertise to estimate the cost of this proposal and the effort it would take to implement a Unix-like system.
 
@@ -44,6 +71,7 @@
 
   \end{letter}
 
+  \printglossaries
   \printbibliography
 
 \end{document}
