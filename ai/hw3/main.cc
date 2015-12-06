@@ -147,6 +147,25 @@ private:
 
 int main() {
   for (auto h : Homework().Do()) {
-    cout << h.Name() << ": " << h.Prob() << endl;
+  // Print predicted to std log,
+  // so redirection of std out will only output
+  // the required expected obsBuSF
+  clog << "Predicted:" << endl;
+  for (int i = 0; i < horses.size(); i++) {
+    clog << "Horse: " << horseNames[i] << endl;
+    for (int j = 0; j < horses[i].size(); j++) {
+      clog << j << ": " << horses[i][j] << endl;
+    }
+  }
+
+  // Map double->string, for sorting
+  map<double, string> prediction;
+  for (int i = 0; i < horseProb.size(); i++) {
+    prediction[horseProb[i]] = horseNames[i];
+  }
+  // Print horse name : horse probabilities
+  int i = horsen;
+  for (auto h : prediction) {
+    cout << i-- << " " << h.second << " " << h.first << endl;
   }
 }

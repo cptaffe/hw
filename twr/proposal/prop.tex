@@ -1,0 +1,96 @@
+\documentclass{letter}
+
+\usepackage[hidelinks]{hyperref}
+% \hypersetup{
+%   colorlinks = true, %Colours links instead of ugly boxes
+%   urlcolor = blue, %Colour for external hyperlinks
+%   linkcolor = green, %Colour of internal links
+%   citecolor = red %Colour of citations
+% }
+\usepackage[british]{babel}
+\usepackage[backend=biber]{biblatex}
+\DeclareLanguageMapping{british}{british-apa}
+\addbibresource{bib.bib}
+\usepackage[acronym]{glossaries}
+\usepackage{csquotes}
+
+% Junk to fix letter being a bitch
+\usepackage{letterbib}
+\usepackage{sections}
+\usepackage{glosscompat}
+
+% Import glossary
+\include{glossary}
+\makeglossaries
+
+\signature{Connor Taffe}
+\address{ 243 Booker Dr. \\ Lonoke, Arkansas 72086 }
+
+\begin{document}
+
+  \begin{letter}{
+    Dept. Chair Prof. Dr. Yoshigoe \\
+    UALR, College of EIT, Dept. of CS \\
+    2801 S. University Ave \\
+    Little Rock, Arkansas 72204
+  }
+    \opening{Dear Prof. Dr. Yoshigoe,}
+
+    % Summary
+    The use of Unix-like operating systems is a hallmark of a computer science program, as well as a vital skill required of computer science students in their careers. For both historical and modern reasons, much of the most influential education material on topics such as operating system design, compilers, and networking exists solely or superiorly for Unix-like operating systems. Some of the most prestigious universities such as Princeton, Stanford, M.I.T. \cite{MITLinux}, UC Berkeley, et al., and as a growing computer science college, we benefit from following in their footsteps. As well, many of our best professors and those we wish to entice learned and prefer Unix-like systems.
+
+    In this proposal I will establish an argument against the use of \gls{win}, and an argument for the use of Unix-like operating systems.
+
+    \section{Argument Against \gls{win}}
+
+    \gls{win} is a popular operating system originally designed for the Intel $x$86 series of \gls{cpu} \cite{WindowsMarketShare}. It's long history has lead from \gls{dos} to \gls{win} version 3 to the newest \gls{win} versions running the \gls{nt} kernel.
+
+    \subsection{Proprietary Nature}
+
+    \gls{win} is a proprietary operating system. This restricts a user's ability to understand to functioning of the underlying operating system because it is inherently illegal to investigate, e.g. use a debugger to dissassemle it. This is starkly contrast to the goal of an educational institution such as \gls{ualr}. See Richard Stallman's short story depicting a dystopian world where this mindset is carried to an extreme \cite{RightToRead}.
+
+    \subsubsection{Impact on Open Source Software}
+
+    The use of proprietary software such as Microsoft Windows in an educational setting supports the idea that proprietary software is the most superior option. It also reduces student exposure to \gls{foss} software.
+
+    \paragraph{Importance of \gls{foss} Contributions}
+
+    In a recent viewing of {\it Most Likely to Succeed}, I had the opportunity to listen to a former venture capitalist, Ted Dintersmith, speak about his views on education as part of his tour promoting the documentary \cite{TedDintersmith:HuffPost}. He noted that companies like Google don't care about degrees anymore, they just ``look at \gls{github}.'' These views are becoming more popular as hiring managers and companies look to open source contributions to identify candidates \cite{FOSSHire:PCWorld}.
+
+    \subsubsection{Open Source in Software Engineering}
+
+    As we can probably agree, the dysmal state of Software Engineering courses at \gls{ualr} do not give students the skills needed in the workplace. Modern methodologies like \gls{agile} \cite{Agile:Forbes} and modern tools like \gls{git} for \gls{scm} and \gls{github} for project hosting, are absent. In their place are the abandoned Waterfall methodology and ancient standards like UML.
+
+    In a recent conversation with Barret Bryant, Chair of the University of North Texas's Dept. of Computer Science, he noted that the future of Software Engineering is \glspl{dsl}. Meanwhile companies like Google \cite{Golang}, Mozilla \cite{Rustlang}, Microsoft \cite{NETFOSS:Microsoft}, and Apple \cite{SwiftFOSS:Apple} are investing in open sourcing new and existing general purpose languages. I believe this shows the existence of a serious rift or idiological difference between industry, students, and universities.
+
+    We can then assume that \gls{foss} software is increasingly playing a vital part of Software Engineering via software like \gls{git}, hosting platforms like \gls{github} (or Bitbucket), and Unix-like operating systems like Linux. The use of Windows and other proprietary software is creating a barrier for students intent to work in the modern tech industry (e.g. most of them).
+
+    % Introduction
+    \section{Introduction}
+
+    The \gls{ualr} Department of Computer Science teaches exclusively on the Microsoft Windows platform. Educating using a proprietary and shrinking platform not only restricts the student's ability to understand the underlying operating system, but stunts his understanding of Unix-like systems he will likely have to work with in his career. Not only is the student disadvantaged, but he has been exposed to and taught that proprietary software is good. These teachings undermine the purpose of the university in computer science as well as the free software movement. This proposal will outline the history of Unix and its associated creations as well as Unix-like operating systems and the involvement of the free software movement, the growing market share that Linux posesses, and the moral highground that free software posseses. Following this, it will outline the changes needed to bring about a solely Unix-like \gls{os} based environment.
+
+    As a Linux user and avid developer and programmer, I have installed and maintained many personal Linux, OpenBSD, and other Unix-like systems. I have also programmed in many languages and produced many small programs for Linux systems. I have experience in IT as well as professional development work. In this way, I have the expertise to estimate the cost of this proposal and the effort it would take to implement a Unix-like system.
+
+    \section{History of Unix-like \glspl{os}}
+
+    For many years Unix-like operating systems have dominated the computer science culture. From their inception at Bell Labs in 1969 and simultaneous creation of the C and C++ languages, Unix and Unix-like operating systems have been the standard at prominent computer science universities such as the famed University of California, Berkeley. It is so ingrained in the culture of these universities that several of the important freely avaliable versions of Unix, such as the Berkeley Software Distribution, Minix, and Linux arose from them.
+
+    The C and C++ languages arose from and are best at home on Unix-like systems. As are many newer languages like Rust from Mozilla \cite{Rustlang}, and Go from Google \cite{Golang} (both concurrent, practical languages). These companies put some effort into portability, but it is not crucial because the vast majority of users and programmers will be running it on Unix-like operating systems. By using Windows, the university is depriving students of the ability to experiment with the newest advancements in computer programming languages. For instance, knowledge that a language with bounds checking like Go could prevent buffer overflows could prevent another {\bf Heartbleed} vulnerability. What better way to learn about Tony Hoar's breakthrough paper on concurrency than to see it in action with Go? In that effect, what better way to learn about networking than to read the Linux kernel's source code and perhaps write a kernel module or use the new Berkeley Packet Filter API to filter packets to userspace programs.
+
+    The Unix-like operating systems have become increasingly prominent in computer science work in industry. For instance Apple's iOS and OS X run a proprietary version of an open source \gls{bsd} distribution known as ``Darwin,'' which itself is from another open source and widely used \gls{bsd} distribution known as ``FreeBSD,'' which descends from the original Unix through the original \gls{bsd}. Android, the popular mobile phone operating system, is based on Linux, a Unix-like operating system. Which was created based partially on Minix, a microkernel \gls{os} created for educational purposes to help convey pricipals of \gls{os} development espoused in its creator, Andrew S. Tanenbaum's, book \cite{Tanenbaum:2005:OSD:1076555} To the credit of that \gls{os}, it is now an open source operating system which attempts to be highly reliable and self healing. In newer versions having such interesting features as runtime replacement of daemons via \gls{llvm} bytecode. Another great use case is Linux itself, which runs in a variety of distributions (CentOS, Fedora, Red Hat, CoreOS, \ldots) on the vast majority, 79\%, of all servers. A figure that is growing according to the Linux Foundation.
+
+    The free software movement has worked for upwards of twenty years with help from heroes like Richard Stallman, \gls{gnu}, and the \gls{fsf}. Although their views may sometimes seem extreme, they have brought about a near utopia of free software. Recent advancements include the domination of Linux, open sourcing of .NET, open sourcing of the \gls{llvm} toolchain \cite{LLVMComp}, and open sourcing of Google's TensorFlow \cite{WiredTensorFlow}. All huge advancements for the user as well as the programmer.
+
+    These open source systems are fast becoming the standard. In fact, the .NET core by Microsoft was implemented using the open sourced \gls{llvm} compiler infrastructure, as was the Rust compiler. The Go compiler has a counterpart in the \gls{gcc} toolchain which uses that infrastructure.
+
+    Moving to a Unix-like operating system requires installing that operating system on all computers provided for student use. The vast majority of these are Linux thin client machines. This process is fairly trivial as the popular window server ``X'' is a server-client architecture which can be run from a central server, allowing all students to time share on the same system similar to the \gls{win} \gls{vm} system currently in use. The Linux server, which should be used as it is the most popular Unix-like operating system, could be installed on the central server.
+
+    \closing{Sincerely,}
+
+  \end{letter}
+
+  \printglossaries
+  \printbibliography
+
+\end{document}
