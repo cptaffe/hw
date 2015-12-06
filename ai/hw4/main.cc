@@ -8,50 +8,60 @@
 
 using namespace std;
 
-template <typename T, int dimensions>
 class Point {
 public:
-  Point(array<T, dimensions> a) : _arr(a) {}
-  T Dimension(int dim) const {
-    return _arr[dim];
+  Point(vector<long double> p)
+    : _point(p) {}
+  long double Distance(const Point &other) const {
+    long double p(0);
+    for (int i = 0; i < _point.size(); i++) {
+      p += pow(_point[i]-other._point[i], 2);
+    }
+    return sqrt(p);
   }
+  friend ostream &operator<<(ostream &os, const Point &p);
 private:
-  array<T, dimensions> _arr;
+  vector<long double> _point;
 };
 
-class Point3D {
-public:
-  Point3D(long double x, long double y, long double z)
-    : _point(array<long double, 3>{{ x, y, z }}) {}
-  long double X() const { return _point.Dimension(0); }
-  long double Y() const { return _point.Dimension(1); }
-  long double Z() const { return _point.Dimension(2); }
-  long double Distance(const Point3D &other) const {
-    return sqrt(pow(X()-other.X(), 2) + pow(Y()-other.Y(), 2) + pow(Z()-other.Z(), 2));
+ostream &operator<<(ostream &os, const Point &p) {
+  os << "[ ";
+  for (auto l : p._point) {
+    os << l << " ";
   }
-  friend ostream &operator<<(ostream &os, const Point3D &p);
-private:
-  Point<long double, 3> _point;
-};
-
-ostream &operator<<(ostream &os, const Point3D &p) {
-  os << "[ x: " << p.X() << ", y: " << p.Y() << ", z: " << p.Z() << " ]";
+  os << "]";
   return os;
 }
 
 class Label {
 public:
-  Label(bool d, Point3D p) : _label(d), _point(p) {}
-  Point3D point() const { return _point; }
+  Label(bool d, Point p) : _label(d), _point(p) {}
+  Point point() const { return _point; }
   bool label() const { return _label; }
   friend ostream &operator<<(ostream &os, const Label &l);
 private:
   bool _label;
-  Point3D _point;
+  Point _point;
 };
 
 ostream &operator<<(ostream &os, const Label &l) {
-  os << "[ label: " << l._label << " ]";
+  os << "[ label: " << l.label() << ", point: " << l.point() << " ]";
+  return os;
+}
+
+ostream &operator<<(ostream &os, const vector<Label> &labels) {
+  for (auto l : labels) {
+    os << l << " ";
+  }
+  return os;
+}
+
+ostream &operator<<(ostream &os, const vector<int> &labels) {
+  os << "[ ";
+  for (auto l : labels) {
+    os << l << " ";
+  }
+  os << "]";
   return os;
 }
 
@@ -59,16 +69,18 @@ class KNearestNeighbor {
 public:
   // Construct KNearestNeighbor with the testing dataset.
   KNearestNeighbor(int k, vector<Label> labels) : _labels(labels), _k(k) {}
-  bool ComputeLabel(const Point3D &p) {
+  long double ComputeLabel(const Point &p) {
     // Search labels for nearest n points.
     sort(_labels.begin(), _labels.end(), [&](Label a, Label b){
-      return p.Distance(a.point()) >= p.Distance(b.point());
+      return p.Distance(a.point()) < p.Distance(b.point());
     });
-    long double sum(0);
-    for (int i = 0; i < _k; i++) {
-      sum += _labels[i].label();
+    long double sum = 0;
+    vector<Label> fk(&_labels[0], &_labels[_k]);
+    for (auto l : fk) {
+      sum += l.label();
     }
-    return round(sum/_k);
+    cout << sum/_k << ": " << fk << endl;
+    return sum/_k;
   }
 private:
   vector<Label> _labels;
@@ -77,10 +89,10 @@ private:
 
 vector<Label> readDataSet(string lf, string xf, string yf, string zf) {
   vector<Label> data;
-  fstream trainL(lf, std::ios_base::in);
-  fstream trainX(xf, std::ios_base::in);
-  fstream trainY(yf, std::ios_base::in);
-  fstream trainZ(zf, std::ios_base::in);
+  fstream fileL(lf, std::ios_base::in);
+  fstream fileX(xf, std::ios_base::in);
+  fstream fileY(yf, std::ios_base::in);
+  fstream fileZ(zf, std::ios_base::in);
 
   vector<bool> labels;
   vector<long double> xs;
@@ -88,23 +100,23 @@ vector<Label> readDataSet(string lf, string xf, string yf, string zf) {
   vector<long double> zs;
 
   bool l;
-  while (trainL >> l) {
+  while (fileL >> l) {
     labels.push_back(l);
   }
 
   long double i;
-  while (trainX >> i) {
+  while (fileX >> i) {
     xs.push_back(i);
   }
-  while (trainY >> i) {
+  while (fileY >> i) {
     ys.push_back(i);
   }
-  while (trainZ >> i) {
+  while (fileZ >> i) {
     zs.push_back(i);
   }
 
   for (int j = 0; j < labels.size(); j++) {
-    data.push_back(Label(labels[j], Point3D(xs[j], ys[j], zs[j])));
+    data.push_back(Label(labels[j], Point(vector<long double>{xs[j], ys[j], zs[j]})));
   }
   return data;
 }
@@ -127,14 +139,14 @@ int main() {
   );
 
   // Test KNearestNeighbor with K [1, 20]
-  map<long double, int> score;
+  map<long double, vector<int>> score;
   for (int i = 1; i <= 20; i++) {
     KNearestNeighbor n(i, training);
     long double accuracy = 0;
     for (auto l : testing) {
-      accuracy += n.ComputeLabel(l.point()) == l.label();
+      accuracy += round(n.ComputeLabel(l.point())) == l.label();
     }
-    score[accuracy/testing.size()] = i;
+    score[accuracy/testing.size()].push_back(i);
   }
   for (auto s : score) {
     cout << get<0>(s) << ": " << get<1>(s) << endl;
