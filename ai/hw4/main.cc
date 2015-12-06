@@ -14,7 +14,7 @@ public:
     : _point(p) {}
   long double Distance(const Point &other) const {
     long double p(0);
-    for (int i = 0; i < _point.size(); i++) {
+    for (size_t i = 0; i < _point.size(); i++) {
       p += pow(_point[i]-other._point[i], 2);
     }
     return sqrt(p);
@@ -49,14 +49,14 @@ ostream &operator<<(ostream &os, const Label &l) {
   return os;
 }
 
-ostream &operator<<(ostream &os, const vector<Label> &labels) {
+static ostream &operator<<(ostream &os, const vector<Label> &labels) {
   for (auto l : labels) {
     os << l << " ";
   }
   return os;
 }
 
-ostream &operator<<(ostream &os, const vector<int> &labels) {
+static ostream &operator<<(ostream &os, const vector<size_t> &labels) {
   os << "[ ";
   for (auto l : labels) {
     os << l << " ";
@@ -68,7 +68,7 @@ ostream &operator<<(ostream &os, const vector<int> &labels) {
 class KNearestNeighbor {
 public:
   // Construct KNearestNeighbor with the testing dataset.
-  KNearestNeighbor(int k, vector<Label> labels) : _labels(labels), _k(k) {}
+  KNearestNeighbor(size_t k, vector<Label> labels) : _labels(labels), _k(k) {}
   long double ComputeLabel(const Point &p) {
     // Search labels for nearest n points.
     sort(_labels.begin(), _labels.end(), [&](Label a, Label b){
@@ -84,10 +84,10 @@ public:
   }
 private:
   vector<Label> _labels;
-  int _k;
+  size_t _k;
 };
 
-vector<Label> readDataSet(string lf, string xf, string yf, string zf) {
+static vector<Label> readDataSet(string lf, string xf, string yf, string zf) {
   vector<Label> data;
   fstream fileL(lf, std::ios_base::in);
   fstream fileX(xf, std::ios_base::in);
@@ -115,7 +115,7 @@ vector<Label> readDataSet(string lf, string xf, string yf, string zf) {
     zs.push_back(i);
   }
 
-  for (int j = 0; j < labels.size(); j++) {
+  for (size_t j = 0; j < labels.size(); j++) {
     data.push_back(Label(labels[j], Point(vector<long double>{xs[j], ys[j], zs[j]})));
   }
   return data;
@@ -139,12 +139,12 @@ int main() {
   );
 
   // Test KNearestNeighbor with K [1, 20]
-  map<long double, vector<int>> score;
-  for (int i = 1; i <= 20; i++) {
+  map<long double, vector<size_t>> score;
+  for (size_t i = 1; i <= 20; i++) {
     KNearestNeighbor n(i, training);
     long double accuracy = 0;
     for (auto l : testing) {
-      accuracy += round(n.ComputeLabel(l.point())) == l.label();
+      accuracy += static_cast<int>(round(n.ComputeLabel(l.point()))) == l.label();
     }
     score[accuracy/testing.size()].push_back(i);
   }
