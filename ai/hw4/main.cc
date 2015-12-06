@@ -58,7 +58,7 @@ ostream &operator<<(ostream &os, const Label &l) {
 class KNearestNeighbor {
 public:
   // Construct KNearestNeighbor with the testing dataset.
-  KNearestNeighbor(int k, vector<Label> labels) : _k(k), _labels(labels) {}
+  KNearestNeighbor(int k, vector<Label> labels) : _labels(labels), _k(k) {}
   bool ComputeLabel(const Point3D &p) {
     // Search labels for nearest n points.
     sort(_labels.begin(), _labels.end(), [&](Label a, Label b){
