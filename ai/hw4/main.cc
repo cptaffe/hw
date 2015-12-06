@@ -49,13 +49,6 @@ ostream &operator<<(ostream &os, const Label &l) {
   return os;
 }
 
-static ostream &operator<<(ostream &os, const vector<Label> &labels) {
-  for (auto l : labels) {
-    os << l << " ";
-  }
-  return os;
-}
-
 static ostream &operator<<(ostream &os, const vector<size_t> &labels) {
   os << "[ ";
   for (auto l : labels) {
@@ -71,15 +64,14 @@ public:
   KNearestNeighbor(size_t k, vector<Label> labels) : _labels(labels), _k(k) {}
   long double ComputeLabel(const Point &p) {
     // Search labels for nearest n points.
-    sort(_labels.begin(), _labels.end(), [&](Label a, Label b){
-      return p.Distance(a.point()) < p.Distance(b.point());
+    sort(_labels.begin(), _labels.end(), [&](Label &a, Label &b){
+      return p.Distance(a.point()) <= p.Distance(b.point());
     });
     long double sum = 0;
     vector<Label> fk(&_labels[0], &_labels[_k]);
     for (auto l : fk) {
       sum += l.label();
     }
-    cout << sum/_k << ": " << fk << endl;
     return sum/_k;
   }
 private:
