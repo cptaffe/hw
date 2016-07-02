@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<Foundry>
+<VM>
+<VMId type="string">52 34 55 09 d0 d0 6b 87-35 12 f8 95 a2 e8 bc 64</VMId>
+<ClientMetaData>
+<clientMetaDataAttributes/>
+<HistoryEventList/></ClientMetaData>
+<vmxPathName type="string">SEEDUbuntu12.04.vmx</vmxPathName></VM><tools-install-info><installError>0</installError><updateCounter>1</updateCounter></tools-install-info></Foundry>
