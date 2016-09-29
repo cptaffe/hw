@@ -1,0 +1,45 @@
+\documentclass[man, 11pt, a4paper, biblatex]{apa6}
+
+\usepackage[english]{babel}
+\usepackage[hidelinks]{hyperref}
+
+\DeclareLanguageMapping{english}{american-apa}
+\addbibresource{bib.bib}
+
+\title{Team 7: Project Proposal}
+\shorttitle{T. 7 Prj. Prop.}
+\author{Olivia Dunlap, John Haynes, Connor Taffe}
+\affiliation{University of Arkansas at Little Rock}
+
+\begin{document}
+  \maketitle
+
+  \section{Problem}
+
+  There are many contacts applications that are currently available for Android mobile devices. Most of these are feature-light, allowing the user to record only the most basic contact information about any given person, such as name, phone number, address, and email address. Other, more ambitious contacts apps, such as Contacts+ or FullContact (both available on the Google Play Marketplace), focus on the inclusion of features such as social media integration, customizable interfaces, or team management. All of these things are useful; however, for those that meet and interact with numerous people in many different settings or enjoy knowing more intricate details, what little organization exists in these various contacts apps is not enough.
+
+	With IntriContacts, we hope to change that. IntriContacts is a contacts application that, in addition to standard contacts functionality, features more in-depth bookkeeping for the purposes of having a more detailed and organized list of contacts. All of this information will be searchable as well as filterable so that the user can retrieve information such as which friends enjoy bowling, who watches a certain TV show, or who was met during that last business conference. Easy import from pre-existing contacts will help users of any experience level get started. IntriContacts will help to recall and record everything memorable about those around you.
+
+  \section{Approach}
+
+  IntriContacts will be targeted towards the android ecosystem and implemented through Android Studio.This project requires the implementation of a graphical user interface, an organized data entry/storage system, and robust searching and sorting functionality. Easy and seamless user navigation across the application will be vital to its usability. The home screen of the app will consist of dynamic user icons with multiple tabs to quickly be able to find any contact. The contact’s icon qill either consist of a photo and name, or, if no photo is available, more information will be displayed. The multiple home screen tabs will organize the contacts by name and date entered. The home screen will also have icons to access the search/filters and the settings. The filters/search menu will allow the user to search for different information and display the contacts that it applies to. It will also allow the user to navigate through their categories and select an entry to display all contacts sharing that entry. Both home screen tabs will have options in the settings to be organized by first/last name and either ascending or descending order. Clicking on a contact’s icon will bring up their information.
+
+  A contact’s information will be organized among several different tabs and stored via SQLite. In viewing a contact’s information, the settings icon persists while the search icon is replaced by an edit icon that, upon being selected, changes the user’s view so that they can add new information. The first tab of each contact will be a generic information page. This will assist in navigating native contact information. The next tab will contain more personal information about the contact such as their nickname, prefered color, pet information, and/or other miscellaneous specific information as desired by the user. Another tab will be dedicated to recording a person’s interests and hobbies. This tab will contain a list of editable data fields that, once selected, will display its applicable data as a list. This list view will have three different icons to add information in the following three different ways: manual entry, list addition, or message parsing. Manual entry will allow the user to add one item to that category. List addition will show a preview of all the past manual entries of that category across all contacts, sorted either alphabetically or by frequency of use, and will allow the user to select different entries to add. The last option for adding information to a category will open up a field to paste a copied message. This message will then analyzed for applicable nouns listed in short succession to extract and present to the user before adding them to the category’s list. The last tab features an open note to catch any missing details.
+
+  Some research and review over Android Studio will be needed to plan out the application design in more detail. In addition experimentation regarding SQLite as a database system for storage will be needed before moving forward. Further research will also be conducted in order to obtain a better understanding of the specific information that is most necessary for inclusion in the application.
+
+
+  \section{Milestones}
+
+  The milestones below are subject to change and may evolve into a more structured research or development effort as more information is gathered about each point in the high-level outline.
+
+  \begin{tabular}{l|p{4in}}
+    1 week & Research BCNF (\cite{bcnf}) representations for data making up contacts for storage in a database (\cite{sqlite}).\\
+    2 weeks & Implement basic views for contact input.\\
+    3 week & Expand views to include non-basic information.\\
+    3 week & Research and implement textual search.\\
+    2 weeks & Implement grouping of contacts by certain attributes.\\
+  \end{tabular}
+
+  \nocite{*}\printbibliography
+\end{document}
