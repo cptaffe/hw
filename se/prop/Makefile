@@ -5,6 +5,7 @@ all:
 	biber $(basename ${src}) # generate citations
 	xelatex ${src} # format citations
 	xelatex ${src} # page breaks
+	${RM} *.bbl *.blg *.bcf *.aux *.log *.out *.run.xml *.fff *.ttt
 
 clean:
-	${RM} *.bbl *.blg *.bcf *.aux *.log *.out *.run.xml
+	${RM} *.pdf
